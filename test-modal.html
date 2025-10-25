@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Modal System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Animations personnalisées */
+        @keyframes slideUp {
+            from {
+                transform: translateY(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-enter {
+            animation: slideUp 0.3s ease-out;
+        }
+
+        .modal-backdrop {
+            animation: fadeIn 0.2s ease-out;
+        }
+
+        /* Scrollbar personnalisée */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 3px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 3px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+
+        /* Responsive - Modal en bas sur mobile */
+        @media (max-width: 640px) {
+            .modal-content {
+                border-radius: 1.5rem 1.5rem 0 0;
+                max-height: 85vh !important;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-100 p-4 sm:p-8">
+    <div class="max-w-4xl mx-auto">
+        <h1 class="text-2xl sm:text-3xl font-bold mb-6 sm:mb-8">Test du système Modal SPA</h1>
+
+        <!-- Grid responsive avec feedback tactile -->
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 mb-6 sm:mb-8">
+            <button onclick="openAdminModal('users', event)"
+                    class="bg-blue-600 text-white px-3 sm:px-4 py-3 sm:py-2 rounded-lg hover:bg-blue-700 transition-all active:scale-95 text-sm sm:text-base"
+                    aria-label="Ouvrir la gestion des utilisateurs">
+                <span class="block sm:inline">👥</span> Utilisateurs
+            </button>
+            <button onclick="openAdminModal('articles', event)"
+                    class="bg-green-600 text-white px-3 sm:px-4 py-3 sm:py-2 rounded-lg hover:bg-green-700 transition-all active:scale-95 text-sm sm:text-base"
+                    aria-label="Ouvrir la gestion des articles">
+                <span class="block sm:inline">📰</span> Articles
+            </button>
+            <button onclick="openAdminModal('orders', event)"
+                    class="bg-purple-600 text-white px-3 sm:px-4 py-3 sm:py-2 rounded-lg hover:bg-purple-700 transition-all active:scale-95 text-sm sm:text-base"
+                    aria-label="Ouvrir la gestion des commandes">
+                <span class="block sm:inline">🧾</span> Commandes
+            </button>
+            <button onclick="openAdminModal('products', event)"
+                    class="bg-orange-600 text-white px-3 sm:px-4 py-3 sm:py-2 rounded-lg hover:bg-orange-700 transition-all active:scale-95 text-sm sm:text-base"
+                    aria-label="Ouvrir la gestion des produits">
+                <span class="block sm:inline">📦</span> Produits
+            </button>
+            <button onclick="openAdminModal('subscriptions', event)"
+                    class="bg-pink-600 text-white px-3 sm:px-4 py-3 sm:py-2 rounded-lg hover:bg-pink-700 transition-all active:scale-95 text-sm sm:text-base"
+                    aria-label="Ouvrir la gestion des abonnements">
+                <span class="block sm:inline">💳</span> Abonnements
+            </button>
+            <button onclick="openAdminModal('stats', event)"
+                    class="bg-indigo-600 text-white px-3 sm:px-4 py-3 sm:py-2 rounded-lg hover:bg-indigo-700 transition-all active:scale-95 text-sm sm:text-base"
+                    aria-label="Ouvrir les statistiques">
+                <span class="block sm:inline">📊</span> Stats
+            </button>
+            <button onclick="openAdminModal('messages', event)"
+                    class="bg-yellow-600 text-white px-3 sm:px-4 py-3 sm:py-2 rounded-lg hover:bg-yellow-700 transition-all active:scale-95 text-sm sm:text-base"
+                    aria-label="Ouvrir les messages">
+                <span class="block sm:inline">✉️</span> Messages
+            </button>
+            <button onclick="openAdminModal('settings', event)"
+                    class="bg-gray-600 text-white px-3 sm:px-4 py-3 sm:py-2 rounded-lg hover:bg-gray-700 transition-all active:scale-95 text-sm sm:text-base"
+                    aria-label="Ouvrir les paramètres">
+                <span class="block sm:inline">⚙️</span> Paramètres
+            </button>
+        </div>
+
+        <div class="bg-white p-4 rounded-lg shadow">
+            <h2 class="text-lg sm:text-xl font-bold mb-4">Console de débogage</h2>
+            <div id="debug-console" class="bg-gray-100 p-3 sm:p-4 rounded text-xs sm:text-sm font-mono max-h-48 sm:max-h-64 overflow-y-auto custom-scrollbar"></div>
+            <button onclick="clearConsole()" class="mt-2 bg-gray-500 text-white px-3 py-1 rounded text-sm hover:bg-gray-600 transition-colors">Effacer</button>
+        </div>
+    </div>
+
+    <!-- Admin Modal SPA System - Responsive avec ARIA -->
+    <div id="admin-modal"
+         class="modal-backdrop fixed inset-0 bg-black bg-opacity-50 hidden items-end sm:items-center justify-center z-50 p-0 sm:p-4"
+         role="dialog"
+         aria-modal="true"
+         aria-labelledby="admin-modal-title">
+        <div class="modal-content bg-white rounded-t-2xl sm:rounded-2xl w-full sm:max-w-6xl max-h-[85vh] sm:max-h-[90vh] overflow-hidden shadow-2xl transform transition-all duration-200">
+            <!-- Modal Header - Sticky avec accessibilité -->
+            <div class="bg-gradient-to-r from-blue-600 to-indigo-600 text-white p-3 sm:p-4 flex items-center justify-between sticky top-0 z-10">
+                <div class="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
+                    <span id="admin-modal-icon" class="text-xl sm:text-2xl flex-shrink-0" aria-hidden="true">📊</span>
+                    <h3 id="admin-modal-title" class="text-base sm:text-lg font-bold truncate">Chargement...</h3>
+                </div>
+                <button onclick="closeAdminModal()"
+                        class="text-white hover:text-gray-200 text-2xl sm:text-3xl font-bold transition-colors ml-2 flex-shrink-0 w-8 h-8 flex items-center justify-center"
+                        aria-label="Fermer le modal">
+                    ×
+                </button>
+            </div>
+
+            <!-- Modal Content - Responsive avec scroll -->
+            <div id="admin-modal-content"
+                 class="p-4 sm:p-6 overflow-y-auto custom-scrollbar"
+                 style="max-height: calc(85vh - 56px);">
+                <!-- Content will be loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Cache pour stocker les contenus déjà chargés
+        const contentCache = {};
+
+        // Détection du type d'appareil
+        function isMobileDevice() {
+            return window.innerWidth < 640;
+        }
+
+        function isTabletDevice() {
+            return window.innerWidth >= 640 && window.innerWidth < 1024;
+        }
+
+        // SPA Modal System for Admin Dashboard - Version améliorée
+        function openAdminModal(section, event) {
+            logToConsole('openAdminModal called with section:', section);
+
+            // Empêcher la navigation par défaut
+            if (event) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+
+            const modal = document.getElementById('admin-modal');
+            const modalTitle = document.getElementById('admin-modal-title');
+            const modalContent = document.getElementById('admin-modal-content');
+            const modalIcon = document.getElementById('admin-modal-icon');
+
+            logToConsole('Modal elements found:', { modal: !!modal, modalTitle: !!modalTitle, modalContent: !!modalContent, modalIcon: !!modalIcon });
+            logToConsole('Device type:', isMobileDevice() ? 'Mobile' : isTabletDevice() ? 'Tablet' : 'Desktop');
+
+            if (!modal || !modalTitle || !modalContent || !modalIcon) {
+                logToConsole('ERROR: Modal elements not found');
+                alert('Erreur: Éléments du modal non trouvés. Rechargez la page.');
+                return;
+            }
+
+            // Configuration des sections
+            const sections = {
+                'users': {
+                    title: '👥 Gestion des Utilisateurs',
+                    icon: '👥',
+                    url: '/admin/modal/users'
+                },
+                'orders': {
+                    title: '🧾 Gestion des Commandes',
+                    icon: '🧾',
+                    url: '/admin/modal/orders'
+                },
+                'articles': {
+                    title: '📰 Gestion des Articles',
+                    icon: '📰',
+                    url: '/admin/modal/articles'
+                },
+                'products': {
+                    title: '📦 Gestion des Produits',
+                    icon: '📦',
+                    url: '/admin/modal/products'
+                },
+                'subscriptions': {
+                    title: '💳 Gestion des Abonnements',
+                    icon: '💳',
+                    url: '/admin/modal/subscriptions'
+                },
+                'stats': {
+                    title: '📊 Statistiques',
+                    icon: '📊',
+                    url: '/admin/modal/stats'
+                },
+                'messages': {
+                    title: '✉️ Messages',
+                    icon: '✉️',
+                    url: '/admin/modal/messages'
+                },
+                'settings': {
+                    title: '⚙️ Paramètres',
+                    icon: '⚙️',
+                    url: '/admin/modal/settings'
+                }
+            };
+
+            const config = sections[section];
+            if (!config) {
+                logToConsole('ERROR: Section not found:', section);
+                alert('Erreur: Section non trouvée: ' + section);
+                return;
+            }
+
+            logToConsole('Config found:', config);
+
+            // Mettre à jour le titre et l'icône
+            modalTitle.textContent = config.title;
+            modalIcon.textContent = config.icon;
+
+            // Vérifier si le contenu est en cache
+            if (contentCache[section]) {
+                logToConsole('Loading from cache:', section);
+                modalContent.innerHTML = contentCache[section];
+
+                // Afficher le modal
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+                const modalContentDiv = modal.querySelector('.modal-content');
+                modalContentDiv.classList.add('modal-enter');
+                document.body.style.overflow = 'hidden';
+
+                // Désactiver le zoom sur mobile
+                if (isMobileDevice()) {
+                    disableMobileZoom();
+                }
+
+                adjustModalSize();
+                return;
+            }
+
+            // Afficher un loader responsive
+            const loaderSize = isMobileDevice() ? 'h-10 w-10' : 'h-12 w-12';
+            modalContent.innerHTML = `
+                <div class="flex flex-col items-center justify-center py-8 sm:py-12">
+                    <div class="animate-spin rounded-full ${loaderSize} border-b-2 border-blue-600"></div>
+                    <span class="ml-0 mt-3 text-gray-600 text-sm sm:text-base">Chargement...</span>
+                </div>
+            `;
+
+            // Afficher le modal avec animation
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            const modalContentDiv = modal.querySelector('.modal-content');
+            modalContentDiv.classList.add('modal-enter');
+            document.body.style.overflow = 'hidden';
+
+            // Désactiver le zoom sur mobile
+            if (isMobileDevice()) {
+                disableMobileZoom();
+            }
+
+            logToConsole('Modal displayed, fetching content from:', config.url);
+
+            // Charger le contenu via AJAX
+            fetch(config.url, {
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'
+                }
+            })
+            .then(response => {
+                logToConsole('Fetch response:', response);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.text();
+            })
+            .then(html => {
+                logToConsole('HTML received, length:', html.length);
+
+                // Le HTML reçu est déjà le contenu partiel, pas besoin de parsing complexe
+                let content = html.trim();
+
+                logToConsole('Content length after trim:', content.length);
+
+                if (!content) {
+                    content = '<div class="text-center py-8 text-gray-500 text-sm sm:text-base">Contenu non disponible</div>';
+                }
+
+                // Adapter le contenu selon l'appareil
+                const scale = isMobileDevice() ? 'scale-100' : isTabletDevice() ? 'scale-95' : 'scale-90';
+
+                // Injecter le contenu dans le modal avec wrapper responsive
+                const responsiveContent = `
+                    <div class="overflow-y-auto">
+                        <div class="transform ${scale} origin-top">
+                            ${content}
+                        </div>
+                    </div>
+                `;
+
+                modalContent.innerHTML = responsiveContent;
+
+                // Mettre en cache le contenu
+                contentCache[section] = responsiveContent;
+
+                // Réexécuter les scripts du contenu chargé (de manière sécurisée)
+                const scripts = modalContent.querySelectorAll('script');
+                scripts.forEach(script => {
+                    if (script.src) {
+                        // Script externe - créer un nouveau script
+                        const newScript = document.createElement('script');
+                        newScript.src = script.src;
+                        newScript.async = false;
+                        document.head.appendChild(newScript);
+                    } else if (script.textContent) {
+                        // Script inline - l'exécuter de manière sécurisée (sans eval)
+                        try {
+                            const scriptFunc = new Function(script.textContent);
+                            scriptFunc();
+                        } catch (e) {
+                            logToConsole('Erreur lors de l\'exécution du script:', e);
+                        }
+                    }
+                });
+
+                // Ajuster la taille du modal selon le contenu
+                setTimeout(() => {
+                    adjustModalSize();
+                }, 100);
+
+                logToConsole('Content loaded successfully');
+            })
+            .catch(error => {
+                logToConsole('ERROR: Erreur de chargement:', error);
+                modalContent.innerHTML = `
+                    <div class="text-center py-6 sm:py-8 text-red-600 px-4">
+                        <div class="text-3xl sm:text-4xl mb-3 sm:mb-4">❌</div>
+                        <p class="font-semibold text-sm sm:text-base">Erreur de chargement</p>
+                        <p class="text-xs sm:text-sm text-gray-500 mt-2">${error.message}</p>
+                        <button onclick="openAdminModal('${section}', null)"
+                                class="mt-4 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors text-sm sm:text-base active:scale-95">
+                            Réessayer
+                        </button>
+                    </div>
+                `;
+            });
+        }
+
+        function disableMobileZoom() {
+            const viewport = document.querySelector('meta[name=viewport]');
+            if (viewport) {
+                viewport.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no');
+            }
+        }
+
+        function enableMobileZoom() {
+            const viewport = document.querySelector('meta[name=viewport]');
+            if (viewport) {
+                viewport.setAttribute('content', 'width=device-width, initial-scale=1.0');
+            }
+        }
+
+        function closeAdminModal() {
+            const modal = document.getElementById('admin-modal');
+            if (modal) {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+                document.body.style.overflow = 'auto';
+
+                // Réactiver le zoom sur mobile
+                if (isMobileDevice()) {
+                    enableMobileZoom();
+                }
+
+                logToConsole('Modal closed');
+            }
+        }
+
+        function adjustModalSize() {
+            const modal = document.getElementById('admin-modal');
+            const content = document.getElementById('admin-modal-content');
+
+            if (modal && content) {
+                const contentHeight = content.scrollHeight;
+                const maxHeight = isMobileDevice()
+                    ? window.innerHeight * 0.85 - 56  // 85vh - header height
+                    : window.innerHeight * 0.8;
+
+                if (contentHeight > maxHeight) {
+                    content.style.maxHeight = maxHeight + 'px';
+                }
+            }
+        }
+
+        // Fermer le modal avec la touche Échap
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeAdminModal();
+            }
+        });
+
+        // Gérer le swipe down sur mobile pour fermer
+        let touchStartY = 0;
+        let touchEndY = 0;
+
+        const adminModal = document.getElementById('admin-modal');
+        if (adminModal) {
+            adminModal.addEventListener('touchstart', function(e) {
+                touchStartY = e.touches[0].clientY;
+            }, { passive: true });
+
+            adminModal.addEventListener('touchend', function(e) {
+                touchEndY = e.changedTouches[0].clientY;
+                handleSwipe();
+            }, { passive: true });
+        }
+
+        function handleSwipe() {
+            const swipeDistance = touchEndY - touchStartY;
+            // Swipe down de plus de 100px ferme le modal
+            if (swipeDistance > 100 && isMobileDevice()) {
+                closeAdminModal();
+                logToConsole('Modal closed by swipe down');
+            }
+        }
+
+        // Ajuster le modal lors du changement d'orientation
+        window.addEventListener('orientationchange', function() {
+            setTimeout(() => {
+                adjustModalSize();
+                logToConsole('Modal adjusted after orientation change');
+            }, 200);
+        });
+
+        // Ajuster le modal lors du redimensionnement
+        let resizeTimeout;
+        window.addEventListener('resize', function() {
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(() => {
+                adjustModalSize();
+            }, 250);
+        });
+
+        // Fonctions de débogage
+        function logToConsole(...args) {
+            const consoleDiv = document.getElementById('debug-console');
+            const timestamp = new Date().toLocaleTimeString();
+            const message = `[${timestamp}] ${args.map(arg =>
+                typeof arg === 'object' ? JSON.stringify(arg, null, 2) : String(arg)
+            ).join(' ')}`;
+            consoleDiv.innerHTML += message + '<br>';
+            consoleDiv.scrollTop = consoleDiv.scrollHeight;
+            console.log(...args);
+        }
+
+        function clearConsole() {
+            document.getElementById('debug-console').innerHTML = '';
+        }
+
+        // Initialisation
+        document.addEventListener('DOMContentLoaded', function() {
+            logToConsole('Admin modal system initialized');
+            logToConsole('Device info:', {
+                width: window.innerWidth,
+                height: window.innerHeight,
+                isMobile: isMobileDevice(),
+                isTablet: isTabletDevice(),
+                userAgent: navigator.userAgent
+            });
+        });
+
+        // Exposer les fonctions globalement
+        window.openAdminModal = openAdminModal;
+        window.closeAdminModal = closeAdminModal;
+        window.logToConsole = logToConsole;
+        window.contentCache = contentCache;
+    </script>
+</body>
+</html>

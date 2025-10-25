@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test de Performance - Articles</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .result { padding: 10px; margin: 10px 0; border-radius: 5px; }
+        .success { background-color: #d4edda; border: 1px solid #c3e6cb; }
+        .warning { background-color: #fff3cd; border: 1px solid #ffeaa7; }
+        .error { background-color: #f8d7da; border: 1px solid #f5c6cb; }
+    </style>
+</head>
+<body>
+    <h1>Test de Performance - Page Articles</h1>
+    
+    <div id="results"></div>
+    
+    <script>
+        async function testPerformance() {
+            const results = document.getElementById('results');
+            results.innerHTML = '<p>Test en cours...</p>';
+            
+            try {
+                // Test simple de chargement
+                const startTime = Date.now();
+                const response = await fetch('/articles');
+                const endTime = Date.now();
+                
+                const responseTime = endTime - startTime;
+                const isSuccess = response.ok;
+                
+                let resultClass = 'success';
+                let message = `✅ Page chargée avec succès en ${responseTime}ms`;
+                
+                if (responseTime > 5000) {
+                    resultClass = 'error';
+                    message = `❌ Performance faible: ${responseTime}ms (> 5s)`;
+                } else if (responseTime > 2000) {
+                    resultClass = 'warning';
+                    message = `⚠️ Performance modérée: ${responseTime}ms (> 2s)`;
+                }
+                
+                if (!isSuccess) {
+                    resultClass = 'error';
+                    message = `❌ Erreur HTTP: ${response.status}`;
+                }
+                
+                // Test multiple
+                results.innerHTML = `
+                    <div class="result ${resultClass}">
+                        <h3>Test de base</h3>
+                        <p>${message}</p>
+                        <p>Code de statut: ${response.status}</p>
+                    </div>
+                `;
+                
+                // Test de charge
+                if (isSuccess) {
+                    const loadTestStart = Date.now();
+                    const promises = [];
+                    
+                    for (let i = 0; i < 3; i++) {
+                        promises.push(fetch('/articles'));
+                    }
+                    
+                    const loadResponses = await Promise.all(promises);
+                    const loadTestEnd = Date.now();
+                    const loadTime = loadTestEnd - loadTestStart;
+                    
+                    const allSuccessful = loadResponses.every(r => r.ok);
+                    
+                    results.innerHTML += `
+                        <div class="result ${allSuccessful ? 'success' : 'warning'}">
+                            <h3>Test de charge (3 requêtes simultanées)</h3>
+                            <p>${allSuccessful ? '✅' : '⚠️'} Temps total: ${loadTime}ms</p>
+                            <p>Temps moyen: ${Math.round(loadTime / 3)}ms par requête</p>
+                            <p>Succès: ${loadResponses.filter(r => r.ok).length}/3</p>
+                        </div>
+                    `;
+                }
+                
+                // Recommandations
+                results.innerHTML += `
+                    <div class="result">
+                        <h3>Recommandations</h3>
+                        <p><strong>Performance actuelle:</strong> ${responseTime < 2000 ? 'Bonne' : responseTime < 5000 ? 'Acceptable' : 'À améliorer'}</p>
+                        <p><strong>Optimisations appliquées:</strong></p>
+                        <ul>
+                            <li>✅ Limitation des articles à 50 maximum</li>
+                            <li>✅ Pré-calcul des textes tronqués</li>
+                            <li>✅ Suppression des requêtes N+1</li>
+                            <li>✅ Pagination manuelle optimisée</li>
+                            <li>✅ Augmentation des limites PHP</li>
+                        </ul>
+                    </div>
+                `;
+                
+            } catch (error) {
+                results.innerHTML = `
+                    <div class="result error">
+                        <h3>Erreur de test</h3>
+                        <p>❌ Impossible de tester: ${error.message}</p>
+                        <p>Vérifiez que le serveur Laravel fonctionne sur http://127.0.0.1:8000</p>
+                    </div>
+                `;
+            }
+        }
+        
+        // Lancer le test automatiquement
+        window.addEventListener('load', testPerformance);
+    </script>
+</body>
+</html>

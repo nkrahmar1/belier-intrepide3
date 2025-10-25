@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Créer des données de test</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-5">
+        <h1>🛠️ Créer des données de test</h1>
+        
+        <?php
+        if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create_data'])) {
+            require '../vendor/autoload.php';
+            
+            $app = require '../bootstrap/app.php';
+            $app->make(Illuminate\Contracts\Console\Kernel::class)->bootstrap();
+            
+            try {
+                // Créer des catégories
+                $categories = [
+                    ['nom' => 'Politique', 'slug' => 'politique', 'description' => 'Articles sur la politique'],
+                    ['nom' => 'Économie', 'slug' => 'economie', 'description' => 'Articles sur l\'économie'],
+                    ['nom' => 'Sport', 'slug' => 'sport', 'description' => 'Articles sur le sport'],
+                    ['nom' => 'Technologie', 'slug' => 'technologie', 'description' => 'Articles sur la technologie'],
+                ];
+                
+                foreach ($categories as $catData) {
+                    \App\Models\Category::firstOrCreate(
+                        ['slug' => $catData['slug']],
+                        $catData
+                    );
+                }
+                
+                // Créer un utilisateur admin si nécessaire
+                $admin = \App\Models\User::firstOrCreate(
+                    ['email' => 'admin@test.com'],
+                    [
+                        'name' => 'Admin Test',
+                        'password' => bcrypt('password'),
+                        'is_admin' => true,
+                        'email_verified_at' => now(),
+                    ]
+                );
+                
+                // Créer des articles de test
+                $articleTitles = [
+                    'Économie' => [
+                        'Analyse de la croissance économique 2024',
+                        'Les défis de l\'inflation mondiale',
+                        'Investissements et nouvelles opportunités'
+                    ],
+                    'Politique' => [
+                        'Les enjeux des prochaines élections',
+                        'Réformes gouvernementales en cours',
+                        'Politique internationale et relations diplomatiques'
+                    ],
+                    'Sport' => [
+                        'Résultats des championnats nationaux',
+                        'Préparation pour les compétitions internationales',
+                        'Nouveaux talents émergents'
+                    ],
+                    'Technologie' => [
+                        'Innovations en intelligence artificielle',
+                        'Tendances du développement web',
+                        'Cybersécurité et protection des données'
+                    ]
+                ];
+                
+                foreach ($articleTitles as $categoryName => $titles) {
+                    $category = \App\Models\Category::where('nom', $categoryName)->first();
+                    
+                    foreach ($titles as $title) {
+                        \App\Models\Article::firstOrCreate(
+                            ['titre' => $title],
+                            [
+                                'contenu' => "Ceci est le contenu détaillé de l'article intitulé '{$title}'. Il contient des informations pertinentes et détaillées sur le sujet traité. L'article a été créé à des fins de test et démontre la fonctionnalité du système de gestion d'articles.",
+                                'category_id' => $category->id,
+                                'user_id' => $admin->id,
+                                'is_published' => true,
+                                'created_at' => now()->subDays(rand(1, 30)),
+                                'updated_at' => now(),
+                            ]
+                        );
+                    }
+                }
+                
+                $totalArticles = \App\Models\Article::count();
+                $totalCategories = \App\Models\Category::count();
+                
+                echo "<div class='alert alert-success'>";
+                echo "<h4>✅ Données créées avec succès !</h4>";
+                echo "<p>Catégories créées : {$totalCategories}</p>";
+                echo "<p>Articles créés : {$totalArticles}</p>";
+                echo "</div>";
+                
+            } catch (Exception $e) {
+                echo "<div class='alert alert-danger'>❌ Erreur : " . htmlspecialchars($e->getMessage()) . "</div>";
+            }
+        }
+        ?>
+        
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Créer des données de test</h5>
+                <p class="card-text">Cliquez sur le bouton ci-dessous pour créer automatiquement des catégories et des articles de test.</p>
+                
+                <form method="POST">
+                    <button type="submit" name="create_data" value="1" class="btn btn-primary">
+                        🚀 Créer les données de test
+                    </button>
+                </form>
+            </div>
+        </div>
+        
+        <div class="mt-4">
+            <a href="/articles" class="btn btn-success">Voir les articles</a>
+            <a href="/admin/dashboard" class="btn btn-info">Dashboard Admin</a>
+            <a href="/test-articles-direct.html" class="btn btn-secondary">Test direct</a>
+        </div>
+    </div>
+</body>
+</html>

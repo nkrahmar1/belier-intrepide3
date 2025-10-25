@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Email BELIER-INTREPIDE</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; }
+        .config { background: #f5f5f5; padding: 20px; margin: 20px 0; border-radius: 5px; }
+        .success { color: green; }
+        .error { color: red; }
+        .info { color: blue; }
+    </style>
+</head>
+<body>
+    <h1>Test de Configuration Email - BELIER-INTREPIDE</h1>
+    
+    <div class="config">
+        <h3>Configuration actuelle :</h3>
+        <?php
+        $envFile = __DIR__ . '/.env';
+        if (file_exists($envFile)) {
+            $content = file_get_contents($envFile);
+            $lines = explode("\n", $content);
+            foreach ($lines as $line) {
+                if (strpos($line, 'MAIL_') === 0 && strpos($line, '#') !== 0) {
+                    echo "<p><strong>" . htmlspecialchars($line) . "</strong></p>";
+                }
+            }
+        }
+        ?>
+    </div>
+    
+    <div class="info">
+        <h3>Étapes de test :</h3>
+        <ol>
+            <li>✅ Serveur Laravel démarré</li>
+            <li>✅ Configuration Mailtrap ajoutée</li>
+            <li>✅ Notifications modifiées pour utiliser .env</li>
+            <li>🔄 Test de connexion en cours...</li>
+        </ol>
+    </div>
+    
+    <div class="info">
+        <h3>Pour tester :</h3>
+        <ol>
+            <li>Va sur la page de connexion de ton site</li>
+            <li>Connecte-toi avec ton compte</li>
+            <li>Vérifie ton inbox Mailtrap : <a href="https://mailtrap.io/inboxes" target="_blank">https://mailtrap.io/inboxes</a></li>
+            <li>Vérifie le fichier debug.log : storage/logs/debug.log</li>
+        </ol>
+    </div>
+    
+    <div class="info">
+        <h3>En cas de problème :</h3>
+        <ul>
+            <li>Vérifie que QUEUE_CONNECTION=sync dans .env</li>
+            <li>Vérifie les logs dans storage/logs/</li>
+            <li>Assure-toi que Mailtrap username/password sont corrects</li>
+        </ul>
+    </div>
+</body>
+</html>

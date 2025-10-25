@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Navbar Laravel Direct</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-box { 
+            border: 2px solid #007bff; 
+            padding: 20px; 
+            margin: 20px 0; 
+            border-radius: 10px; 
+            background: #f8f9fa;
+        }
+        .success { border-color: #28a745; background: #d4edda; }
+        .error { border-color: #dc3545; background: #f8d7da; }
+        .warning { border-color: #ffc107; background: #fff3cd; }
+        .code { 
+            background: #e9ecef; 
+            padding: 10px; 
+            border-radius: 5px; 
+            font-family: monospace; 
+            margin: 10px 0;
+        }
+        button { 
+            background: #007bff; 
+            color: white; 
+            padding: 10px 20px; 
+            border: none; 
+            border-radius: 5px; 
+            cursor: pointer; 
+            margin: 5px;
+        }
+        button:hover { background: #0056b3; }
+        iframe { width: 100%; height: 500px; border: 1px solid #ccc; }
+    </style>
+</head>
+<body>
+    <h1>🔧 Test Navbar Laravel Direct</h1>
+    
+    <div class="test-box">
+        <h3>📋 Instructions de test</h3>
+        <p><strong>Suivez ces étapes pour tester votre navbar :</strong></p>
+        <ol>
+            <li>Cliquez sur "Ouvrir le site" ci-dessous</li>
+            <li>Testez le bouton "Mon compte" - il doit s'ouvrir</li>
+            <li>Testez l'icône du panier - il doit s'ouvrir</li>
+            <li>Si connecté, testez "Se déconnecter"</li>
+        </ol>
+    </div>
+
+    <div class="test-box">
+        <h3>🌐 Accès au site</h3>
+        <button onclick="window.open('http://127.0.0.1:8003', '_blank')">
+            🚀 Ouvrir le site dans un nouvel onglet
+        </button>
+        <button onclick="loadSite()">
+            📱 Charger le site dans cette page
+        </button>
+        <button onclick="testConsole()">
+            🔍 Ouvrir la console développeur
+        </button>
+    </div>
+
+    <div class="test-box warning">
+        <h3>⚠️ Si les dropdowns ne fonctionnent pas</h3>
+        <p>Voici le code JavaScript à exécuter dans la console du navigateur (F12) :</p>
+        <div class="code">
+// Test 1: Vérifier Bootstrap
+console.log('Bootstrap disponible:', typeof bootstrap !== 'undefined');
+
+// Test 2: Compter les dropdowns  
+const dropdowns = document.querySelectorAll('[data-bs-toggle="dropdown"]');
+console.log('Nombre de dropdowns:', dropdowns.length);
+
+// Test 3: Initialiser manuellement
+dropdowns.forEach((dropdown, index) => {
+    try {
+        new bootstrap.Dropdown(dropdown);
+        console.log(`Dropdown ${index + 1} initialisé`);
+    } catch (error) {
+        console.error(`Erreur dropdown ${index + 1}:`, error);
+    }
+});
+        </div>
+        <button onclick="copyCode()">📋 Copier ce code</button>
+    </div>
+
+    <div class="test-box">
+        <h3>🛠️ Solutions rapides</h3>
+        
+        <h4>Problème 1: Bootstrap ne se charge pas</h4>
+        <ul>
+            <li>Vérifiez votre connexion Internet</li>
+            <li>Regardez la console navigateur (F12) pour les erreurs 404</li>
+            <li>Assurez-vous que Bootstrap JS se charge AVANT vos scripts</li>
+        </ul>
+
+        <h4>Problème 2: Dropdowns ne s'initialisent pas</h4>
+        <ul>
+            <li>Vérifiez l'attribut <code>data-bs-toggle="dropdown"</code></li>
+            <li>Exécutez le code JavaScript ci-dessus dans la console</li>
+            <li>Rechargez la page (Ctrl+F5)</li>
+        </ul>
+
+        <h4>Problème 3: JavaScript en conflit</h4>
+        <ul>
+            <li>Désactivez temporairement autres scripts</li>
+            <li>Vérifiez qu'il n'y a pas d'erreurs JavaScript bloquantes</li>
+            <li>Testez en mode navigation privée</li>
+        </ul>
+    </div>
+
+    <div class="test-box success" id="results" style="display: none;">
+        <h3>✅ Résultats des tests</h3>
+        <div id="test-output"></div>
+    </div>
+
+    <div id="site-container" style="display: none;">
+        <h3>🖥️ Votre site :</h3>
+        <iframe id="site-frame" src=""></iframe>
+    </div>
+
+    <script>
+        function loadSite() {
+            const container = document.getElementById('site-container');
+            const iframe = document.getElementById('site-frame');
+            iframe.src = 'http://127.0.0.1:8003';
+            container.style.display = 'block';
+            iframe.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function testConsole() {
+            alert('Instructions:\n\n1. Appuyez sur F12 pour ouvrir les outils développeur\n2. Allez dans l\'onglet "Console"\n3. Collez le code JavaScript fourni ci-dessus\n4. Appuyez sur Entrée pour l\'exécuter');
+        }
+
+        function copyCode() {
+            const code = `// Test 1: Vérifier Bootstrap
+console.log('Bootstrap disponible:', typeof bootstrap !== 'undefined');
+
+// Test 2: Compter les dropdowns  
+const dropdowns = document.querySelectorAll('[data-bs-toggle="dropdown"]');
+console.log('Nombre de dropdowns:', dropdowns.length);
+
+// Test 3: Initialiser manuellement
+dropdowns.forEach((dropdown, index) => {
+    try {
+        new bootstrap.Dropdown(dropdown);
+        console.log(\`Dropdown \${index + 1} initialisé\`);
+    } catch (error) {
+        console.error(\`Erreur dropdown \${index + 1}:\`, error);
+    }
+});`;
+
+            navigator.clipboard.writeText(code).then(() => {
+                alert('✅ Code copié ! Collez-le dans la console de votre navigateur (F12)');
+            }).catch(() => {
+                alert('❌ Erreur de copie. Sélectionnez et copiez manuellement le code ci-dessus.');
+            });
+        }
+
+        // Auto-test au chargement
+        document.addEventListener('DOMContentLoaded', function() {
+            const results = document.getElementById('results');
+            const output = document.getElementById('test-output');
+            
+            let testResults = '<p><strong>Tests automatiques :</strong></p>';
+            
+            // Test de la connectivité
+            fetch('http://127.0.0.1:8003')
+                .then(response => {
+                    testResults += '<div style="color: green;">✅ Serveur Laravel accessible</div>';
+                    return response.text();
+                })
+                .then(html => {
+                    if (html.includes('bootstrap')) {
+                        testResults += '<div style="color: green;">✅ Bootstrap détecté dans le HTML</div>';
+                    } else {
+                        testResults += '<div style="color: orange;">⚠️ Bootstrap non détecté dans le HTML</div>';
+                    }
+                    
+                    if (html.includes('data-bs-toggle="dropdown"')) {
+                        testResults += '<div style="color: green;">✅ Dropdowns détectés dans le HTML</div>';
+                    } else {
+                        testResults += '<div style="color: red;">❌ Aucun dropdown détecté dans le HTML</div>';
+                    }
+                    
+                    output.innerHTML = testResults;
+                    results.style.display = 'block';
+                })
+                .catch(error => {
+                    testResults += '<div style="color: red;">❌ Serveur Laravel inaccessible: ' + error.message + '</div>';
+                    output.innerHTML = testResults;
+                    results.style.display = 'block';
+                });
+        });
+    </script>
+</body>
+</html>

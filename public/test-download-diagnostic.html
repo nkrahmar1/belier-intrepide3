@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test de Téléchargement</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-5">
+        <h1 class="text-center">🔍 Test de Téléchargement</h1>
+
+        <div class="row">
+            <div class="col-md-8 mx-auto">
+
+                <?php
+                require_once 'vendor/autoload.php';
+                $app = require_once 'bootstrap/app.php';
+                $app->make('Illuminate\Contracts\Console\Kernel')->bootstrap();
+
+                use App\Models\Article;
+                use App\Models\User;
+                use Illuminate\Support\Facades\Storage;
+
+                echo "<div class='alert alert-info'>";
+                echo "<h3>📊 État du système</h3>";
+
+                // Vérifier les articles avec documents
+                $articlesWithDocs = Article::whereNotNull('document_path')->get();
+                echo "<p><strong>Articles avec documents:</strong> " . $articlesWithDocs->count() . "</p>";
+
+                foreach ($articlesWithDocs as $article) {
+                    $exists = Storage::exists($article->document_path) ? "✅" : "❌";
+                    echo "<p>$exists Article: {$article->titre} -> {$article->document_path}</p>";
+                }
+
+                // Vérifier les utilisateurs
+                $users = User::all();
+                echo "<p><strong>Utilisateurs totaux:</strong> " . $users->count() . "</p>";
+
+                foreach ($users as $user) {
+                    $hasSubscription = $user->hasActiveSubscription() ? "✅ Abonné" : "❌ Pas d'abonnement";
+                    echo "<p>👤 {$user->firstname} {$user->lastname} - $hasSubscription</p>";
+                }
+
+                echo "</div>";
+                ?>
+
+                <div class="alert alert-warning">
+                    <h3>🚀 Solutions pour résoudre le problème</h3>
+
+                    <h4>1. Vérifier votre abonnement:</h4>
+                    <ul>
+                        <li>Connectez-vous à votre compte</li>
+                        <li>Vérifiez que vous avez un abonnement actif</li>
+                        <li>Si pas d'abonnement, faites un paiement via CinetPay</li>
+                    </ul>
+
+                    <h4>2. Problème de route (corrigé):</h4>
+                    <ul>
+                        <li>✅ J'ai corrigé le conflit de routes</li>
+                        <li>✅ La route publique fonctionne maintenant</li>
+                    </ul>
+
+                    <h4>3. Documents manquants:</h4>
+                    <ul>
+                        <li>Les documents doivent être dans: <code>storage/app/documents/</code></li>
+                        <li>Chemin complet: <code>documents/nom-du-fichier.pdf</code></li>
+                    </ul>
+                </div>
+
+                <div class="alert alert-success">
+                    <h3>✅ Tests à faire maintenant:</h3>
+                    <ol>
+                        <li><strong>Connectez-vous</strong> avec votre compte</li>
+                        <li><strong>Vérifiez votre abonnement</strong> (si pas actif, renouvelez)</li>
+                        <li><strong>Allez sur une page de catégorie</strong></li>
+                        <li><strong>Cliquez sur "Télécharger"</strong> d'un article avec document</li>
+                        <li><strong>Le téléchargement devrait commencer</strong> automatiquement</li>
+                    </ol>
+                </div>
+
+                <div class="text-center">
+                    <a href="/" class="btn btn-primary">🏠 Retour à l'accueil</a>
+                    <a href="/login" class="btn btn-success">🔐 Se connecter</a>
+                    <a href="/category/Political" class="btn btn-info">📄 Tester téléchargement</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

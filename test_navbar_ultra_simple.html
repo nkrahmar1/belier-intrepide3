@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Navbar Ultra Simple</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            margin: 20px; 
+            background: #f5f5f5;
+        }
+        .container { 
+            max-width: 800px; 
+            margin: 0 auto; 
+            background: white; 
+            padding: 30px; 
+            border-radius: 10px; 
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .btn { 
+            background: #007bff; 
+            color: white; 
+            padding: 12px 24px; 
+            border: none; 
+            border-radius: 5px; 
+            cursor: pointer; 
+            margin: 10px 5px;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+        }
+        .btn:hover { 
+            background: #0056b3; 
+        }
+        .btn-success { 
+            background: #28a745; 
+        }
+        .btn-success:hover { 
+            background: #1e7e34; 
+        }
+        .alert { 
+            padding: 20px; 
+            margin: 20px 0; 
+            border-radius: 5px; 
+        }
+        .alert-info { 
+            background: #d1ecf1; 
+            border: 1px solid #bee5eb; 
+            color: #0c5460;
+        }
+        .alert-success { 
+            background: #d4edda; 
+            border: 1px solid #c3e6cb; 
+            color: #155724;
+        }
+        h1 { 
+            color: #333; 
+            text-align: center; 
+        }
+        h2 { 
+            color: #007bff; 
+            margin-top: 30px;
+        }
+        ol, ul { 
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Test Navbar Ultra Simple</h1>
+        
+        <div class="alert alert-info">
+            <strong>🎯 Objectif :</strong><br>
+            Tester si les dropdowns de votre navbar fonctionnent correctement pour la déconnexion et l'affichage du panier.
+        </div>
+
+        <h2>🚀 Accès rapide</h2>
+        <p>Cliquez sur le bouton ci-dessous pour ouvrir votre site :</p>
+        <a href="http://127.0.0.1:8003" target="_blank" class="btn">
+            🌐 Ouvrir le Site Laravel
+        </a>
+        <a href="http://127.0.0.1:8003/test_navbar_simple.html" target="_blank" class="btn btn-success">
+            ✅ Test Bootstrap Simple
+        </a>
+
+        <h2>📋 Instructions de test</h2>
+        <ol>
+            <li><strong>Ouvrez votre site</strong> en cliquant sur le bouton ci-dessus</li>
+            <li><strong>Localisez la navbar</strong> en haut de la page</li>
+            <li><strong>Testez le bouton "Mon compte"</strong> :
+                <ul>
+                    <li>Cliquez dessus → Un menu doit s'ouvrir</li>
+                    <li>Si connecté, vous devez voir "Se déconnecter"</li>
+                    <li>Si déconnecté, vous devez voir "Se connecter" et "S'inscrire"</li>
+                </ul>
+            </li>
+            <li><strong>Testez l'icône du panier</strong> :
+                <ul>
+                    <li>Cliquez sur l'icône panier → Un menu doit s'ouvrir</li>
+                    <li>Vous devez voir vos articles achetés/téléchargés</li>
+                    <li>Un badge avec le nombre d'articles doit être visible</li>
+                </ul>
+            </li>
+        </ol>
+
+        <h2>🔧 Si ça ne fonctionne pas</h2>
+        
+        <div class="alert alert-success">
+            <strong>✅ Solution rapide :</strong><br>
+            Ouvrez la console de votre navigateur (touche F12) et tapez ce code :
+            <br><br>
+            <code style="background: #f8f9fa; padding: 10px; display: block; margin: 10px 0; border-radius: 3px;">
+document.querySelectorAll('[data-bs-toggle="dropdown"]').forEach(function(el, i) {<br>
+&nbsp;&nbsp;new bootstrap.Dropdown(el);<br>
+&nbsp;&nbsp;console.log('Dropdown ' + (i+1) + ' initialisé');<br>
+});
+            </code>
+        </div>
+
+        <h2>🛠️ Problèmes courants</h2>
+        <ul>
+            <li><strong>Bootstrap ne se charge pas :</strong> Vérifiez votre connexion Internet</li>
+            <li><strong>Erreurs JavaScript :</strong> Ouvrez F12 et regardez l'onglet Console</li>
+            <li><strong>Dropdowns figés :</strong> Rechargez la page avec Ctrl+F5</li>
+            <li><strong>Conflit de scripts :</strong> Testez en mode navigation privée</li>
+        </ul>
+
+        <h2>📞 Aide supplémentaire</h2>
+        <p>Si les problèmes persistent :</p>
+        <ol>
+            <li>Appuyez sur F12 pour ouvrir les outils développeur</li>
+            <li>Allez dans l'onglet "Console"</li>
+            <li>Regardez s'il y a des erreurs en rouge</li>
+            <li>Copiez les erreurs pour analyse</li>
+        </ol>
+
+        <div style="text-align: center; margin-top: 40px;">
+            <p style="color: #666; font-style: italic;">
+                🎯 L'objectif est que vous puissiez vous déconnecter et voir vos articles dans le panier !
+            </p>
+        </div>
+    </div>
+</body>
+</html>

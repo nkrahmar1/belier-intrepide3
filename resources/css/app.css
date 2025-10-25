@@ -1,0 +1,16 @@
+/* Import des styles Tailwind */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+/* Déclaration d’une variable CSS personnalisée pour la police */
+:root {
+    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif,
+        'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+}
+
+/* Exemple : appliquer la police au body */
+body {
+    font-family: var(--font-sans);
+}

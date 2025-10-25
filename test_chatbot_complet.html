@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <title>Test Chatbot</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f5f5f5;
+        }
+        .test-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .test-section {
+            margin-bottom: 30px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .test-result {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .success { background-color: #d4edda; border-left: 4px solid #28a745; }
+        .error { background-color: #f8d7da; border-left: 4px solid #dc3545; }
+        .info { background-color: #d1ecf1; border-left: 4px solid #17a2b8; }
+        
+        #test-chatbot {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 350px;
+            height: 500px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 25px rgba(0,0,0,0.2);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        
+        .chat-header {
+            background: linear-gradient(135deg, #10b981, #065f46);
+            color: white;
+            padding: 15px;
+            text-align: center;
+            font-weight: bold;
+        }
+        
+        .chat-messages {
+            flex: 1;
+            padding: 15px;
+            overflow-y: auto;
+            background-color: #f9fafb;
+        }
+        
+        .message {
+            margin-bottom: 15px;
+        }
+        
+        .message.user {
+            text-align: right;
+        }
+        
+        .message.admin {
+            text-align: left;
+        }
+        
+        .message-bubble {
+            display: inline-block;
+            max-width: 80%;
+            padding: 10px 15px;
+            border-radius: 15px;
+            font-size: 14px;
+        }
+        
+        .message.user .message-bubble {
+            background-color: #10b981;
+            color: white;
+        }
+        
+        .message.admin .message-bubble {
+            background-color: white;
+            color: #374151;
+            border: 1px solid #e5e7eb;
+        }
+        
+        .chat-input {
+            padding: 15px;
+            border-top: 1px solid #e5e7eb;
+        }
+        
+        .input-group {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .input-group input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #d1d5db;
+            border-radius: 20px;
+            outline: none;
+        }
+        
+        .input-group button {
+            background: #10b981;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+        }
+        
+        .input-group button:hover {
+            background: #059669;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🤖 Test du Système Chatbot</h1>
+        <p>Cette page teste le système de chatbot intégré.</p>
+        
+        <div class="test-section">
+            <h3>📋 Tests Automatiques</h3>
+            <button onclick="runTests()" style="background: #007bff; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer;">
+                Lancer les Tests
+            </button>
+            <div id="test-results"></div>
+        </div>
+        
+        <div class="test-section">
+            <h3>💬 Chat En Direct</h3>
+            <p>Utilisez le widget de chat ci-dessous pour tester les fonctionnalités en temps réel :</p>
+        </div>
+    </div>
+
+    <!-- Widget de Chat -->
+    <div id="test-chatbot">
+        <div class="chat-header">
+            💚 Support Client
+        </div>
+        <div class="chat-messages" id="chat-messages">
+            <div class="message admin">
+                <div class="message-bubble">
+                    Bonjour ! Je suis ici pour vous aider. Comment puis-je vous assister aujourd'hui ?
+                </div>
+            </div>
+        </div>
+        <div class="chat-input">
+            <div class="input-group">
+                <input type="text" id="message-input" placeholder="Tapez votre message...">
+                <button onclick="sendTestMessage()">Envoyer</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Configuration
+        const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+        
+        // Tests automatiques
+        async function runTests() {
+            const resultsDiv = document.getElementById('test-results');
+            resultsDiv.innerHTML = '<div class="info">🔄 Tests en cours...</div>';
+            
+            const tests = [];
+            
+            // Test 1: Vérifier la route de base du chatbot
+            try {
+                const response = await fetch('/chatbot/', {
+                    method: 'GET',
+                    headers: {
+                        'X-CSRF-TOKEN': csrfToken,
+                        'Accept': 'application/json'
+                    }
+                });
+                
+                if (response.ok) {
+                    tests.push({ name: 'Route /chatbot/', status: 'success', message: 'Route accessible' });
+                } else {
+                    tests.push({ name: 'Route /chatbot/', status: 'error', message: `Erreur ${response.status}` });
+                }
+            } catch (error) {
+                tests.push({ name: 'Route /chatbot/', status: 'error', message: error.message });
+            }
+            
+            // Test 2: Envoyer un message de test
+            try {
+                const response = await fetch('/chatbot/send', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken,
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        message: 'Message de test automatique'
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok && data.status === 'success') {
+                    tests.push({ name: 'Envoi de message', status: 'success', message: 'Message envoyé avec succès' });
+                } else {
+                    tests.push({ name: 'Envoi de message', status: 'error', message: data.message || 'Erreur inconnue' });
+                }
+            } catch (error) {
+                tests.push({ name: 'Envoi de message', status: 'error', message: error.message });
+            }
+            
+            // Test 3: Récupérer les messages
+            try {
+                const response = await fetch('/chatbot/messages', {
+                    method: 'GET',
+                    headers: {
+                        'X-CSRF-TOKEN': csrfToken,
+                        'Accept': 'application/json'
+                    }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    tests.push({ name: 'Récupération messages', status: 'success', message: `${data.length || 0} message(s) trouvé(s)` });
+                } else {
+                    tests.push({ name: 'Récupération messages', status: 'error', message: `Erreur ${response.status}` });
+                }
+            } catch (error) {
+                tests.push({ name: 'Récupération messages', status: 'error', message: error.message });
+            }
+            
+            // Afficher les résultats
+            let html = '<h4>Résultats des Tests:</h4>';
+            tests.forEach(test => {
+                const className = test.status === 'success' ? 'success' : 'error';
+                html += `<div class="test-result ${className}">
+                    <strong>${test.name}:</strong> ${test.message}
+                </div>`;
+            });
+            
+            resultsDiv.innerHTML = html;
+        }
+        
+        // Chat en direct
+        async function sendTestMessage() {
+            const input = document.getElementById('message-input');
+            const message = input.value.trim();
+            
+            if (!message) return;
+            
+            // Ajouter le message à l'interface
+            addMessageToChat('user', message);
+            input.value = '';
+            
+            try {
+                const response = await fetch('/chatbot/send', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken,
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({ message: message })
+                });
+                
+                const data = await response.json();
+                
+                if (data.status === 'success') {
+                    // Simuler une réponse automatique
+                    setTimeout(() => {
+                        addMessageToChat('admin', `Message reçu: "${message}". Un admin vous répondra bientôt !`);
+                    }, 1000);
+                } else {
+                    addMessageToChat('admin', 'Erreur lors de l\'envoi du message.');
+                }
+            } catch (error) {
+                addMessageToChat('admin', 'Erreur de connexion.');
+            }
+        }
+        
+        function addMessageToChat(type, message) {
+            const messagesDiv = document.getElementById('chat-messages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${type}`;
+            messageDiv.innerHTML = `<div class="message-bubble">${message}</div>`;
+            messagesDiv.appendChild(messageDiv);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }
+        
+        // Permettre l'envoi avec Entrée
+        document.getElementById('message-input').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                sendTestMessage();
+            }
+        });
+    </script>
+</body>
+</html>

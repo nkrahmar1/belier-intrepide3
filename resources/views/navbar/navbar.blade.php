@@ -290,7 +290,7 @@
                 {{ strtoupper(substr(Auth::user()->firstname, 0, 1)) }}{{ strtoupper(substr(Auth::user()->lastname, 0, 1)) }}
             </span>
             <button type="button" class="btn btn-light dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" id="accountDropdownAuth">
-                Account
+                Mon compte
             </button>
             <ul class="dropdown-menu" aria-labelledby="accountDropdownAuth">
                 <li>

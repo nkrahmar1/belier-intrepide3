@@ -113,7 +113,7 @@
                 max-width: 1200px;
                 margin: 0 auto;
             }
-            
+
             /* Main content ne déborde pas à droite */
             main {
                 padding-right: 1rem;
@@ -214,55 +214,55 @@
                 <a href="{{ url('/') }}" class="flex items-center gap-2 px-4 py-2 rounded-xl shadow-sm bg-gradient-to-r from-green-100 via-white to-green-50 text-green-700 font-bold border border-green-200 hover:scale-105 hover:shadow-lg transition-all duration-200">
                     <span class="text-2xl">🏡</span> <span class="tracking-wide">Accueil du site</span>
                 </a>
-                <a @click.prevent="navigateTo('{{ route('admin.dashboard') }}', 'Dashboard')" 
-                   href="{{ route('admin.dashboard') }}" 
+                <a @click.prevent="navigateTo('{{ route('admin.dashboard') }}', 'Dashboard')"
+                   href="{{ route('admin.dashboard') }}"
                    :class="currentPage === 'Dashboard' ? 'ring-2 ring-blue-500 bg-blue-50' : ''"
                    class="flex items-center gap-2 px-4 py-2 rounded-xl shadow-sm bg-gradient-to-r from-green-100 via-white to-emerald-50 text-green-700 font-bold border border-green-200 hover:scale-105 hover:shadow-lg transition-all duration-200 cursor-pointer">
                     <span class="text-2xl">🏠</span> <span class="tracking-wide">Dashboard</span>
                 </a>
-                <a @click.prevent="loadSection('users', 'Utilisateurs')" 
+                <a @click.prevent="loadSection('users', 'Utilisateurs')"
                    href="#users"
                    :class="currentPage === 'Utilisateurs' ? 'ring-2 ring-blue-500 bg-blue-50' : ''"
                    class="flex items-center gap-2 px-4 py-2 rounded-xl shadow-sm bg-gradient-to-r from-green-100 via-white to-emerald-50 text-green-700 font-bold border border-green-200 hover:scale-105 hover:shadow-lg transition-all duration-200 cursor-pointer">
                     <span class="text-2xl">👥</span> <span class="tracking-wide">Utilisateurs</span>
                 </a>
-                <a @click.prevent="loadSection('orders', 'Commandes')" 
+                <a @click.prevent="loadSection('orders', 'Commandes')"
                    href="#orders"
                    :class="currentPage === 'Commandes' ? 'ring-2 ring-blue-500 bg-blue-50' : ''"
                    class="flex items-center gap-2 px-4 py-2 rounded-xl shadow-sm bg-gradient-to-r from-green-100 via-white to-blue-50 text-green-700 font-bold border border-green-200 hover:scale-105 hover:shadow-lg transition-all duration-200 cursor-pointer">
                     <span class="text-2xl">🧾</span> <span class="tracking-wide">Commandes</span>
                 </a>
-                <a @click.prevent="loadSection('articles', 'Gestion des Articles')" 
+                <a @click.prevent="loadSection('articles', 'Gestion des Articles')"
                    href="#articles"
                    :class="currentPage === 'Gestion des Articles' ? 'ring-2 ring-blue-500 bg-blue-50' : ''"
                    class="flex items-center gap-2 px-4 py-2 rounded-xl shadow-sm bg-gradient-to-r from-green-100 via-white to-emerald-50 text-green-700 font-bold border border-green-200 hover:scale-105 hover:shadow-lg transition-all duration-200 cursor-pointer">
                     <span class="text-2xl">📰</span> <span class="tracking-wide">Articles</span>
                 </a>
-                <a @click.prevent="loadSection('products', 'Produits')" 
+                <a @click.prevent="loadSection('products', 'Produits')"
                    href="#products"
                    :class="currentPage === 'Produits' ? 'ring-2 ring-blue-500 bg-blue-50' : ''"
                    class="flex items-center gap-2 px-4 py-2 rounded-xl shadow-sm bg-gradient-to-r from-green-100 via-white to-emerald-50 text-green-700 font-bold border border-green-200 hover:scale-105 hover:shadow-lg transition-all duration-200 cursor-pointer">
                     <span class="text-2xl">📦</span> <span class="tracking-wide">Produits</span>
                 </a>
-                <a @click.prevent="loadSection('subscriptions', 'Abonnements')" 
+                <a @click.prevent="loadSection('subscriptions', 'Abonnements')"
                    href="#subscriptions"
                    :class="currentPage === 'Abonnements' ? 'ring-2 ring-blue-500 bg-blue-50' : ''"
                    class="flex items-center gap-2 px-4 py-2 rounded-xl shadow-sm bg-gradient-to-r from-green-100 via-white to-emerald-50 text-green-700 font-bold border border-green-200 hover:scale-105 hover:shadow-lg transition-all duration-200 cursor-pointer">
                     <span class="text-2xl">💳</span> <span class="tracking-wide">Abonnements</span>
                 </a>
-                <a @click.prevent="loadSection('stats', 'Statistiques')" 
+                <a @click.prevent="loadSection('stats', 'Statistiques')"
                    href="#stats"
                    :class="currentPage === 'Statistiques' ? 'ring-2 ring-blue-500 bg-blue-50' : ''"
                    class="flex items-center gap-2 px-4 py-2 rounded-xl shadow-sm bg-gradient-to-r from-green-100 via-white to-emerald-50 text-green-700 font-bold border border-green-200 hover:scale-105 hover:shadow-lg transition-all duration-200 cursor-pointer">
                     <span class="text-2xl">📊</span> <span class="tracking-wide">Statistiques</span>
                 </a>
-                <a @click.prevent="loadSection('messages', 'Messages')" 
+                <a @click.prevent="loadSection('messages', 'Messages')"
                    href="#messages"
                    :class="currentPage === 'Messages' ? 'ring-2 ring-blue-500 bg-blue-50' : ''"
                    class="flex items-center gap-2 px-4 py-2 rounded-xl shadow-sm bg-gradient-to-r from-green-100 via-white to-emerald-50 text-green-700 font-bold border border-green-200 hover:scale-105 hover:shadow-lg transition-all duration-200 cursor-pointer">
                     <span class="text-2xl">✉️</span> <span class="tracking-wide">Messages</span>
                 </a>
-                <a @click.prevent="loadSection('settings', 'Paramètres')" 
+                <a @click.prevent="loadSection('settings', 'Paramètres')"
                    href="#settings"
                    :class="currentPage === 'Paramètres' ? 'ring-2 ring-blue-500 bg-blue-50' : ''"
                    class="flex items-center gap-2 px-4 py-2 rounded-xl shadow-sm bg-gradient-to-r from-green-100 via-white to-emerald-50 text-green-700 font-bold border border-green-200 hover:scale-105 hover:shadow-lg transition-all duration-200 cursor-pointer">
@@ -287,7 +287,7 @@
         </aside>
 
         <!-- Main content area with proper margin for sidebar -->
-        <div id="main-content" class="lg:ml-64 min-h-screen transition-all duration-300">
+        <div id="main-content" class="lg:ml-64 min-h-screen transition-all duration-300 relative z-0">
             <!-- Mobile header -->
             <div class="lg:hidden bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between sticky top-0 z-30">
                 <h1 class="text-lg font-semibold text-gray-900" x-text="currentPage">@yield('title', 'Dashboard')</h1>
@@ -295,17 +295,17 @@
             </div>
 
             <!-- Desktop Header Mosaic Style - Sticky -->
-            <header class="hidden lg:block bg-white border-b border-gray-200 sticky top-0 z-30 shadow-sm">
+            <header class="hidden lg:block bg-white border-b border-gray-200 sticky top-0 z-40 shadow-sm">
                 <div class="flex items-center justify-between px-6 py-4">
                     <!-- Left: Sidebar Toggle + Breadcrumb -->
                     <div class="flex items-center gap-4">
-                        <button id="sidebar-toggle-btn" 
+                        <button id="sidebar-toggle-btn"
                                 onclick="toggleSidebar()"
                                 class="p-2 rounded-lg hover:bg-gray-100 transition-colors group"
                                 title="Réduire/Agrandir la sidebar">
-                            <svg class="w-6 h-6 text-gray-600 group-hover:text-gray-900" 
+                            <svg class="w-6 h-6 text-gray-600 group-hover:text-gray-900"
                                  fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                       d="M4 6h16M4 12h16M4 18h16" />
                             </svg>
                         </button>
@@ -317,29 +317,29 @@
                     <!-- Right: Actions + Dark Mode + Profile -->
                     <div class="flex items-center gap-4">
                         <!-- Search Button (Modal Search) -->
-                        <button onclick="openSearchModal()" 
+                        <button onclick="openSearchModal()"
                                 class="p-2 rounded-lg hover:bg-gray-100 transition-colors"
                                 title="Rechercher (Ctrl+K)">
                             <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                       d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                             </svg>
                         </button>
 
                         <!-- Notifications -->
                         <div class="relative" x-data="{ open: false }">
-                            <button @click="open = !open" 
+                            <button @click="open = !open"
                                     class="p-2 rounded-lg hover:bg-gray-100 transition-colors relative"
                                     title="Notifications">
                                 <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                           d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
                                 </svg>
                                 <span class="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
                             </button>
-                            
+
                             <!-- Dropdown Notifications -->
-                            <div x-show="open" 
+                            <div x-show="open"
                                  @click.away="open = false"
                                  x-transition:enter="transition ease-out duration-200"
                                  x-transition:enter-start="opacity-0 scale-95"
@@ -366,35 +366,35 @@
                         </div>
 
                         <!-- Dark Mode Toggle -->
-                        <button id="dark-mode-toggle" 
+                        <button id="dark-mode-toggle"
                                 onclick="toggleDarkMode()"
                                 class="p-2 rounded-lg hover:bg-gray-100 transition-colors"
                                 title="Activer/Désactiver le mode sombre">
                             <svg id="dark-mode-icon-sun" class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                       d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
                             </svg>
                             <svg id="dark-mode-icon-moon" class="w-5 h-5 text-gray-600 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                       d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
                             </svg>
                         </button>
 
                         <!-- Profile Dropdown -->
                         <div class="relative" x-data="{ open: false }">
-                            <button @click="open = !open" 
+                            <button @click="open = !open"
                                     class="flex items-center gap-2 p-2 rounded-lg hover:bg-gray-100 transition-colors">
-                                <img class="h-8 w-8 rounded-full" 
-                                     src="{{ auth()->user()->avatar ?? 'https://ui-avatars.com/api/?name='.urlencode(auth()->user()->name ?? 'Admin').'&color=7F9CF5&background=EBF4FF' }}" 
+                                <img class="h-8 w-8 rounded-full"
+                                     src="{{ auth()->user()->avatar ?? 'https://ui-avatars.com/api/?name='.urlencode(auth()->user()->name ?? 'Admin').'&color=7F9CF5&background=EBF4FF' }}"
                                      alt="Avatar">
                                 <span class="text-sm font-medium text-gray-700">{{ auth()->user()->name ?? 'Admin' }}</span>
                                 <svg class="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                                 </svg>
                             </button>
-                            
+
                             <!-- Dropdown Profile -->
-                            <div x-show="open" 
+                            <div x-show="open"
                                  @click.away="open = false"
                                  x-transition:enter="transition ease-out duration-200"
                                  x-transition:enter-start="opacity-0 scale-95"
@@ -426,7 +426,7 @@
             <!-- Main content -->
             <main class="min-h-screen p-4 sm:p-6 lg:p-8">
                 <!-- SPA Loading Overlay -->
-                <div x-show="isLoading" 
+                <div x-show="isLoading"
                      x-transition:enter="transition ease-out duration-300"
                      x-transition:enter-start="opacity-0"
                      x-transition:enter-end="opacity-100"
@@ -513,19 +513,19 @@
         function toggleSidebar() {
             const sidebar = document.getElementById('sidebar');
             const mainContent = document.getElementById('main-content');
-            
+
             sidebarCollapsed = !sidebarCollapsed;
-            
+
             if (sidebarCollapsed) {
                 // Réduire la sidebar
                 sidebar.classList.add('!w-20');
                 mainContent.classList.add('lg:!ml-20');
                 mainContent.classList.remove('lg:ml-64');
-                
+
                 // Cacher les textes, ne garder que les icônes (emoji)
                 const sidebarTexts = sidebar.querySelectorAll('.sidebar-nav a span.tracking-wide');
                 sidebarTexts.forEach(text => text.classList.add('hidden'));
-                
+
                 // Sauvegarder l'état dans localStorage
                 localStorage.setItem('sidebarCollapsed', 'true');
             } else {
@@ -533,11 +533,11 @@
                 sidebar.classList.remove('!w-20');
                 mainContent.classList.remove('lg:!ml-20');
                 mainContent.classList.add('lg:ml-64');
-                
+
                 // Réafficher les textes
                 const sidebarTexts = sidebar.querySelectorAll('.sidebar-nav a span.tracking-wide');
                 sidebarTexts.forEach(text => text.classList.remove('hidden'));
-                
+
                 // Sauvegarder l'état dans localStorage
                 localStorage.setItem('sidebarCollapsed', 'false');
             }
@@ -549,7 +549,7 @@
             const sidebar = document.getElementById('sidebar');
             const sidebarTexts = sidebar?.querySelectorAll('.sidebar-nav a span.tracking-wide');
             sidebarTexts?.forEach(text => text.classList.remove('hidden'));
-            
+
             // Ensuite restaurer l'état sauvegardé si nécessaire
             const savedState = localStorage.getItem('sidebarCollapsed');
             if (savedState === 'true') {
@@ -561,11 +561,11 @@
         function toggleDarkMode() {
             const html = document.documentElement;
             const isDark = html.classList.toggle('dark');
-            
+
             // Toggle icons
             const sunIcon = document.getElementById('dark-mode-icon-sun');
             const moonIcon = document.getElementById('dark-mode-icon-moon');
-            
+
             if (isDark) {
                 sunIcon.classList.add('hidden');
                 moonIcon.classList.remove('hidden');
@@ -957,17 +957,17 @@
     </script>
 
     <!-- Admin Modal SPA System - Mosaic Design -->
-    <div id="admin-modal" 
+    <div id="admin-modal"
          class="fixed inset-0 z-50 hidden items-center justify-center p-4 overflow-y-auto"
          style="backdrop-filter: blur(8px); background-color: rgba(0, 0, 0, 0.6);"
          onclick="if(event.target.id === 'admin-modal') closeAdminModal()">
-        
-        <div class="bg-white dark:bg-gray-800 rounded-2xl w-full max-w-6xl shadow-2xl 
+
+        <div class="bg-white dark:bg-gray-800 rounded-2xl w-full max-w-6xl shadow-2xl
                     transform transition-all duration-300 ease-out
                     animate-modal-enter my-8">
-            
+
             <!-- Modal Header - Gradient moderne -->
-            <div class="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 
+            <div class="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600
                         text-white p-5 flex items-center justify-between
                         border-b border-white/20">
                 <div class="flex items-center gap-3">
@@ -979,22 +979,22 @@
                         <p class="text-xs text-white/70 mt-0.5">Dashboard administrateur</p>
                     </div>
                 </div>
-                <button onclick="closeAdminModal()" 
-                        class="group flex items-center justify-center w-10 h-10 
-                               rounded-full hover:bg-white/20 
+                <button onclick="closeAdminModal()"
+                        class="group flex items-center justify-center w-10 h-10
+                               rounded-full hover:bg-white/20
                                transition-all duration-200 ease-in-out
                                transform hover:rotate-90"
                         title="Fermer (ESC)">
-                    <svg class="w-6 h-6 text-white group-hover:scale-110 transition-transform" 
+                    <svg class="w-6 h-6 text-white group-hover:scale-110 transition-transform"
                          fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                               d="M6 18L18 6M6 6l12 12" />
                     </svg>
                 </button>
             </div>
 
             <!-- Modal Content -->
-            <div id="admin-modal-content" 
+            <div id="admin-modal-content"
                  class="overflow-y-auto bg-gray-50 dark:bg-gray-900
                         scrollbar-thin scrollbar-thumb-blue-500 scrollbar-track-gray-200
                         dark:scrollbar-track-gray-800"
@@ -1013,8 +1013,8 @@
                 <div class="text-sm text-gray-500 dark:text-gray-400">
                     <span class="font-medium">Belier Intrépide</span> • Dashboard Admin
                 </div>
-                <button onclick="closeAdminModal()" 
-                        class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 
+                <button onclick="closeAdminModal()"
+                        class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300
                                hover:text-gray-900 dark:hover:text-white
                                transition-colors">
                     Fermer
@@ -1128,13 +1128,13 @@
     </style>
 
     <!-- AI Chatbot Assistant - Floating -->
-    <div x-data="chatbotManager()" 
+    <div x-data="chatbotManager()"
          x-init="init()"
          class="fixed bottom-6 right-6 z-50"
          style="z-index: 9999;">
-        
+
         <!-- Chatbot Window -->
-        <div x-show="isOpen" 
+        <div x-show="isOpen"
              x-transition:enter="transition ease-out duration-300"
              x-transition:enter-start="opacity-0 scale-95 translate-y-4"
              x-transition:enter-end="opacity-100 scale-100 translate-y-0"
@@ -1143,7 +1143,7 @@
              x-transition:leave-end="opacity-0 scale-95"
              class="mb-4 w-96 h-[600px] bg-white dark:bg-gray-800 rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-700 flex flex-col overflow-hidden"
              style="display: none;">
-            
+
             <!-- Header -->
             <div class="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 text-white p-4 flex items-center justify-between">
                 <div class="flex items-center gap-3">
@@ -1158,7 +1158,7 @@
                         <p class="text-xs text-white/80">En ligne • Prêt à vous aider</p>
                     </div>
                 </div>
-                <button @click="toggleChat()" 
+                <button @click="toggleChat()"
                         class="text-white/80 hover:text-white hover:bg-white/20 rounded-lg p-2 transition-colors">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
@@ -1170,7 +1170,7 @@
             <div class="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50 dark:bg-gray-900"
                  x-ref="messagesContainer"
                  @scroll.debounce="handleScroll()">
-                
+
                 <!-- Welcome Message -->
                 <div x-show="messages.length === 0" class="text-center py-8">
                     <span class="text-6xl mb-4 block">👋</span>
@@ -1181,19 +1181,19 @@
                         Je peux vous aider avec :
                     </p>
                     <div class="space-y-2 text-sm text-left max-w-xs mx-auto">
-                        <button @click="sendQuickCommand('stats')" 
+                        <button @click="sendQuickCommand('stats')"
                                 class="w-full text-left p-3 bg-white dark:bg-gray-800 rounded-lg hover:bg-blue-50 dark:hover:bg-gray-700 transition-colors border border-gray-200 dark:border-gray-700">
                             📊 Afficher les statistiques
                         </button>
-                        <button @click="sendQuickCommand('users')" 
+                        <button @click="sendQuickCommand('users')"
                                 class="w-full text-left p-3 bg-white dark:bg-gray-800 rounded-lg hover:bg-blue-50 dark:hover:bg-gray-700 transition-colors border border-gray-200 dark:border-gray-700">
                             👥 Gérer les utilisateurs
                         </button>
-                        <button @click="sendQuickCommand('articles')" 
+                        <button @click="sendQuickCommand('articles')"
                                 class="w-full text-left p-3 bg-white dark:bg-gray-800 rounded-lg hover:bg-blue-50 dark:hover:bg-gray-700 transition-colors border border-gray-200 dark:border-gray-700">
                             📰 Créer un article
                         </button>
-                        <button @click="sendQuickCommand('help')" 
+                        <button @click="sendQuickCommand('help')"
                                 class="w-full text-left p-3 bg-white dark:bg-gray-800 rounded-lg hover:bg-blue-50 dark:hover:bg-gray-700 transition-colors border border-gray-200 dark:border-gray-700">
                             ❓ Obtenir de l'aide
                         </button>
@@ -1204,8 +1204,8 @@
                 <template x-for="(message, index) in messages" :key="index">
                     <div :class="message.sender === 'user' ? 'flex justify-end' : 'flex justify-start'"
                          class="chatbot-message">
-                        <div :class="message.sender === 'user' 
-                                      ? 'bg-blue-600 text-white' 
+                        <div :class="message.sender === 'user'
+                                      ? 'bg-blue-600 text-white'
                                       : 'bg-white dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700'"
                              class="max-w-[80%] rounded-2xl px-4 py-3 shadow-sm">
                             <p class="text-sm whitespace-pre-wrap" x-html="message.text"></p>
@@ -1229,21 +1229,21 @@
             <!-- Input Area -->
             <div class="p-4 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700">
                 <form @submit.prevent="sendMessage()" class="flex gap-2">
-                    <input type="text" 
+                    <input type="text"
                            x-model="inputMessage"
                            :disabled="isTyping"
                            placeholder="Tapez votre message..."
-                           class="flex-1 px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 
+                           class="flex-1 px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600
                                   bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white
                                   focus:ring-2 focus:ring-blue-500 focus:border-transparent
                                   disabled:opacity-50 disabled:cursor-not-allowed text-sm">
-                    <button type="submit" 
+                    <button type="submit"
                             :disabled="!inputMessage.trim() || isTyping"
-                            class="bg-blue-600 text-white p-3 rounded-xl hover:bg-blue-700 
+                            class="bg-blue-600 text-white p-3 rounded-xl hover:bg-blue-700
                                    disabled:opacity-50 disabled:cursor-not-allowed
                                    transition-colors flex items-center justify-center">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                   d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
                         </svg>
                     </button>
@@ -1255,8 +1255,8 @@
         </div>
 
         <!-- Floating Button -->
-        <button @click="toggleChat()" 
-                class="chatbot-bubble w-16 h-16 bg-gradient-to-r from-blue-600 to-purple-600 
+        <button @click="toggleChat()"
+                class="chatbot-bubble w-16 h-16 bg-gradient-to-r from-blue-600 to-purple-600
                        rounded-full shadow-2xl flex items-center justify-center
                        hover:scale-110 transition-transform duration-200
                        relative group">
@@ -1264,15 +1264,15 @@
             <svg x-show="isOpen" class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
             </svg>
-            
+
             <!-- Badge notification -->
-            <span x-show="unreadCount > 0" 
-                  class="absolute -top-1 -right-1 w-6 h-6 bg-red-500 text-white text-xs font-bold 
+            <span x-show="unreadCount > 0"
+                  class="absolute -top-1 -right-1 w-6 h-6 bg-red-500 text-white text-xs font-bold
                          rounded-full flex items-center justify-center"
                   x-text="unreadCount"></span>
-            
+
             <!-- Tooltip -->
-            <div class="absolute right-full mr-3 top-1/2 -translate-y-1/2 
+            <div class="absolute right-full mr-3 top-1/2 -translate-y-1/2
                         bg-gray-900 text-white px-3 py-2 rounded-lg text-sm whitespace-nowrap
                         opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
                 Assistant AI
@@ -1288,7 +1288,7 @@
                 currentPage: '{{ $title ?? "Dashboard" }}',
                 currentUrl: window.location.href,
                 loadingIcon: '🏠',
-                
+
                 init() {
                     console.log('✅ SPA App initialized');
                     this.updatePageTitle();
@@ -1302,7 +1302,7 @@
                     }
 
                     console.log('🚀 Navigation SPA vers:', pageName);
-                    
+
                     this.isLoading = true;
                     this.currentPage = pageName;
                     this.currentUrl = url;
@@ -1320,13 +1320,13 @@
                         if (!response.ok) throw new Error('Erreur de chargement');
 
                         const html = await response.text();
-                        
+
                         // Parser le HTML reçu
                         const parser = new DOMParser();
                         const doc = parser.parseFromString(html, 'text/html');
-                        
+
                         // Extraire le contenu principal
-                        const newContent = doc.querySelector('main')?.innerHTML || 
+                        const newContent = doc.querySelector('main')?.innerHTML ||
                                          doc.querySelector('[x-data]')?.innerHTML ||
                                          html;
 
@@ -1337,7 +1337,7 @@
                         const mainElement = document.querySelector('main');
                         if (mainElement) {
                             mainElement.innerHTML = newContent;
-                            
+
                             // Re-initialiser les scripts Alpine.js dans le nouveau contenu
                             if (window.Alpine) {
                                 Alpine.initTree(mainElement);
@@ -1351,17 +1351,17 @@
 
                         // Mettre à jour l'URL sans rechargement
                         window.history.pushState({ page: pageName, url: url }, pageName, url);
-                        
+
                         // Scroll en haut de page
                         window.scrollTo({ top: 0, behavior: 'smooth' });
 
                         this.updatePageTitle();
-                        
+
                         console.log('✅ Contenu chargé avec succès');
 
                     } catch (error) {
                         console.error('❌ Erreur navigation SPA:', error);
-                        
+
                         // Fallback: rechargement classique
                         window.location.href = url;
                     } finally {
@@ -1371,7 +1371,7 @@
 
                 async loadSection(section, title) {
                     console.log('📄 Chargement section:', section);
-                    
+
                     this.isLoading = true;
                     this.currentPage = title;
                     this.updateLoadingIcon(section);
@@ -1381,17 +1381,17 @@
 
                     // Contenu dynamique selon la section
                     const content = this.getSectionContent(section, title);
-                    
+
                     const mainElement = document.querySelector('main');
                     if (mainElement) {
                         // Animation de sortie
                         mainElement.style.opacity = '0';
                         mainElement.style.transform = 'translateY(20px)';
-                        
+
                         await new Promise(resolve => setTimeout(resolve, 200));
-                        
+
                         mainElement.innerHTML = content;
-                        
+
                         // Animation d'entrée
                         await new Promise(resolve => setTimeout(resolve, 50));
                         mainElement.style.transition = 'all 0.3s ease-out';
@@ -1420,18 +1420,17 @@
                     };
 
                     return `
-                        <div class="px-4 sm:px-6 lg:px-8 py-8">
-                            <div class="max-w-7xl mx-auto">
-                                <!-- Header -->
-                                <div class="mb-8">
-                                    <div class="flex items-center gap-4 mb-4">
-                                        <span class="text-5xl">${icons[section] || '📋'}</span>
-                                        <div>
-                                            <h1 class="text-3xl font-bold text-gray-900 dark:text-white">${title}</h1>
-                                            <p class="text-gray-600 dark:text-gray-400 mt-1">Gestion et administration</p>
-                                        </div>
+                        <div class="max-w-7xl mx-auto">
+                            <!-- Header -->
+                            <div class="mb-8">
+                                <div class="flex items-center gap-4 mb-4">
+                                    <span class="text-5xl">${icons[section] || '📋'}</span>
+                                    <div>
+                                        <h1 class="text-3xl font-bold text-gray-900 dark:text-white">${title}</h1>
+                                        <p class="text-gray-600 dark:text-gray-400 mt-1">Gestion et administration</p>
                                     </div>
                                 </div>
+                            </div>
 
                                 <!-- Content Card -->
                                 <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
@@ -1544,7 +1543,7 @@
                 toggleChat() {
                     this.isOpen = !this.isOpen;
                     this.unreadCount = 0;
-                    
+
                     if (this.isOpen) {
                         this.$nextTick(() => {
                             this.scrollToBottom();
@@ -1573,7 +1572,7 @@
                     // Simuler une réponse AI (à remplacer par vraie API)
                     try {
                         const response = await this.getAIResponse(question);
-                        
+
                         setTimeout(() => {
                             const aiMessage = {
                                 sender: 'ai',
@@ -1583,7 +1582,7 @@
 
                             this.messages.push(aiMessage);
                             this.isTyping = false;
-                            
+
                             this.$nextTick(() => {
                                 this.scrollToBottom();
                             });
@@ -1614,19 +1613,19 @@
                     // Réponses intelligentes basées sur le contexte du dashboard
                     const responses = {
                         'stats': '📊 Voici un résumé de vos statistiques :\n\n• Utilisateurs totaux : <strong>' + (document.querySelectorAll('[data-stat="users"]')[0]?.textContent || 'N/A') + '</strong>\n• Articles publiés : <strong>En cours de calcul...</strong>\n• Commandes aujourd\'hui : <strong>En cours...</strong>\n\nVoulez-vous voir plus de détails ? Je peux ouvrir le modal statistiques pour vous.',
-                        
+
                         'users': '👥 Pour gérer les utilisateurs :\n\n1. Je peux ouvrir le modal utilisateurs\n2. Vous pouvez ajouter, modifier ou supprimer des users\n3. Gérer les rôles et permissions\n\nSouhaitez-vous que j\'ouvre le panneau utilisateurs ?',
-                        
+
                         'article': '📰 Pour créer un article :\n\n1. Cliquez sur le bouton "Nouvel Article" ✅\n2. Remplissez le titre et le contenu\n3. Ajoutez une image (optionnel)\n4. Choisissez la catégorie\n5. Publiez ou sauvegardez en brouillon\n\nBesoin d\'aide pour une étape spécifique ?',
-                        
+
                         'help': '🤖 Je suis votre assistant AI pour le dashboard admin !\n\nJe peux vous aider à :\n• 📊 Consulter les statistiques\n• 👥 Gérer les utilisateurs\n• 📰 Créer/modifier des articles\n• 💳 Suivre les abonnements\n• ⚙️ Configurer les paramètres\n• 🔍 Trouver rapidement des informations\n\nPosez-moi n\'importe quelle question !',
-                        
+
                         'default': '🤔 Voici ce que je comprends de votre question :\n\n"<em>' + question + '</em>"\n\nJe peux vous aider avec :\n• Les statistiques et données\n• La gestion des utilisateurs\n• La création de contenu\n• Les paramètres du système\n\nPouvez-vous préciser ce dont vous avez besoin ?'
                     };
 
                     // Détection intelligente des mots-clés
                     const lowerQ = question.toLowerCase();
-                    
+
                     if (lowerQ.includes('stat') || lowerQ.includes('chiffre') || lowerQ.includes('nombre')) {
                         return responses.stats;
                     } else if (lowerQ.includes('user') || lowerQ.includes('utilisateur') || lowerQ.includes('membre')) {

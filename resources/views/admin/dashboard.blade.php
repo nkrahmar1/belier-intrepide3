@@ -240,7 +240,7 @@
                                 </td>
                                 <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                                     <div class="flex items-center justify-center gap-2">
-                                        <button @click="togglePublish({{ $article->id }}, {{ $article->is_published ? 'true' : 'false' }})"
+                                        <button @click="togglePublish({{ $article->id ?? 'null' }}, {{ $article->is_published ? 'true' : 'false' }})"
                                             class="text-sm px-3 py-1.5 rounded-lg {{ $article->is_published ? 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600' : 'bg-emerald-100 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-400 hover:bg-emerald-200 dark:hover:bg-emerald-500/30' }} transition-colors">
                                             {{ $article->is_published ? 'Dépublier' : 'Publier' }}
                                         </button>
@@ -251,7 +251,7 @@
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
                                             </svg>
                                         </a>
-                                        <button @click="deleteArticle({{ $article->id }})"
+                                        <button @click="deleteArticle({{ $article->id ?? 'null' }})"
                                             class="text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300"
                                             title="Supprimer l'article">
                                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

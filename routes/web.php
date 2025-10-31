@@ -147,7 +147,7 @@ Route::middleware(['auth', \App\Http\Middleware\AdminMiddleware::class])->group(
 Route::middleware(['auth', \App\Http\Middleware\AdminMiddleware::class])->group(function () {
     Route::post('/admin/articles/quick-create', [AdminDashboardController::class, 'quickCreateArticle'])->name('admin.articles.quick-create');
     Route::post('/admin/articles/{id}/toggle-publish', [AdminDashboardController::class, 'togglePublish'])->name('admin.articles.toggle-publish');
-    Route::delete('/admin/articles/{id}', [AdminDashboardController::class, 'deleteArticle'])->name('admin.articles.destroy');
+    Route::delete('/admin/articles/{id}', [AdminDashboardController::class, 'deleteArticle'])->name('admin.articles.quick-delete');
 });
 
 // Routes Modal AJAX pour Sidebar (Système SPA)
@@ -187,7 +187,7 @@ Route::middleware(['auth', \App\Http\Middleware\AdminMiddleware::class])
     ->group(function () {
         // Articles avec gestion complète
         Route::resource('articles', AdminArticleController::class);
-        Route::post('/articles/{article}/toggle-publish', [AdminArticleController::class, 'togglePublish'])->name('articles.toggle-publish');
+        Route::post('/articles/{article}/toggle-publish', [AdminArticleController::class, 'togglePublish'])->name('articles.toggle');
         Route::post('/articles/{article}/duplicate', [AdminArticleController::class, 'duplicate'])->name('articles.duplicate');
         Route::get('/articles/{article}/download', [AdminArticleController::class, 'downloadDocument'])->name('articles.download');
         Route::get('/articles/stats', [AdminArticleController::class, 'getStats'])->name('articles.stats');

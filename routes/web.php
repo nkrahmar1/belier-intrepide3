@@ -107,6 +107,9 @@ Route::get('/test-simple-bootstrap', function () {
 Route::get('/', [HomeController::class, 'home'])->name('app_home');
 Route::get('/about', [HomeController::class, 'about'])->name('app_about');
 
+// Route pour afficher un article avec contrôle d'abonnement
+Route::get('/article/{id}', [HomeController::class, 'showArticle'])->name('article.show');
+
 // --------------------
 // Route pour les catégories
 // --------------------

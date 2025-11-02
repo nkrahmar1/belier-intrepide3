@@ -35,6 +35,35 @@
     .navbar {
     position: relative !important;
     z-index: 9999 !important;
+    display: block !important;
+    visibility: visible !important;
+    }
+
+    /* S'assurer que le collapse est visible sur DESKTOP */
+    @media (min-width: 992px) {
+        .navbar-collapse {
+            display: flex !important;
+            visibility: visible !important;
+        }
+    }
+
+    /* Sur MOBILE, gérer le collapse normalement */
+    @media (max-width: 991px) {
+        .navbar-collapse.collapse:not(.show) {
+            display: none !important;
+        }
+
+        .navbar-collapse.collapse.show {
+            display: flex !important;
+            flex-direction: column;
+        }
+
+        .navbar-collapse {
+            background-color: #04672a;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 10px;
+        }
     }
 
     /* === FLOATING ELEMENTS === */
@@ -1158,13 +1187,28 @@
         <main class="main-content">
             @if($featuredArticles->count() > 0)
                 <!-- S'il y a des articles en vedette, on affiche le premier comme article principal -->
-                @php $mainArticle = $featuredArticles->first(); @endphp
-                <article class="featured-article">
-                    @if($mainArticle->image)
-                        <img src="{{ asset('storage/' . $mainArticle->image) }}" alt="{{ $mainArticle->titre }}">
-                    @else
-                        <img src="{{asset('image/pdci1.jpg')}}" alt="Article principal">
-                    @endif
+                @php 
+                    $mainArticle = $featuredArticles->first();
+                    
+                    // Gestion intelligente de l'image pour l'article principal
+                    $mainImageUrl = null;
+                    if($mainArticle->image) {
+                        $storagePath = storage_path('app/public/' . $mainArticle->image);
+                        if(file_exists($storagePath)) {
+                            $mainImageUrl = asset('storage/' . $mainArticle->image);
+                        } else {
+                            $publicPath = public_path('image/' . basename($mainArticle->image));
+                            if(file_exists($publicPath)) {
+                                $mainImageUrl = asset('image/' . basename($mainArticle->image));
+                            }
+                        }
+                    }
+                    if(!$mainImageUrl) {
+                        $mainImageUrl = asset('image/pdci1.jpg');
+                    }
+                @endphp
+                <article class="featured-article" onclick="window.location.href='{{ route('article.show', $mainArticle->id) }}'" style="cursor: pointer;">
+                    <img src="{{ $mainImageUrl }}" alt="{{ $mainArticle->titre }}" onerror="this.src='{{ asset('image/pdci1.jpg') }}'">
                     <div class="article-category {{ strtolower($mainArticle->category->nom ?? 'general') }}">
                         {{ strtoupper($mainArticle->category->nom ?? 'GÉNÉRAL') }}
                     </div>
@@ -1176,222 +1220,110 @@
                             <span>👤 {{ $mainArticle->user->firstname }} {{ $mainArticle->user->lastname }}</span>
                         @endif
                         <span>📖 {{ ceil(str_word_count(strip_tags($mainArticle->contenu)) / 200) }} min de lecture</span>
+                        @if($mainArticle->category && strtolower($mainArticle->category->nom) === 'politique')
+                            <span style="color: #dc3545; font-weight: bold;">
+                                <i class="fas fa-lock"></i> Réservé abonnés
+                            </span>
+                        @endif
                     </div>
                 </article>
-                <!-- Grille d'articles dynamiques -->
+                <!-- Grille d'articles dynamiques - SIMPLIFIÉE -->
                 <div class="articles-grid">
                 @php
-                    // Créer un tableau pour organiser les articles par catégorie
-                    $articlesByCategory = [];
-                    foreach($featuredArticles->skip(1)->take(6) as $article) {
-                        $categoryKey = strtolower($article->category->nom ?? 'general');
-                        if (!isset($articlesByCategory[$categoryKey])) {
-                            $articlesByCategory[$categoryKey] = [];
-                        }
-                        $articlesByCategory[$categoryKey][] = $article;
-                    }
-
-                    // Articles de fallback par catégorie
-                    $defaultArticles = [
-                        'economie' => [
-                            'image' => 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=400&h=200&fit=crop',
-                            'category' => 'ÉCONOMIE',
-                            'title' => 'Commerce africain : L\'Afreximbank dévoile son rapport 2025 et révèle les défis et opportunités',
-                            'excerpt' => 'Analyse complète des tendances du commerce intra-africain et des perspectives d\'investissement pour le développement économique...',
-                            'date' => '25 Juin 2025'
-                        ],
-                        'sport' => [
-                            'image' => 'https://images.unsplash.com/photo-1461896836934-ffe607ba8211?w=400&h=200&fit=crop',
-                            'category' => 'SPORT',
-                            'title' => 'CAN 2025 : Préparatifs intensifs pour les Éléphants de Côte d\'Ivoire',
-                            'excerpt' => 'L\'équipe nationale se prépare activement pour la prochaine Coupe d\'Afrique des Nations avec un programme d\'entraînement renforcé...',
-                            'date' => '24 Juin 2025'
-                        ],
-                        'politique' => [
-                            'image' => 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=400&h=200&fit=crop',
-                            'category' => 'POLITIQUE',
-                            'title' => 'Coopération Côte d\'Ivoire-Ghana : Renforcement des liens bilatéraux',
-                            'excerpt' => 'Nouvelles initiatives de coopération économique et politique entre les deux pays voisins pour un développement mutuel...',
-                            'date' => '23 Juin 2025'
-                        ],
-                        'culture et média' => [
-                            'image' => 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=400&h=200&fit=crop',
-                            'category' => 'CULTURE',
-                            'title' => 'Festival des Arts de Côte d\'Ivoire : Célébration de la diversité culturelle',
-                            'excerpt' => 'Une semaine dédiée à la promotion des arts et de la culture ivoirienne avec des événements dans tout le pays...',
-                            'date' => '22 Juin 2025'
-                        ],
-                        'pdci-rda' => [
-                            'image' => asset('image/pdci.jpg'),
-                            'category' => 'PDCI-RDA',
-                            'title' => 'AAM2025 à Abuja : Afreximbank trace la route de l\'Afrique résiliente et innovante',
-                            'excerpt' => 'Participation active du PDCI-RDA aux discussions sur l\'avenir économique de l\'Afrique lors de la conférence d\'Abuja...',
-                            'date' => '21 Juin 2025'
-                        ],
-                        'society' => [
-                            'image' => asset('image/justice.webp'),
-                            'category' => 'POLITIQUE',
-                            'title' => 'Cour de cassation : Un manuel didactique mis à la disposition des praticiens du droit',
-                            'excerpt' => 'Initiative pour améliorer l\'accès à la justice et renforcer les compétences des professionnels du secteur juridique...',
-                            'date' => '20 Juin 2025'
-                        ]
+                    // Images de fallback par catégorie depuis votre dossier local
+                    $categoryImages = [
+                        'economie' => 'economie2.webp',
+                        'sport' => 'sport-monde.jpg',
+                        'politique' => 'politique.jpg',
+                        'culture et média' => 'culture.webp',
+                        'pdci-rda' => 'pdci1.jpg',
+                        'société' => 'justice.webp',
+                        'afrique' => 'ivoire.jpg',
+                        'dossiers' => 'im3.png'
                     ];
-
-                    $categoriesOrder = ['economie', 'sport', 'politique', 'culture et média', 'pdci-rda', 'society'];
-                    $articleCount = 0;
                 @endphp
 
-                @foreach($categoriesOrder as $categoryKey)
-                    @if($articleCount >= 6) @break @endif
-
-                    @if(isset($articlesByCategory[$categoryKey]) && count($articlesByCategory[$categoryKey]) > 0)
-                        {{-- Article dynamique de la base de données --}}
-                        @php $article = $articlesByCategory[$categoryKey][0]; @endphp
-                        <article class="article-card">
-                            @if($article->image)
-                                <img src="{{ asset('storage/' . $article->image) }}" alt="{{ $article->titre }}">
-                            @else
-                                <img src="{{ $defaultArticles[$categoryKey]['image'] ?? 'https://via.placeholder.com/400x200' }}" alt="{{ $article->titre }}">
-                            @endif
-                            <div class="article-card-content">
-                                @php
-                                    $categoryClass = 'general';
-                                    $categoryName = $article->category->nom ?? 'Général';
-                                    switch(strtolower($categoryName)) {
-                                        case 'economie': $categoryClass = 'economie'; break;
-                                        case 'sport': $categoryClass = 'sport'; break;
-                                        case 'culture et média': $categoryClass = 'culture'; break;
-                                        case 'politique': $categoryClass = 'politique'; break;
-                                        case 'pdci-rda': $categoryClass = 'pdci'; break;
-                                        case 'afrique': $categoryClass = 'afrique'; break;
-                                        case 'société': $categoryClass = 'societe'; break;
-                                        case 'dossiers': $categoryClass = 'dossiers'; break;
+                {{-- Afficher les 6 prochains articles après le principal --}}
+                @foreach($featuredArticles->skip(1)->take(6) as $article)
+                    <article class="article-card" onclick="window.location.href='{{ route('article.show', $article->id) }}'" style="cursor: pointer;">
+                        {{-- Image de l'article avec gestion intelligente --}}
+                        @php
+                            $imageUrl = null;
+                            
+                            if($article->image) {
+                                // Vérifier si le fichier existe dans storage
+                                $storagePath = storage_path('app/public/' . $article->image);
+                                if(file_exists($storagePath)) {
+                                    $imageUrl = asset('storage/' . $article->image);
+                                } else {
+                                    // Si le fichier n'existe pas dans storage, chercher dans public/image
+                                    $publicPath = public_path('image/' . basename($article->image));
+                                    if(file_exists($publicPath)) {
+                                        $imageUrl = asset('image/' . basename($article->image));
                                     }
-                                @endphp
-                                <div class="article-category {{ $categoryClass }}">{{ strtoupper($categoryName) }}</div>
-                                <h3 class="article-card-title">{{ $article->titre }}</h3>
-                                <p class="article-card-excerpt">{{ Str::limit($article->extrait ?: strip_tags($article->contenu), 120) }}</p>
-                                <div class="article-meta">
-                                    <span>📅 {{ $article->created_at->format('d M Y') }}</span>
-                                    @if($article->document_path)
-                                        <span style="margin-left: 10px;">
-                                            <a href="{{ route('articles.download', $article->id) }}"
-                                               style="color: #28a745; font-weight: bold; text-decoration: none;"
-                                               title="Télécharger le document">
-                                                <i class="fas fa-file-download"></i> PDF
-                                            </a>
+                                }
+                            }
+                            
+                            // Si toujours pas d'image, utiliser le fallback par catégorie
+                            if(!$imageUrl) {
+                                $catKey = strtolower($article->category->nom ?? 'general');
+                                $fallbackImage = $categoryImages[$catKey] ?? 'pdci1.jpg';
+                                $imageUrl = asset('image/' . $fallbackImage);
+                            }
+                        @endphp
+                        <img src="{{ $imageUrl }}" alt="{{ $article->titre }}" onerror="this.src='{{ asset('image/pdci1.jpg') }}'">
+
+                        <div class="article-card-content">
+                            @php
+                                $categoryClass = 'general';
+                                $categoryName = $article->category->nom ?? 'Général';
+                                switch(strtolower($categoryName)) {
+                                    case 'economie': $categoryClass = 'economie'; break;
+                                    case 'sport': $categoryClass = 'sport'; break;
+                                    case 'culture et média': $categoryClass = 'culture'; break;
+                                    case 'politique': $categoryClass = 'politique'; break;
+                                    case 'pdci-rda': $categoryClass = 'pdci'; break;
+                                    case 'afrique': $categoryClass = 'afrique'; break;
+                                    case 'société': $categoryClass = 'societe'; break;
+                                    case 'dossiers': $categoryClass = 'dossiers'; break;
+                                }
+                            @endphp
+
+                            <div class="article-category {{ $categoryClass }}">{{ strtoupper($categoryName) }}</div>
+                            <h3 class="article-card-title">{{ $article->titre }}</h3>
+                            <p class="article-card-excerpt">{{ Str::limit($article->extrait ?: strip_tags($article->contenu), 120) }}</p>
+
+                            <div class="article-meta">
+                                <span>📅 {{ $article->created_at->format('d M Y') }}</span>
+
+                                @if($categoryClass === 'politique')
+                                    <span style="margin-left: 10px;">
+                                        <span style="color: #dc3545; font-weight: bold;">
+                                            <i class="fas fa-lock"></i> Réservé abonnés
                                         </span>
-                                    @endif
-                                </div>
+                                    </span>
+                                @endif
+
+                                @if($article->document_path)
+                                    <span style="margin-left: 10px;">
+                                        <span style="color: #28a745; font-weight: bold;" title="Document disponible">
+                                            <i class="fas fa-file-pdf"></i> PDF
+                                        </span>
+                                    </span>
+                                @endif
                             </div>
-                        </article>
-                        @php $articleCount++; @endphp
-                    @elseif(isset($defaultArticles[$categoryKey]))
-                        {{-- Article statique par défaut --}}
-                        @php $defaultArticle = $defaultArticles[$categoryKey]; @endphp
-                        <article class="article-card">
-                            <img src="{{ $defaultArticle['image'] }}" alt="{{ $defaultArticle['category'] }}">
-                            <div class="article-card-content">
-                                <div class="article-category {{ strtolower(str_replace(['É', ' '], ['e', ''], $defaultArticle['category'])) }}">{{ $defaultArticle['category'] }}</div>
-                                <h3 class="article-card-title">{{ $defaultArticle['title'] }}</h3>
-                                <p class="article-card-excerpt">{{ $defaultArticle['excerpt'] }}</p>
-                                <div class="article-meta">
-                                    <span>📅 {{ $defaultArticle['date'] }}</span>
-                                </div>
-                            </div>
-                        </article>
-                        @php $articleCount++; @endphp
-                    @endif
+                        </div>
+                    </article>
                 @endforeach
             </div>
             @else
-                <!-- Articles par défaut si aucun article en vedette -->
-                <article class="featured-article">
-                    <img src="{{asset('image/pdci1.jpg')}}" alt="Article principal">
-                    <div class="article-category pdci">PDCI-RDA</div>
-                    <h2 class="article-title">PDCI-RDA 2025 : Une première journée entre héritage partagé, résilience institutionnelle et intégration panafricaine</h2>
-                    <p class="article-excerpt">Le Parti Démocratique de Côte d'Ivoire - Rassemblement Démocratique Africain trace la voie vers une Afrique résiliente et innovante avec des initiatives concrètes pour le développement socio-économique du continent.</p>
-                    <div class="article-meta">
-                        <span>📅 26 Juin 2025</span>
-                        <span>👤 Rédaction PDCI</span>
-                        <span>📖 5 min de lecture</span>
-                    </div>
-                </article>
-
-                <div class="articles-grid">
-                    <article class="article-card">
-                        <img src="https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=400&h=200&fit=crop" alt="Économie">
-                        <div class="article-card-content">
-                            <div class="article-category economie">ÉCONOMIE</div>
-                            <h3 class="article-card-title">Commerce africain : L'Afreximbank dévoile son rapport 2025 et révèle les défis et opportunités</h3>
-                            <p class="article-card-excerpt">Analyse complète des tendances du commerce intra-africain et des perspectives d'investissement pour le développement économique...</p>
-                            <div class="article-meta">
-                                <span>📅 25 Juin 2025</span>
-                            </div>
-                        </div>
-                    </article>
-
-                    <article class="article-card">
-                        <img src="https://images.unsplash.com/photo-1461896836934-ffe607ba8211?w=400&h=200&fit=crop" alt="Sport">
-                        <div class="article-card-content">
-                            <div class="article-category sport">SPORT</div>
-                            <h3 class="article-card-title">CAN 2025 : Préparatifs intensifs pour les Éléphants de Côte d'Ivoire</h3>
-                            <p class="article-card-excerpt">L'équipe nationale se prépare activement pour la prochaine Coupe d'Afrique des Nations avec un programme d'entraînement renforcé...</p>
-                            <div class="article-meta">
-                                <span>📅 24 Juin 2025</span>
-                            </div>
-                        </div>
-                    </article>
-
-                    <article class="article-card">
-                        <img src="https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=400&h=200&fit=crop" alt="Politique">
-                        <div class="article-card-content">
-                            <div class="article-category politique">POLITIQUE</div>
-                            <h3 class="article-card-title">Coopération Côte d'Ivoire-Ghana : Renforcement des liens bilatéraux</h3>
-                            <p class="article-card-excerpt">Nouvelles initiatives de coopération économique et politique entre les deux pays voisins pour un développement mutuel...</p>
-                            <div class="article-meta">
-                                <span>📅 23 Juin 2025</span>
-                            </div>
-                        </div>
-                    </article>
-
-                    <article class="article-card">
-                        <img src="https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=400&h=200&fit=crop" alt="Culture">
-                        <div class="article-card-content">
-                            <div class="article-category culture">CULTURE</div>
-                            <h3 class="article-card-title">Festival des Arts de Côte d'Ivoire : Célébration de la diversité culturelle</h3>
-                            <p class="article-card-excerpt">Une semaine dédiée à la promotion des arts et de la culture ivoirienne avec des événements dans tout le pays...</p>
-                            <div class="article-meta">
-                                <span>📅 22 Juin 2025</span>
-                            </div>
-                        </div>
-                    </article>
-
-                    <article class="article-card">
-                        <img src="{{asset('image/pdci.jpg')}}" alt="PDCI">
-                        <div class="article-card-content">
-                            <div class="article-category pdci">PDCI-RDA</div>
-                            <h3 class="article-card-title">AAM2025 à Abuja : Afreximbank trace la route de l'Afrique résiliente et innovante</h3>
-                            <p class="article-card-excerpt">Participation active du PDCI-RDA aux discussions sur l'avenir économique de l'Afrique lors de la conférence d'Abuja...</p>
-                            <div class="article-meta">
-                                <span>📅 21 Juin 2025</span>
-                            </div>
-                        </div>
-                    </article>
-
-                    <article class="article-card">
-                        <img src="{{asset('image/justice.webp')}}" alt="Justice">
-                        <div class="article-card-content">
-                            <div class="article-category politique">POLITIQUE</div>
-                            <h3 class="article-card-title">Cour de cassation : Un manuel didactique mis à la disposition des praticiens du droit</h3>
-                            <p class="article-card-excerpt">Initiative pour améliorer l'accès à la justice et renforcer les compétences des professionnels du secteur juridique...</p>
-                            <div class="article-meta">
-                                <span>📅 20 Juin 2025</span>
-                            </div>
-                        </div>
-                    </article>
-            </div>
-        @endif
+                {{-- Message si aucun article n'est disponible --}}
+                <div style="text-align: center; padding: 60px 20px;">
+                    <i class="fas fa-newspaper" style="font-size: 4rem; color: #ccc; margin-bottom: 20px;"></i>
+                    <h3 style="color: #666;">Aucun article publié pour le moment</h3>
+                    <p style="color: #999;">Revenez bientôt pour découvrir nos dernières actualités !</p>
+                </div>
+            @endif
         </main>
 
         <aside class="sidebar">
@@ -1419,6 +1351,32 @@
 
             <div class="sidebar-section">
                 <h3 class="sidebar-title">À la Une</h3>
+                @forelse($sidebarArticles as $sidebarArticle)
+                <article class="sidebar-article" onclick="window.location.href='{{ route('article.show', $sidebarArticle->id) }}'" style="cursor: pointer;">
+                    @php
+                        $sidebarImageUrl = null;
+                        if($sidebarArticle->image) {
+                            $storagePath = storage_path('app/public/' . $sidebarArticle->image);
+                            if(file_exists($storagePath)) {
+                                $sidebarImageUrl = asset('storage/' . $sidebarArticle->image);
+                            } else {
+                                $publicPath = public_path('image/' . basename($sidebarArticle->image));
+                                if(file_exists($publicPath)) {
+                                    $sidebarImageUrl = asset('image/' . basename($sidebarArticle->image));
+                                }
+                            }
+                        }
+                        if(!$sidebarImageUrl) {
+                            $sidebarImageUrl = asset('image/politique.jpg');
+                        }
+                    @endphp
+                    <img src="{{ $sidebarImageUrl }}" alt="{{ $sidebarArticle->titre }}" onerror="this.src='{{ asset('image/politique.jpg') }}'">
+                    <div class="sidebar-article-content">
+                        <h4 class="sidebar-article-title">{{ Str::limit($sidebarArticle->titre, 60) }}</h4>
+                        <div class="sidebar-article-date">{{ $sidebarArticle->created_at->format('d M Y') }}</div>
+                    </div>
+                </article>
+                @empty
                 <article class="sidebar-article">
                     <img src="{{asset('image/politique.jpg')}}" alt="Actualité">
                     <div class="sidebar-article-content">
@@ -1426,27 +1384,7 @@
                         <div class="sidebar-article-date">26 Juin 2025</div>
                     </div>
                 </article>
-                <article class="sidebar-article">
-                    <img src="{{asset('image/justice.webp')}}" alt="Justice">
-                    <div class="sidebar-article-content">
-                        <h4 class="sidebar-article-title">Cour de cassation : Un manuel didactique pour les praticiens du droit</h4>
-                        <div class="sidebar-article-date">25 Juin 2025</div>
-                    </div>
-                </article>
-                <article class="sidebar-article">
-                    <img src="{{asset('image/economie2.webp')}}" alt="Économie numérique">
-                    <div class="sidebar-article-content">
-                        <h4 class="sidebar-article-title">Économie numérique africaine : Trajectoire vers 712 milliards $</h4>
-                        <div class="sidebar-article-date">24 Juin 2025</div>
-                    </div>
-                </article>
-                <article class="sidebar-article">
-                    <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=80&h=60&fit=crop" alt="Sport">
-                    <div class="sidebar-article-content">
-                        <h4 class="sidebar-article-title">Championnat national : Résultats et classements</h4>
-                        <div class="sidebar-article-date">23 Juin 2025</div>
-                    </div>
-                </article>
+                @endforelse
             </div>
 
             <div class="sidebar-section">
@@ -1517,7 +1455,7 @@
         <!-- Section Mes Articles (Accordéon) -->
         <div class="card border-0 shadow-sm mb-3">
             <div class="card-body p-0">
-                <button class="accordion-button w-100 text-start px-3 py-3 border-0 bg-white d-flex justify-content-between align-items-center" 
+                <button class="accordion-button w-100 text-start px-3 py-3 border-0 bg-white d-flex justify-content-between align-items-center"
                         onclick="toggleDashboardSection('articlesSection', this)"
                         style="font-size: 1rem; font-weight: 600; cursor: pointer; transition: all 0.3s;">
                     <span>
@@ -1538,7 +1476,7 @@
         <!-- Section Profil (Accordéon) -->
         <div class="card border-0 shadow-sm mb-3">
             <div class="card-body p-0">
-                <button class="accordion-button w-100 text-start px-3 py-3 border-0 bg-white d-flex justify-content-between align-items-center" 
+                <button class="accordion-button w-100 text-start px-3 py-3 border-0 bg-white d-flex justify-content-between align-items-center"
                         onclick="toggleDashboardSection('profileSection', this)"
                         style="font-size: 1rem; font-weight: 600; cursor: pointer; transition: all 0.3s;">
                     <span>
@@ -1550,15 +1488,15 @@
                 <div id="profileSection" class="collapse-section px-3 pb-3" style="display: none; padding-top: 1rem;">
                     <ul class="list-group list-group-flush">
                         <li class="list-group-item d-flex justify-content-between align-items-center border-0 px-0 py-2">
-                            <strong><i class="fas fa-id-card me-2 text-muted"></i>Nom :</strong> 
+                            <strong><i class="fas fa-id-card me-2 text-muted"></i>Nom :</strong>
                             <span>{{ Auth::user()->firstname }}</span>
                         </li>
                         <li class="list-group-item d-flex justify-content-between align-items-center border-0 px-0 py-2">
-                            <strong><i class="fas fa-signature me-2 text-muted"></i>Prénom :</strong> 
+                            <strong><i class="fas fa-signature me-2 text-muted"></i>Prénom :</strong>
                             <span>{{ Auth::user()->lastname }}</span>
                         </li>
                         <li class="list-group-item d-flex justify-content-between align-items-center border-0 px-0 py-2">
-                            <strong><i class="fas fa-envelope me-2 text-muted"></i>Email :</strong> 
+                            <strong><i class="fas fa-envelope me-2 text-muted"></i>Email :</strong>
                             <span class="text-break">{{ Auth::user()->email }}</span>
                         </li>
                     </ul>
@@ -1569,7 +1507,7 @@
         <!-- Section Adresse (Accordéon) -->
         <div class="card border-0 shadow-sm mb-3">
             <div class="card-body p-0">
-                <button class="accordion-button w-100 text-start px-3 py-3 border-0 bg-white d-flex justify-content-between align-items-center" 
+                <button class="accordion-button w-100 text-start px-3 py-3 border-0 bg-white d-flex justify-content-between align-items-center"
                         onclick="toggleDashboardSection('addressSection', this)"
                         style="font-size: 1rem; font-weight: 600; cursor: pointer; transition: all 0.3s;">
                     <span>
@@ -1622,6 +1560,54 @@
             <h2 class="section-title">Les + Populaires</h2>
 
             <ul class="popular-list">
+                @forelse($popularArticles as $index => $popularArticle)
+                <li class="popular-item">
+                    <a href="{{ route('article.show', $popularArticle->id) }}" class="popular-link">
+                        <div class="popular-number">{{ $index + 1 }}</div>
+                        @php
+                            $popularImageUrl = null;
+                            if($popularArticle->image) {
+                                $storagePath = storage_path('app/public/' . $popularArticle->image);
+                                if(file_exists($storagePath)) {
+                                    $popularImageUrl = asset('storage/' . $popularArticle->image);
+                                } else {
+                                    $publicPath = public_path('image/' . basename($popularArticle->image));
+                                    if(file_exists($publicPath)) {
+                                        $popularImageUrl = asset('image/' . basename($popularArticle->image));
+                                    }
+                                }
+                            }
+                            if(!$popularImageUrl) {
+                                $popularImageUrl = asset('image/economie2.webp');
+                            }
+                        @endphp
+                        <img src="{{ $popularImageUrl }}" alt="{{ $popularArticle->titre }}" class="popular-image" onerror="this.src='{{ asset('image/economie2.webp') }}'">
+                        <div class="popular-content">
+                            @if($popularArticle->category)
+                                @php
+                                    $categoryClass = 'economie';
+                                    switch(strtolower($popularArticle->category->nom)) {
+                                        case 'sport': $categoryClass = 'sport'; break;
+                                        case 'politique': $categoryClass = 'politique'; break;
+                                        case 'culture et média': $categoryClass = 'culture'; break;
+                                        case 'pdci-rda': $categoryClass = 'pdci'; break;
+                                    }
+                                @endphp
+                                <div class="category-tag {{ $categoryClass }}">{{ strtoupper($popularArticle->category->nom) }}</div>
+                            @endif
+                            <h3 class="popular-title">{{ Str::limit($popularArticle->titre, 80) }}</h3>
+                            <div class="popular-meta">
+                                <span>📅 {{ $popularArticle->created_at->format('d M Y') }}</span>
+                                @if($popularArticle->category && strtolower($popularArticle->category->nom) === 'politique')
+                                    <span style="color: #dc3545; font-weight: bold; font-size: 0.85rem;">
+                                        <i class="fas fa-lock"></i> Réservé abonnés
+                                    </span>
+                                @endif
+                            </div>
+                        </div>
+                    </a>
+                </li>
+                @empty
                 <li class="popular-item">
                     <a href="#" class="popular-link">
                         <div class="popular-number">1</div>
@@ -1636,111 +1622,7 @@
                         </div>
                     </a>
                 </li>
-
-                <li class="popular-item">
-                    <a href="#" class="popular-link">
-                        <div class="popular-number">2</div>
-                        <img src="https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=300&h=200&fit=crop" alt="Armée ivoirienne" class="popular-image">
-                        <div class="popular-content">
-                            <div class="category-tag sport">SPORT</div>
-                            <h3 class="popular-title">Armée ivoirienne: Un recrutement de sous-officiers et militaires du rang spécialistes ouvert</h3>
-                            <div class="popular-meta">
-                                <span>📅 25 Juin 2025</span>
-                                <span>👁️ 9,876 vues</span>
-                            </div>
-                        </div>
-                    </a>
-                </li>
-
-                <li class="popular-item">
-                    <a href="#" class="popular-link">
-                        <div class="popular-number">3</div>
-                        <img src="https://images.unsplash.com/photo-1577962917302-cd874c4e31d2?w=300&h=200&fit=crop" alt="Fonction publique" class="popular-image">
-                        <div class="popular-content">
-                            <div class="category-tag politique">POLITIQUE</div>
-                            <h3 class="popular-title">Concours d'entrée à la Fonction publique 2023: De nombreuses innovations au profit des jeunes</h3>
-                            <div class="popular-meta">
-                                <span>📅 24 Juin 2025</span>
-                                <span>👁️ 8,234 vues</span>
-                            </div>
-                        </div>
-                    </a>
-                </li>
-
-                <li class="popular-item">
-                    <a href="#" class="popular-link">
-                        <div class="popular-number">4</div>
-                        <img src="https://images.unsplash.com/photo-1529107386315-e1a2ed48a620?w=300&h=200&fit=crop" alt="PDCI-RDA Afrique" class="popular-image">
-                        <div class="popular-content">
-                            <div class="category-tag pdci">PDCI-RDA</div>
-                            <h3 class="popular-title">PDCI-RDA : Nouvelle stratégie pour l'intégration panafricaine</h3>
-                            <div class="popular-meta">
-                                <span>📅 23 Juin 2025</span>
-                                <span>👁️ 7,123 vues</span>
-                            </div>
-                        </div>
-                    </a>
-                </li>
-
-                <li class="popular-item">
-                    <a href="#" class="popular-link">
-                        <div class="popular-number">5</div>
-                        <img src="https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=300&h=200&fit=crop" alt="Festival MASA Culture" class="popular-image">
-                        <div class="popular-content">
-                            <div class="category-tag culture">CULTURE</div>
-                            <h3 class="popular-title">Festival MASA 2025 : La culture ivoirienne à l'honneur</h3>
-                            <div class="popular-meta">
-                                <span>📅 22 Juin 2025</span>
-                                <span>👁️ 6,445 vues</span>
-                            </div>
-                        </div>
-                    </a>
-                </li>
-
-                <li class="popular-item">
-                    <a href="#" class="popular-link">
-                        <div class="popular-number">6</div>
-                        <img src="https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=300&h=200&fit=crop" alt="Souveraineté Sanitaire Afrique" class="popular-image">
-                        <div class="popular-content">
-                            <div class="category-tag economie">ÉCONOMIE</div>
-                            <h3 class="popular-title">Souveraineté Sanitaire : L'Afrique prend son destin en main avec Afreximbank</h3>
-                            <div class="popular-meta">
-                                <span>📅 21 Juin 2025</span>
-                                <span>👁️ 5,889 vues</span>
-                            </div>
-                        </div>
-                    </a>
-                </li>
-
-                <li class="popular-item">
-                    <a href="#" class="popular-link">
-                        <div class="popular-number">7</div>
-                        <img src="https://images.unsplash.com/photo-1431324155629-1a6deb1dec8d?w=300&h=200&fit=crop" alt="Football championnat" class="popular-image">
-                        <div class="popular-content">
-                            <div class="category-tag sport">SPORT</div>
-                            <h3 class="popular-title">Championnat national de football : Résultats de la 15e journée</h3>
-                            <div class="popular-meta">
-                                <span>📅 20 Juin 2025</span>
-                                <span>👁️ 4,567 vues</span>
-                            </div>
-                        </div>
-                    </a>
-                </li>
-
-                <li class="popular-item">
-                    <a href="#" class="popular-link">
-                        <div class="popular-number">8</div>
-                        <img src="https://images.unsplash.com/photo-1541872705-1f73c6400ec9?w=300&h=200&fit=crop" alt="Dialogue politique" class="popular-image">
-                        <div class="popular-content">
-                            <div class="category-tag politique">POLITIQUE</div>
-                            <h3 class="popular-title">Dialogue politique national : Les recommandations du comité d'organisation</h3>
-                            <div class="popular-meta">
-                                <span>📅 19 Juin 2025</span>
-                                <span>👁️ 3,234 vues</span>
-                            </div>
-                        </div>
-                    </a>
-                </li>
+                @endforelse
             </ul>
         </div>
     </div>
@@ -1768,14 +1650,14 @@ function toggleSection(sectionId) {
 function toggleDashboardSection(sectionId, button) {
     const section = document.getElementById(sectionId);
     const icon = button.querySelector('.transition-icon');
-    
+
     // Toggle de l'affichage avec animation douce et élastique
     if (section.style.display === 'none' || section.style.display === '') {
         section.style.display = 'block';
         section.style.animation = 'slideDown 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55)';
         icon.style.transform = 'rotate(180deg)';
         button.classList.add('active');
-        
+
         // Effet sonore visuel (vibration subtile)
         button.style.animation = 'none';
         setTimeout(() => {
@@ -1806,7 +1688,7 @@ if (!document.getElementById('dashboard-animations')) {
                 transform: translateY(0) scale(1);
             }
         }
-        
+
         @keyframes slideUp {
             from {
                 opacity: 1;
@@ -1817,7 +1699,7 @@ if (!document.getElementById('dashboard-animations')) {
                 transform: translateY(-20px) scale(0.98);
             }
         }
-        
+
         @keyframes iconPulse {
             0%, 100% {
                 transform: scale(1);

@@ -22,6 +22,20 @@ class HomeController extends Controller
             ->orderBy('homepage_featured_at', 'desc')
             ->get();
 
+        // Récupération de TOUS les articles de la catégorie Politique (publiés)
+        $politiqueArticles = Article::where('is_published', true)
+            ->whereNotNull('published_at')
+            ->where('published_at', '<=', now())
+            ->whereHas('category', function($query) {
+                $query->where('nom', 'Politique');
+            })
+            ->with(['category', 'user'])
+            ->latest('published_at')
+            ->get();
+
+        // Fusionner les articles en vedette avec TOUS les articles Politique (éviter les doublons)
+        $featuredArticles = $featuredArticles->merge($politiqueArticles)->unique('id')->sortByDesc('published_at');
+
         // Grouper les articles par catégorie pour l'affichage
         $articlesByCategory = $featuredArticles->groupBy(function($article) {
             return $article->category ? $article->category->nom : 'Non classé';
@@ -34,6 +48,24 @@ class HomeController extends Controller
             ->with('category', 'user')
             ->latest('published_at')
             ->take(6)
+            ->get();
+
+        // Récupération des articles pour la sidebar (les 4 derniers)
+        $sidebarArticles = Article::where('is_published', true)
+            ->whereNotNull('published_at')
+            ->where('published_at', '<=', now())
+            ->with('category', 'user')
+            ->latest('published_at')
+            ->take(4)
+            ->get();
+
+        // Récupération des articles populaires (les 8 plus récents)
+        $popularArticles = Article::where('is_published', true)
+            ->whereNotNull('published_at')
+            ->where('published_at', '<=', now())
+            ->with('category', 'user')
+            ->latest('published_at')
+            ->take(8)
             ->get();
 
         $featuredProducts = Product::where('featured', true)->take(4)->get();
@@ -51,6 +83,8 @@ class HomeController extends Controller
             'featuredArticles',
             'articlesByCategory',
             'latestArticles',
+            'sidebarArticles',
+            'popularArticles',
             'featuredProducts',
             'categories',
             'cartItemCount'
@@ -105,5 +139,25 @@ class HomeController extends Controller
         }
 
         return view('home.category', compact('articles', 'categorie'));
+    }
+
+    /**
+     * Affiche un article avec contrôle d'abonnement pour les articles Politique
+     */
+    public function showArticle($id)
+    {
+        $article = Article::with(['category', 'user'])->findOrFail($id);
+
+        // Vérifier si l'article est de catégorie Politique
+        $isPolitique = $article->category && strtolower($article->category->nom) === 'politique';
+
+        // Vérifier si l'utilisateur est connecté et abonné
+        $user = Auth::user();
+        $isSubscribed = $user && $user->hasActiveSubscription();
+
+        // Si c'est un article Politique et que l'utilisateur n'est pas abonné
+        $needsSubscription = $isPolitique && !$isSubscribed;
+
+        return view('home.article-detail', compact('article', 'needsSubscription', 'isSubscribed'));
     }
 }

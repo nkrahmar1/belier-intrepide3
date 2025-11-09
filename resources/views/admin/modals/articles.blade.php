@@ -3,7 +3,7 @@
     [x-cloak] { display: none !important; }
 </style>
 
-<div class="space-y-4 p-4" x-data="articlesManager()">
+<div class="space-y-6" x-data="articlesManager()">
     <div class="flex justify-between items-center mb-6">
         <div>
             <h3 class="text-xl font-bold text-gray-900 dark:text-white">
@@ -13,40 +13,40 @@
                 {{ $articles->total() }} article(s) au total
             </p>
         </div>
-        <button @click="openCreateModal()" 
-                class="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 
-                       text-white px-4 py-2 rounded-lg font-semibold flex items-center gap-2 
+        <button @click="openCreateModal()"
+                class="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700
+                       text-white px-4 py-2 rounded-lg font-semibold flex items-center gap-2
                        transform hover:scale-105 transition-all duration-200 shadow-lg">
             <span class="text-lg">➕</span>
             <span>Nouvel article</span>
         </button>
     </div>
-    
+
     {{-- Grid des articles --}}
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         @forelse($articles as $article)
-            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm hover:shadow-xl 
-                        transform hover:-translate-y-1 transition-all duration-300 
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm hover:shadow-xl
+                        transform hover:-translate-y-1 transition-all duration-300
                         border border-gray-200 dark:border-gray-700 overflow-hidden">
-                
+
                 {{-- Image --}}
                 @if($article->image)
-                    <img src="{{ asset('storage/' . $article->image) }}" 
-                         alt="{{ $article->titre }}" 
+                    <img src="{{ asset('storage/' . $article->image) }}"
+                         alt="{{ $article->titre }}"
                          class="w-full h-48 object-cover">
                 @else
-                    <div class="w-full h-48 bg-gradient-to-br from-green-400 to-emerald-500 
+                    <div class="w-full h-48 bg-gradient-to-br from-green-400 to-emerald-500
                                 flex items-center justify-center">
                         <span class="text-6xl">📰</span>
                     </div>
                 @endif
-                
+
                 <div class="p-4">
                     {{-- Titre --}}
                     <h4 class="font-bold text-gray-900 dark:text-white mb-2 line-clamp-2 text-lg">
                         {{ $article->titre }}
                     </h4>
-                    
+
                     {{-- Catégorie et Statut --}}
                     <div class="flex items-center justify-between mb-3">
                         <span class="flex items-center text-sm text-gray-600 dark:text-gray-400">
@@ -58,7 +58,7 @@
                             {{ $article->is_published ? '✅ Publié' : '⏳ Brouillon' }}
                         </span>
                     </div>
-                    
+
                     {{-- Auteur et Date --}}
                     <div class="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400 mb-4">
                         <span class="flex items-center gap-1">
@@ -70,29 +70,29 @@
                             {{ $article->created_at->format('d/m/Y') }}
                         </span>
                     </div>
-                    
+
                     {{-- Actions --}}
                     <div class="flex gap-2">
                         <button onclick="togglePublishArticle({{ $article->id }}, {{ $article->is_published ? 'true' : 'false' }})"
-                                class="flex-1 {{ $article->is_published ? 'bg-gray-50 dark:bg-gray-700 text-gray-600 dark:text-gray-400' : 'bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400' }} 
-                                       px-3 py-2 rounded-lg text-sm font-semibold 
-                                       hover:opacity-80 transition-all 
+                                class="flex-1 {{ $article->is_published ? 'bg-gray-50 dark:bg-gray-700 text-gray-600 dark:text-gray-400' : 'bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400' }}
+                                       px-3 py-2 rounded-lg text-sm font-semibold
+                                       hover:opacity-80 transition-all
                                        flex items-center justify-center gap-1">
                             <span>{{ $article->is_published ? '📝' : '✅' }}</span>
                             <span>{{ $article->is_published ? 'Dépublier' : 'Publier' }}</span>
                         </button>
                         <a href="{{ route('admin.articles.edit', ['article' => $article->id]) }}"
-                           class="flex-1 bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 
-                                  px-3 py-2 rounded-lg text-sm font-semibold 
-                                  hover:bg-blue-100 dark:hover:bg-blue-900/50 transition-colors 
+                           class="flex-1 bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400
+                                  px-3 py-2 rounded-lg text-sm font-semibold
+                                  hover:bg-blue-100 dark:hover:bg-blue-900/50 transition-colors
                                   flex items-center justify-center gap-1">
                             <span>✏️</span>
                             <span>Modifier</span>
                         </a>
-                        <button onclick="deleteArticleItem({{ $article->id }})"
-                                class="bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 
-                                       px-3 py-2 rounded-lg text-sm font-semibold 
-                                       hover:bg-red-100 dark:hover:bg-red-900/50 transition-colors 
+                        <button onclick="deleteArticleItem({{ $article->id ?? 'null' }})"
+                                class="bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400
+                                       px-3 py-2 rounded-lg text-sm font-semibold
+                                       hover:bg-red-100 dark:hover:bg-red-900/50 transition-colors
                                        flex items-center justify-center gap-1">
                             <span>🗑️</span>
                         </button>
@@ -109,7 +109,7 @@
             </div>
         @endforelse
     </div>
-    
+
     {{-- Pagination --}}
     @if($articles->hasPages())
         <div class="mt-6 flex justify-center">
@@ -118,24 +118,24 @@
     @endif
 
     {{-- MODAL DE CRÉATION/ÉDITION D'ARTICLE --}}
-    <div x-show="showModal" 
+    <div x-show="showModal"
          x-cloak
          @keydown.escape.window="closeModal()"
          class="fixed inset-0 z-50 overflow-y-auto"
          style="display: none;">
-        
+
         {{-- Overlay --}}
         <div class="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm transition-opacity"
              @click="closeModal()"></div>
 
         {{-- Modal Content --}}
         <div class="flex items-center justify-center min-h-screen p-4">
-            <div @click.stop 
+            <div @click.stop
                  x-transition:enter="transition ease-out duration-300"
                  x-transition:enter-start="opacity-0 transform scale-95"
                  x-transition:enter-end="opacity-100 transform scale-100"
                  class="relative bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden">
-                
+
                 {{-- Header --}}
                 <div class="sticky top-0 bg-gradient-to-r from-green-600 to-emerald-600 px-6 py-4 flex items-center justify-between z-10">
                     <div class="flex items-center gap-3">
@@ -145,7 +145,7 @@
                             <p class="text-green-100 text-sm">Remplissez les informations ci-dessous</p>
                         </div>
                     </div>
-                    <button @click="closeModal()" 
+                    <button @click="closeModal()"
                             class="text-white hover:bg-white/20 rounded-lg p-2 transition-colors">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
@@ -156,17 +156,17 @@
                 {{-- Form Body --}}
                 <form @submit.prevent="submitArticle()" class="overflow-y-auto max-h-[calc(90vh-200px)]">
                     <div class="p-6 space-y-6">
-                        
+
                         {{-- Titre --}}
                         <div>
                             <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
                                 📌 Titre de l'article *
                             </label>
-                            <input type="text" 
+                            <input type="text"
                                    x-model="formData.titre"
                                    required
                                    placeholder="Ex: Le Bélier Intrépide annonce une nouvelle politique..."
-                                   class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg 
+                                   class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg
                                           focus:ring-2 focus:ring-green-500 dark:bg-gray-700 dark:text-white
                                           transition-all">
                             <p class="text-xs text-gray-500 mt-1">Minimum 3 caractères</p>
@@ -177,9 +177,9 @@
                             <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
                                 📁 Catégorie *
                             </label>
-                            <select x-model="formData.category_id" 
+                            <select x-model="formData.category_id"
                                     required
-                                    class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg 
+                                    class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg
                                            focus:ring-2 focus:ring-green-500 dark:bg-gray-700 dark:text-white">
                                 <option value="">-- Choisir une catégorie --</option>
                                 <option value="1">🏛️ POLITIQUE</option>
@@ -202,7 +202,7 @@
                                       rows="2"
                                       maxlength="500"
                                       placeholder="Résumé court pour les aperçus (max 500 caractères)..."
-                                      class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg 
+                                      class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg
                                              focus:ring-2 focus:ring-green-500 dark:bg-gray-700 dark:text-white"></textarea>
                             <p class="text-xs text-gray-500 mt-1" x-text="(formData.extrait?.length || 0) + '/500 caractères'"></p>
                         </div>
@@ -216,8 +216,8 @@
                                       required
                                       rows="8"
                                       placeholder="Rédigez le contenu complet de votre article ici..."
-                                      class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg 
-                                             focus:ring-2 focus:ring-green-500 dark:bg-gray-700 dark:text-white 
+                                      class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg
+                                             focus:ring-2 focus:ring-green-500 dark:bg-gray-700 dark:text-white
                                              font-mono text-sm"></textarea>
                             <p class="text-xs text-gray-500 mt-1">Minimum 10 caractères</p>
                         </div>
@@ -228,36 +228,36 @@
                                 🖼️ Image de couverture
                             </label>
                             <div class="flex items-center gap-4">
-                                <label class="flex-1 flex flex-col items-center px-4 py-6 bg-white dark:bg-gray-700 
-                                              border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg 
+                                <label class="flex-1 flex flex-col items-center px-4 py-6 bg-white dark:bg-gray-700
+                                              border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg
                                               cursor-pointer hover:border-green-500 transition-colors">
                                     <svg class="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                               d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
                                     </svg>
                                     <span class="mt-2 text-sm text-gray-600 dark:text-gray-400">
                                         <span class="font-semibold text-green-600">Cliquez pour choisir</span> ou glissez une image
                                     </span>
                                     <span class="text-xs text-gray-500 mt-1">JPG, PNG, GIF, WEBP (max 2MB)</span>
-                                    <input type="file" 
+                                    <input type="file"
                                            @change="handleImageUpload($event)"
                                            accept="image/jpeg,image/png,image/jpg,image/gif,image/webp"
                                            class="hidden">
                                 </label>
-                                
+
                                 {{-- Aperçu image --}}
                                 <div x-show="imagePreview" class="flex-shrink-0">
-                                    <img :src="imagePreview" 
-                                         alt="Aperçu" 
+                                    <img :src="imagePreview"
+                                         alt="Aperçu"
                                          class="w-32 h-32 object-cover rounded-lg border-2 border-green-500">
-                                    <button @click="removeImage()" 
+                                    <button @click="removeImage()"
                                             type="button"
                                             class="mt-2 text-xs text-red-600 hover:text-red-800">
                                         ❌ Supprimer
                                     </button>
                                 </div>
                             </div>
-                            <p x-show="imageName" 
+                            <p x-show="imageName"
                                class="text-sm text-green-600 dark:text-green-400 mt-2"
                                x-text="'✅ ' + imageName"></p>
                         </div>
@@ -267,26 +267,26 @@
                             <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
                                 📎 Document téléchargeable (optionnel)
                             </label>
-                            <label class="flex flex-col items-center px-4 py-6 bg-white dark:bg-gray-700 
-                                          border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg 
+                            <label class="flex flex-col items-center px-4 py-6 bg-white dark:bg-gray-700
+                                          border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg
                                           cursor-pointer hover:border-blue-500 transition-colors">
                                 <svg class="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                           d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
                                 </svg>
                                 <span class="mt-2 text-sm text-gray-600 dark:text-gray-400">
                                     <span class="font-semibold text-blue-600">Cliquez pour choisir</span> un document
                                 </span>
                                 <span class="text-xs text-gray-500 mt-1">PDF, DOC, DOCX, TXT, ZIP (max 10MB)</span>
-                                <input type="file" 
+                                <input type="file"
                                        @change="handleDocumentUpload($event)"
                                        accept=".pdf,.doc,.docx,.txt,.zip"
                                        class="hidden">
                             </label>
-                            <p x-show="documentName" 
+                            <p x-show="documentName"
                                class="text-sm text-blue-600 dark:text-blue-400 mt-2 flex items-center justify-between">
                                 <span x-text="'📄 ' + documentName"></span>
-                                <button @click="removeDocument()" 
+                                <button @click="removeDocument()"
                                         type="button"
                                         class="text-xs text-red-600 hover:text-red-800">
                                     ❌ Supprimer
@@ -296,9 +296,9 @@
 
                         {{-- Options --}}
                         <div class="grid grid-cols-2 gap-4">
-                            <label class="flex items-center gap-3 p-4 border border-gray-300 dark:border-gray-600 rounded-lg 
+                            <label class="flex items-center gap-3 p-4 border border-gray-300 dark:border-gray-600 rounded-lg
                                           cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
-                                <input type="checkbox" 
+                                <input type="checkbox"
                                        x-model="formData.is_premium"
                                        class="w-5 h-5 text-green-600 rounded focus:ring-green-500">
                                 <div>
@@ -307,9 +307,9 @@
                                 </div>
                             </label>
 
-                            <label class="flex items-center gap-3 p-4 border border-gray-300 dark:border-gray-600 rounded-lg 
+                            <label class="flex items-center gap-3 p-4 border border-gray-300 dark:border-gray-600 rounded-lg
                                           cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
-                                <input type="checkbox" 
+                                <input type="checkbox"
                                        x-model="formData.is_published"
                                        class="w-5 h-5 text-green-600 rounded focus:ring-green-500">
                                 <div>
@@ -320,8 +320,8 @@
                         </div>
 
                         {{-- Messages d'erreur --}}
-                        <div x-show="errorMessage" 
-                             class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 
+                        <div x-show="errorMessage"
+                             class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800
                                     rounded-lg p-4 flex items-start gap-3">
                             <span class="text-2xl">❌</span>
                             <div class="flex-1">
@@ -334,10 +334,10 @@
 
                     {{-- Footer avec boutons --}}
                     <div class="sticky bottom-0 bg-gray-50 dark:bg-gray-900 px-6 py-4 flex items-center justify-end gap-3 border-t border-gray-200 dark:border-gray-700">
-                        <button type="button" 
+                        <button type="button"
                                 @click="closeModal()"
                                 :disabled="submitting"
-                                class="px-6 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg 
+                                class="px-6 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg
                                        text-gray-700 dark:text-gray-300 font-semibold
                                        hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors
                                        disabled:opacity-50 disabled:cursor-not-allowed">
@@ -345,8 +345,8 @@
                         </button>
                         <button type="submit"
                                 :disabled="submitting"
-                                class="px-6 py-2.5 bg-gradient-to-r from-green-600 to-emerald-600 
-                                       hover:from-green-700 hover:to-emerald-700 text-white rounded-lg 
+                                class="px-6 py-2.5 bg-gradient-to-r from-green-600 to-emerald-600
+                                       hover:from-green-700 hover:to-emerald-700 text-white rounded-lg
                                        font-semibold flex items-center gap-2 transition-all
                                        disabled:opacity-50 disabled:cursor-not-allowed">
                             <svg x-show="submitting" class="animate-spin h-5 w-5" fill="none" viewBox="0 0 24 24">
@@ -364,8 +364,8 @@
 </div>
 
 <script>
-// Composant Alpine.js pour gérer les articles
-function articlesManager() {
+// Définir la fonction globalement pour Alpine.js
+window.articlesManager = function() {
     return {
         showModal: false,
         submitting: false,
@@ -462,7 +462,7 @@ function articlesManager() {
             const allowedExtensions = ['.pdf', '.doc', '.docx', '.txt', '.zip'];
             const fileName = file.name.toLowerCase();
             const isValidExtension = allowedExtensions.some(ext => fileName.endsWith(ext));
-            
+
             if (!isValidExtension) {
                 this.errorMessage = 'Format de document non supporté (utilisez PDF, DOC, DOCX, TXT ou ZIP)';
                 return;
@@ -532,10 +532,10 @@ function articlesManager() {
                 if (data.success) {
                     // Succès !
                     this.closeModal();
-                    
+
                     // Afficher message de succès
                     alert('✅ Article créé avec succès !');
-                    
+
                     // Recharger la section articles via SPA
                     const spaData = Alpine.$data(document.querySelector('[x-data*="spaApp"]'));
                     if (spaData && typeof spaData.loadSection === 'function') {
@@ -546,7 +546,7 @@ function articlesManager() {
                 } else {
                     // Erreur du serveur
                     this.errorMessage = data.message || 'Une erreur est survenue';
-                    
+
                     // Afficher erreurs de validation
                     if (data.errors) {
                         const errorMessages = Object.values(data.errors).flat();

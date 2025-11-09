@@ -107,7 +107,7 @@
                                 <td>
                                     <div class="btn-group btn-group-sm" role="group">
                                         <!-- Bouton de publication/dépublication -->
-                                        <form action="{{ route('admin.articles.toggle-publish', $article) }}"
+                                        <form action="{{ route('admin.articles.toggle-publish', ['id' => $article->id]) }}"
                                               method="POST"
                                               class="d-inline">
                                             @csrf
@@ -345,7 +345,7 @@ function showNotification(message, type = 'info') {
     const notification = document.createElement('div');
     notification.className = `alert alert-${type === 'success' ? 'success' : type === 'error' ? 'danger' : 'info'} alert-dismissible fade show`;
     notification.style.cssText = 'position: fixed; top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
-    
+
     notification.innerHTML = `
         <div class="d-flex align-items-center">
             <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-triangle' : 'info-circle'} me-2"></i>
@@ -353,9 +353,9 @@ function showNotification(message, type = 'info') {
             <button type="button" class="btn-close ms-auto" onclick="this.parentElement.parentElement.remove()"></button>
         </div>
     `;
-    
+
     document.body.appendChild(notification);
-    
+
     // Supprimer automatiquement après 5 secondes
     setTimeout(() => {
         if (notification.parentElement) {

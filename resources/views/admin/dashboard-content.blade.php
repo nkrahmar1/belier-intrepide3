@@ -31,7 +31,7 @@
     </script>
     <h1 class="text-3xl md:text-4xl font-extrabold text-indigo-700 mb-8 flex items-center gap-3">
         <span class="inline-block bg-indigo-100 text-indigo-600 rounded-full p-2 shadow-md">🏠</span>
-        Dashboard
+        Tableau de bord
     </h1>
     <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
         <div class="bg-white rounded-2xl shadow-xl p-8 border border-indigo-100 flex flex-col justify-center items-center hover:shadow-2xl transition group w-full">

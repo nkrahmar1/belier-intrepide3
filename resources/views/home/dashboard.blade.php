@@ -17,7 +17,7 @@
         <div class="px-6 py-4">
             <div class="flex items-center justify-between">
                 <div class="flex items-center space-x-4">
-                    <h1 class="text-2xl font-bold text-gray-900">Dashboard Admin</h1>
+                    <h1 class="text-2xl font-bold text-gray-900">Tableau de bord Admin</h1>
                     <div class="flex items-center space-x-2 text-sm text-gray-500">
                         <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3a4 4 0 118 0v4m-4 16v-4m-8 4h16a1 1 0 001-1V8a1 1 0 00-1-1H7a1 1 0 00-1 1v14a1 1 0 001 1z"/>

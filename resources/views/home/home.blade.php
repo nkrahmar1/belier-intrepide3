@@ -705,7 +705,7 @@
     }
 
     /* === AMÉLIORATION PROFESSIONNELLE === */
-    
+
     /* Container principal unifié */
     .home-content .container {
         max-width: 1200px !important;
@@ -907,19 +907,35 @@
     <div class="content-grid">
         <main class="main-content">
             @if($featuredArticles->count() > 0)
-                <!-- S'il y a des articles en vedette, on affiche le premier comme article principal -->
+                {{-- ============================================
+                    ARTICLE PRINCIPAL (ARTICLE EN VEDETTE)
+                    Modifiable facilement : Affiche le premier article en vedette
+                    - Image : Ligne suivante ($mainArticle->image)
+                    - Titre : $mainArticle->titre
+                    - Texte : $mainArticle->extrait
+                ============================================ --}}
                 @php $mainArticle = $featuredArticles->first(); @endphp
                 <article class="featured-article">
+                    {{-- IMAGE DE L'ARTICLE PRINCIPAL - Facile à modifier --}}
                     @if($mainArticle->image)
                         <img src="{{ asset('storage/' . $mainArticle->image) }}" alt="{{ $mainArticle->titre }}">
                     @else
+                        {{-- Image par défaut si pas d'image uploadée - Modifiable ici : --}}
                         <img src="{{asset('image/pdci1.jpg')}}" alt="Article principal">
                     @endif
+
+                    {{-- CATÉGORIE --}}
                     <div class="article-category {{ strtolower($mainArticle->category->nom ?? 'general') }}">
                         {{ strtoupper($mainArticle->category->nom ?? 'GÉNÉRAL') }}
                     </div>
+
+                    {{-- TITRE DE L'ARTICLE --}}
                     <h2 class="article-title">{{ $mainArticle->titre }}</h2>
+
+                    {{-- EXTRAIT/DESCRIPTION --}}
                     <p class="article-excerpt">{{ $mainArticle->extrait ?: Str::limit(strip_tags($mainArticle->contenu), 200) }}</p>
+
+                    {{-- MÉTADONNÉES (Date, Auteur, Temps de lecture) --}}
                     <div class="article-meta">
                         <span>📅 {{ $mainArticle->created_at->format('d M Y') }}</span>
                         @if($mainArticle->user)
@@ -928,10 +944,14 @@
                         <span>📖 {{ ceil(str_word_count(strip_tags($mainArticle->contenu)) / 200) }} min de lecture</span>
                     </div>
                 </article>
-                <!-- Grille d'articles dynamiques -->
+
+                {{-- ============================================
+                    GRILLE DES 6 ARTICLES SECONDAIRES
+                    Articles organisés par catégorie
+                ============================================ --}}
                 <div class="articles-grid">
                 @php
-                    // Créer un tableau pour organiser les articles par catégorie
+                    // ===== ORGANISATION DES ARTICLES PAR CATÉGORIE =====
                     $articlesByCategory = [];
                     foreach($featuredArticles->skip(1)->take(6) as $article) {
                         $categoryKey = strtolower($article->category->nom ?? 'general');
@@ -941,7 +961,8 @@
                         $articlesByCategory[$categoryKey][] = $article;
                     }
 
-                    // Articles de fallback par catégorie
+                    // ===== ARTICLES PAR DÉFAUT (SI PAS D'ARTICLES EN BDD) =====
+                    // 💡 FACILE À MODIFIER : Change les images, titres, textes ici
                     $defaultArticles = [
                         'economie' => [
                             'image' => 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=400&h=200&fit=crop',
@@ -1023,12 +1044,15 @@
                                 <p class="article-card-excerpt">{{ Str::limit($article->extrait ?: strip_tags($article->contenu), 120) }}</p>
                                 <div class="article-meta">
                                     <span>📅 {{ $article->created_at->format('d M Y') }}</span>
+
+                                    {{-- ===== BOUTON TÉLÉCHARGEMENT PDF (SI DOCUMENT EXISTE) ===== --}}
                                     @if($article->document_path)
                                         <span style="margin-left: 10px;">
                                             <a href="{{ route('articles.download', $article->id) }}"
                                                style="color: #28a745; font-weight: bold; text-decoration: none;"
-                                               title="Télécharger le document">
-                                                <i class="fas fa-file-download"></i> PDF
+                                               title="Télécharger le document PDF"
+                                               download>
+                                                <i class="fas fa-file-download"></i> Télécharger PDF
                                             </a>
                                         </span>
                                     @endif
@@ -1055,7 +1079,13 @@
                 @endforeach
             </div>
             @else
-                <!-- Articles par défaut si aucun article en vedette -->
+                {{-- ============================================
+                    ARTICLES PAR DÉFAUT (SI AUCUN ARTICLE EN VEDETTE)
+                    💡 MODIFIABLE : Ces articles s'affichent quand la BDD est vide
+                    Modifie les images et textes directement ci-dessous
+                ============================================ --}}
+
+                {{-- ARTICLE PRINCIPAL PAR DÉFAUT --}}
                 <article class="featured-article">
                     <img src="{{asset('image/pdci1.jpg')}}" alt="Article principal">
                     <div class="article-category pdci">PDCI-RDA</div>
@@ -1144,8 +1174,13 @@
         @endif
         </main>
 
+        {{-- ============================================
+            SIDEBAR (BARRE LATÉRALE DROITE)
+            Contient : Profil utilisateur, Articles à la une, Catégories, etc.
+            💡 Facile à personnaliser
+        ============================================ --}}
         <aside class="sidebar">
-            <!-- Section utilisateur connecté dans la sidebar -->
+            {{-- ===== SECTION PROFIL UTILISATEUR (si connecté) ===== --}}
             @auth
             <div class="sidebar-section" style="background: #f8f9fa; border-left: 4px solid #667eea; padding: 15px; margin-bottom: 20px;">
                 <h3 class="sidebar-title" style="color: #667eea; display: flex; align-items: center;">
@@ -1167,6 +1202,9 @@
             </div>
             @endauth
 
+            {{-- ===== ARTICLES À LA UNE (sidebar) =====
+                 💡 MODIFIABLE : Change les images et titres ci-dessous
+            --}}
             <div class="sidebar-section">
                 <h3 class="sidebar-title">À la Une</h3>
                 <article class="sidebar-article">
@@ -1199,6 +1237,7 @@
                 </article>
             </div>
 
+            {{-- ===== LISTE DES CATÉGORIES (sidebar) ===== --}}
             <div class="sidebar-section">
                 <h3 class="sidebar-title">Catégories</h3>
                 <ul class="categories-list">
@@ -1211,6 +1250,9 @@
                 </ul>
             </div>
 
+            {{-- ===== RÉSEAUX SOCIAUX =====
+                 💡 MODIFIABLE : Ajoute tes vrais liens sociaux
+            --}}
             <div class="sidebar-section">
                 <h3 class="sidebar-title">Suivez-nous</h3>
                 <div class="social-links">
@@ -1222,6 +1264,7 @@
                 </div>
             </div>
 
+            {{-- ===== NEWSLETTER (Inscription) ===== --}}
             <div class="sidebar-section">
                 <h3 class="sidebar-title">Newsletter</h3>
                 <p style="font-size: 0.9rem; color: #666; margin-bottom: 1rem;">Restez informé de nos dernières actualités</p>
@@ -1315,6 +1358,10 @@
 
 <br><br>
 
+{{-- ============================================
+    SECTION VIDÉO DE PRÉSENTATION
+    💡 MODIFIABLE : Change l'URL YouTube ci-dessous
+============================================ --}}
 <!-- Section vidéo de présentation -->
 <div class="container">
     <div class="video-container">
@@ -1330,6 +1377,11 @@
 
 <br><br>
 
+    {{-- ============================================
+        SECTION "LES + POPULAIRES"
+        Liste des articles les plus consultés
+        💡 MODIFIABLE : Images, titres, liens, etc.
+    ============================================ --}}
     <!--pour la deuxieme sections --->
 
     <div class="container">
@@ -1639,7 +1691,7 @@ updateCarousel() {
         function addReadMoreButtons() {
             // Sélectionner tous les extraits d'articles
             const excerpts = document.querySelectorAll('.article-excerpt, .article-card-excerpt');
-            
+
             excerpts.forEach(excerpt => {
                 // Vérifier si le texte est tronqué (plus de 3 lignes)
                 if (excerpt.scrollHeight > excerpt.clientHeight + 5) {
@@ -1647,19 +1699,19 @@ updateCarousel() {
                     const readMoreBtn = document.createElement('button');
                     readMoreBtn.className = 'read-more-btn';
                     readMoreBtn.innerHTML = '<span>Voir plus</span> <i class="fas fa-chevron-down"></i>';
-                    
+
                     // Insérer le bouton après l'extrait
                     excerpt.parentNode.insertBefore(readMoreBtn, excerpt.nextSibling);
-                    
+
                     // Ajouter l'événement click
                     readMoreBtn.addEventListener('click', function(e) {
                         e.preventDefault();
                         e.stopPropagation();
-                        
+
                         // Toggle la classe expanded
                         excerpt.classList.toggle('expanded');
                         readMoreBtn.classList.toggle('expanded');
-                        
+
                         // Changer le texte du bouton
                         if (excerpt.classList.contains('expanded')) {
                             readMoreBtn.innerHTML = '<span>Voir moins</span> <i class="fas fa-chevron-down"></i>';

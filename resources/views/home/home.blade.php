@@ -839,6 +839,56 @@
         .popular-item {
             padding: 0.75rem;
         }
+
+        /* Amélioration des liens sur mobile */
+        a {
+            word-break: break-word;
+            hyphens: auto;
+        }
+
+        /* Liens des articles plus grands sur mobile */
+        .article-title,
+        .article-card-title {
+            font-size: 1.1rem !important;
+            line-height: 1.4 !important;
+        }
+
+        /* Bouton téléchargement PDF plus visible sur mobile */
+        .article-meta a {
+            display: inline-block;
+            padding: 8px 12px;
+            margin-top: 8px;
+            background: #28a745;
+            color: white !important;
+            border-radius: 6px;
+            text-decoration: none !important;
+            font-weight: bold;
+            font-size: 0.95rem;
+        }
+
+        .article-meta a:hover {
+            background: #218838;
+        }
+
+        /* Espacement des liens dans la sidebar sur mobile */
+        .sidebar-article a {
+            display: block;
+            padding: 10px;
+            margin-bottom: 5px;
+        }
+
+        /* Grid plus étroit sur mobile */
+        .articles-grid {
+            grid-template-columns: 1fr !important;
+            gap: 1rem !important;
+        }
+
+        /* Amélioration navigation mobile */
+        .categories-list li a {
+            padding: 12px 15px;
+            font-size: 1rem;
+            display: block;
+        }
     }
 </style>
 

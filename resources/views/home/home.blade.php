@@ -1097,14 +1097,30 @@
 
                                     {{-- ===== BOUTON TÉLÉCHARGEMENT PDF (SI DOCUMENT EXISTE) ===== --}}
                                     @if($article->document_path)
-                                        <span style="margin-left: 10px;">
-                                            <a href="{{ route('articles.download', $article->id) }}"
-                                               style="color: #28a745; font-weight: bold; text-decoration: none;"
-                                               title="Télécharger le document PDF"
-                                               download>
-                                                <i class="fas fa-file-download"></i> Télécharger PDF
-                                            </a>
-                                        </span>
+                                        @auth
+                                            @if(Auth::user()->isAdmin() || Auth::user()->hasActiveSubscription())
+                                                <span style="margin-left: 10px;">
+                                                    <a href="{{ route('articles.download', $article->id) }}"
+                                                       style="color: #28a745; font-weight: bold; text-decoration: none;"
+                                                       title="Télécharger le document PDF"
+                                                       download>
+                                                        <i class="fas fa-file-download"></i> Télécharger PDF
+                                                    </a>
+                                                </span>
+                                            @else
+                                                <span style="margin-left: 10px;">
+                                                    <a href="{{ route('home.abonnement') }}" title="Réservé aux abonnés" style="color: #ff6b35; font-weight: 700; text-decoration: none;">
+                                                        🔒 Réservé aux abonnés
+                                                    </a>
+                                                </span>
+                                            @endif
+                                        @else
+                                            <span style="margin-left: 10px;">
+                                                <a href="{{ route('login') }}" title="Connectez-vous pour télécharger" style="color: #0069d9; font-weight: 700; text-decoration: none;">
+                                                    Se connecter pour télécharger
+                                                </a>
+                                            </span>
+                                        @endauth
                                     @endif
                                 </div>
                             </div>

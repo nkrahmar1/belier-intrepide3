@@ -25,16 +25,16 @@ class ArticleDocumentController extends Controller
                 ->with('error', 'Vous devez vous connecter pour télécharger ce document.');
         }
 
-        // 3. Vérifier les permissions (admin ou abonnement actif)
+        // 3. Vérifier les permissions (utiliser la logique encapsulée dans le modèle)
         $user = Auth::user();
-        if (!$user->isAdmin() && !$user->hasActiveSubscription()) {
-            Log::info("Tentative de téléchargement sans abonnement - User: {$user->email}, Article: {$article->titre}");
+        if (!$article->canBeDownloadedBy($user)) {
+            Log::info("Tentative de téléchargement non autorisée - User: " . ($user->email ?? 'guest') . ", Article: {$article->titre}");
             return redirect()->route('home.abonnement')
                 ->with('error', 'Vous devez avoir un abonnement actif pour télécharger ce document.');
         }
 
-        // 4. Vérifier que le fichier existe physiquement
-        if (!Storage::exists($article->document_path)) {
+        // 4. Vérifier que le fichier existe physiquement (disque public car les documents sont stockés avec le disk 'public')
+        if (!\Illuminate\Support\Facades\Storage::disk('public')->exists($article->document_path)) {
             Log::error("Fichier manquant - Document: {$article->document_path}, Article: {$article->titre}");
             return back()->with('error', 'Le document est introuvable sur le serveur.');
         }
@@ -51,7 +51,7 @@ class ArticleDocumentController extends Controller
         }
 
         // 7. Déclencher le téléchargement avec le document_path de l'article
-        return Storage::download(
+        return \Illuminate\Support\Facades\Storage::disk('public')->download(
             $article->document_path,  // Utilise exactement le document_path de l'article
             $article->file_original_name ?? basename($article->document_path)  // Nom de fichier personnalisé ou nom par défaut
         );

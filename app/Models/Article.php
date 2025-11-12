@@ -24,7 +24,9 @@ class Article extends Model
         'is_published',
         'is_premium',
         'is_featured',
-        'published_at'
+        'published_at',
+        'featured_on_homepage',
+        'homepage_featured_at',
     ];
 
     protected $casts = [
@@ -34,6 +36,8 @@ class Article extends Model
         'published_at' => 'datetime',
         'views_count' => 'integer',
         'downloads_count' => 'integer',
+        'featured_on_homepage',
+        'homepage_featured_at',
     ];
 
     protected $dates = [

@@ -41,11 +41,11 @@ class ArticleDocumentController extends Controller
 
         // 5. Log du téléchargement réussi
         Log::info("Téléchargement réussi - User: {$user->email}, Article: {$article->titre}, Document: {$article->document_path}");
-        
+
         // 6. Ajouter l'article au panier pour tracking des téléchargements
         $cartController = new \App\Http\Controllers\CartController();
         $addedToCart = $cartController->addDownloadedArticle($article);
-        
+
         if ($addedToCart) {
             Log::info("Article ajouté au panier de téléchargements - Article: {$article->titre}, User: {$user->email}");
         }

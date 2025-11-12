@@ -257,6 +257,47 @@
         }
     }
 
+    /* ===== OVERRIDE: Forcer visibilité des liens (pc + mobile) ===== */
+    .navbar {
+        position: sticky !important;
+        top: 0;
+        z-index: 999999 !important; /* au-dessus de tout */
+        -webkit-backface-visibility: hidden;
+        backface-visibility: hidden;
+        background-color: #04672a !important; /* assure fond pour visibilité */
+        box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    }
+
+    /* Forcer les liens à être visibles, même si d'autres styles les masquent */
+    .navbar .nav-link,
+    .navbar .navbar-brand {
+        color: #ffffff !important;
+        opacity: 1 !important;
+        visibility: visible !important;
+        display: inline-block !important;
+        pointer-events: auto !important;
+        text-decoration: none !important;
+    }
+
+    /* Quand le collapse est ouvert, forcer l'affichage en flex (mobile) */
+    .navbar-collapse.collapse.show {
+        display: flex !important;
+        flex-basis: 100% !important;
+        flex-wrap: wrap !important;
+    }
+
+    /* Si un autre style cache accidentellement .navbar-collapse, on le remet visible */
+    .navbar-collapse {
+        display: flex !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+    }
+
+    /* S'assurer que le collapse lui-même a un fond sur mobile (évite effet 'transparent over content') */
+    .navbar-collapse.collapse {
+        background-color: rgba(4,103,42,0.95) !important;
+    }
+
 
 
 </style>
@@ -612,5 +653,30 @@ function updateCartBadge(cartCount) {
         badge.classList.remove('active');
     }
 }
+
+// Fix runtime: forcer la visibilité des liens de la navbar si une classe utilitaire les masque
+document.addEventListener('DOMContentLoaded', function() {
+    try {
+        const nav = document.querySelector('nav.navbar');
+        if (nav) {
+            // retirer classes utilitaires communes qui masquent la visibilité
+            ['invisible','d-none','opacity-0','pe-none'].forEach(cls => {
+                if (nav.classList.contains(cls)) nav.classList.remove(cls);
+            });
+
+            // forcer styles inline si nécessaire
+            const links = nav.querySelectorAll('.nav-link, .navbar-brand');
+            links.forEach(a => {
+                a.style.visibility = 'visible';
+                a.style.opacity = '1';
+                a.style.display = 'inline-block';
+                a.style.pointerEvents = 'auto';
+                a.style.color = '#ffffff';
+            });
+        }
+    } catch (e) {
+        console.warn('Navbar visibility fix failed', e);
+    }
+});
 </script>
 

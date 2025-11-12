@@ -14,12 +14,18 @@ class HomeController extends Controller
     public function home()
     {
         // Récupération des articles publiés sur la homepage avec tous leurs éléments
+        // Récupère les articles mis en avant pour la homepage.
+        // Supporte les deux colonnes `is_featured` (admin) et l'ancienne `featured_on_homepage`.
         $featuredArticles = Article::where('is_published', true)
-            ->where('featured_on_homepage', true)
             ->whereNotNull('published_at')
             ->where('published_at', '<=', now())
+            ->where(function($q) {
+                $q->where('is_featured', true)
+                  ->orWhere('featured_on_homepage', true);
+            })
             ->with(['category', 'user'])
-            ->orderBy('homepage_featured_at', 'desc')
+            ->orderByDesc('homepage_featured_at')
+            ->orderByDesc('published_at')
             ->get();
 
         // Récupération de TOUS les articles de la catégorie Politique (publiés)

@@ -36,8 +36,8 @@ class Article extends Model
         'published_at' => 'datetime',
         'views_count' => 'integer',
         'downloads_count' => 'integer',
-        'featured_on_homepage',
-        'homepage_featured_at',
+        'featured_on_homepage' => 'boolean',
+        'homepage_featured_at' => 'datetime',
     ];
 
     protected $dates = [

@@ -250,22 +250,24 @@ class ArticleController extends Controller
     public function togglePublish(Article $article)
     {
         try {
+            $newStatus = !$article->is_published;
+
             $article->update([
-                'is_published' => !$article->is_published,
-                'published_at' => !$article->is_published ? null : now()
+                'is_published' => $newStatus,
+                'published_at' => $newStatus ? now() : null
             ]);
 
-            Log::info("Article {$article->id} - Statut publication basculé: " . ($article->is_published ? 'publié' : 'dépublié'));
+            Log::info("Article {$article->id} - Statut publication basculé: " . ($newStatus ? 'publié' : 'dépublié'));
 
             return response()->json([
                 'success' => true,
-                'message' => $article->is_published ? 'Article publié avec succès' : 'Article dépublié',
-                'is_published' => $article->is_published,
+                'message' => $newStatus ? 'Article publié avec succès' : 'Article dépublié',
+                'is_published' => $newStatus,
                 'published_at' => $article->published_at ? $article->published_at->format('d/m/Y H:i') : null
             ]);
         } catch (\Exception $e) {
             Log::error("Erreur lors du basculement de publication: " . $e->getMessage());
-            
+
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors de la mise à jour du statut'
@@ -281,7 +283,7 @@ class ArticleController extends Controller
         try {
             // Créer une copie de l'article
             $newArticle = $article->replicate();
-            
+
             // Modifier les champs spécifiques
             $newArticle->fill([
                 'titre' => $article->titre . ' (Copie)',
@@ -297,7 +299,7 @@ class ArticleController extends Controller
                 $originalImagePath = $article->image;
                 $imageExtension = pathinfo($originalImagePath, PATHINFO_EXTENSION);
                 $newImagePath = 'articles/images/' . Str::random(40) . '.' . $imageExtension;
-                
+
                 if (Storage::disk('public')->exists($originalImagePath)) {
                     Storage::disk('public')->copy($originalImagePath, $newImagePath);
                     $newArticle->image = $newImagePath;
@@ -308,7 +310,7 @@ class ArticleController extends Controller
                 $originalDocPath = $article->document_path;
                 $docExtension = pathinfo($originalDocPath, PATHINFO_EXTENSION);
                 $newDocPath = 'articles/documents/' . Str::random(40) . '.' . $docExtension;
-                
+
                 if (Storage::disk('public')->exists($originalDocPath)) {
                     Storage::disk('public')->copy($originalDocPath, $newDocPath);
                     $newArticle->document_path = $newDocPath;
@@ -327,7 +329,7 @@ class ArticleController extends Controller
             ]);
         } catch (\Exception $e) {
             Log::error("Erreur lors de la duplication: " . $e->getMessage());
-            
+
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors de la duplication de l\'article'
@@ -350,7 +352,7 @@ class ArticleController extends Controller
             }
 
             $originalName = $article->file_original_name ?? 'document_' . $article->id . '.pdf';
-            
+
             Log::info("Téléchargement du document pour l'article {$article->id}");
 
             return response()->download(
@@ -387,7 +389,7 @@ class ArticleController extends Controller
             ]);
         } catch (\Exception $e) {
             Log::error("Erreur lors de la récupération des statistiques: " . $e->getMessage());
-            
+
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors de la récupération des statistiques'
@@ -424,7 +426,7 @@ class ArticleController extends Controller
             ], 400);
         } catch (\Exception $e) {
             Log::error("Erreur lors de l'upload d'image: " . $e->getMessage());
-            
+
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors de l\'upload de l\'image'
@@ -439,44 +441,46 @@ class ArticleController extends Controller
     {
         try {
             $article = Article::findOrFail($id);
-            
+
             // Validation
             $request->validate([
                 'featured' => 'required|boolean'
             ]);
-            
+
             $featured = $request->input('featured');
-            
-            // Mise à jour du statut
+
+            // Mise à jour du statut: synchroniser les champs possibles
             $article->is_featured = $featured;
+            $article->featured_on_homepage = $featured;
+            $article->homepage_featured_at = $featured ? now() : null;
             $article->save();
-            
-            $message = $featured 
+
+            $message = $featured
                 ? 'Article ajouté à la page d\'accueil avec succès'
                 : 'Article retiré de la page d\'accueil avec succès';
-                
+
             return response()->json([
                 'success' => true,
                 'message' => $message,
                 'is_featured' => $article->is_featured
             ]);
-            
+
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Article non trouvé'
             ], 404);
-            
+
         } catch (\Illuminate\Validation\ValidationException $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Données invalides',
                 'errors' => $e->errors()
             ], 422);
-            
+
         } catch (\Exception $e) {
             Log::error('Erreur toggle homepage: ' . $e->getMessage());
-            
+
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors de la mise à jour'

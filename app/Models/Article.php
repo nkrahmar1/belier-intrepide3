@@ -27,10 +27,12 @@ class Article extends Model
         'is_featured',
         'article_type',
         'content_quality',
-        'download_count',
+        'downloads_count',
         'unit_price',
         'free_download_limit',
-        'published_at'
+        'published_at',
+        'featured_on_homepage',
+        'homepage_featured_at',
     ];
 
     protected $casts = [
@@ -40,7 +42,8 @@ class Article extends Model
         'published_at' => 'datetime',
         'views_count' => 'integer',
         'downloads_count' => 'integer',
-        'download_count' => 'integer',
+        'featured_on_homepage' => 'boolean',
+        'homepage_featured_at' => 'datetime',
         'storage_size' => 'integer',
         'unit_price' => 'decimal:2',
         'free_download_limit' => 'integer',

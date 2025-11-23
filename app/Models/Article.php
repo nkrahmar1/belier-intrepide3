@@ -21,9 +21,15 @@ class Article extends Model
         'document_path',
         'file_original_name',
         'file_size',
+        'storage_size',
         'is_published',
         'is_premium',
         'is_featured',
+        'article_type',
+        'content_quality',
+        'download_count',
+        'unit_price',
+        'free_download_limit',
         'published_at'
     ];
 
@@ -34,6 +40,10 @@ class Article extends Model
         'published_at' => 'datetime',
         'views_count' => 'integer',
         'downloads_count' => 'integer',
+        'download_count' => 'integer',
+        'storage_size' => 'integer',
+        'unit_price' => 'decimal:2',
+        'free_download_limit' => 'integer',
     ];
 
     protected $dates = [
@@ -114,12 +124,126 @@ class Article extends Model
         return 'slug';
     }
 
-    public function canBeDownloadedBy(User $user)
+    public function canBeDownloadedBy(User $user = null)
     {
+        // Article gratuit : accessible à tous
         if (!$this->is_premium) {
             return true;
         }
+        
+        // Article premium : nécessite un abonnement actif
         return $user && $user->hasActiveSubscription();
+    }
+
+    /**
+     * Vérifier si un utilisateur peut télécharger selon le type d'article
+     */
+    public function canUserDownload($user = null)
+    {
+        // Utilisateur non connecté
+        if (!$user) {
+            return $this->isGratuitType() ? ['can_download' => true, 'reason' => 'free'] : 
+                   ['can_download' => false, 'reason' => 'login_required'];
+        }
+
+        // Types d'articles gratuits
+        if ($this->isGratuitType()) {
+            // Vérifier les limites de téléchargement gratuit
+            if ($this->free_download_limit > 0) {
+                $userDownloads = $this->getUserDownloadCount($user);
+                if ($userDownloads >= $this->free_download_limit) {
+                    return ['can_download' => false, 'reason' => 'limit_exceeded'];
+                }
+            }
+            return ['can_download' => true, 'reason' => 'free'];
+        }
+
+        // Types d'articles premium
+        if ($this->isPremiumType()) {
+            if ($user->hasActiveSubscription()) {
+                return ['can_download' => true, 'reason' => 'premium_subscription'];
+            }
+            
+            // Possibilité d'achat unitaire
+            if ($this->unit_price > 0) {
+                return ['can_download' => false, 'reason' => 'purchase_required', 'price' => $this->unit_price];
+            }
+            
+            return ['can_download' => false, 'reason' => 'subscription_required'];
+        }
+
+        return ['can_download' => false, 'reason' => 'unknown'];
+    }
+
+    /**
+     * Types d'articles gratuits
+     */
+    public function isGratuitType()
+    {
+        return in_array($this->article_type, ['breve', 'communique', 'tutoriel']);
+    }
+
+    /**
+     * Types d'articles premium
+     */
+    public function isPremiumType()
+    {
+        return in_array($this->article_type, ['analyse', 'enquete', 'interview', 'explicatif']) 
+               || $this->is_premium;
+    }
+
+    /**
+     * Obtenir le nombre de téléchargements d'un utilisateur pour cet article
+     */
+    public function getUserDownloadCount($user)
+    {
+        return \App\Models\ArticleDownload::where('user_id', $user->id)
+                                         ->where('article_id', $this->id)
+                                         ->count();
+    }
+
+    /**
+     * Relation avec les téléchargements
+     */
+    public function downloads()
+    {
+        return $this->hasMany(\App\Models\ArticleDownload::class);
+    }
+
+    /**
+     * Obtenir la classification complète de l'article
+     */
+    public function getArticleClassification()
+    {
+        $classifications = [
+            'breve' => ['name' => 'Brève', 'access' => 'Gratuit', 'quality' => 'Court'],
+            'communique' => ['name' => 'Communiqué', 'access' => 'Gratuit', 'quality' => 'Court'],
+            'analyse' => ['name' => 'Analyse', 'access' => 'Premium', 'quality' => 'Profond'],
+            'enquete' => ['name' => 'Enquête', 'access' => 'Premium', 'quality' => 'Profond'],
+            'interview' => ['name' => 'Interview', 'access' => 'Premium', 'quality' => 'Exclusif'],
+            'tutoriel' => ['name' => 'Tutoriel', 'access' => 'Gratuit/Premium', 'quality' => 'Moyen'],
+            'explicatif' => ['name' => 'Explicatif', 'access' => 'Gratuit/Premium', 'quality' => 'Moyen'],
+        ];
+
+        return $classifications[$this->article_type] ?? ['name' => 'Standard', 'access' => 'Gratuit', 'quality' => 'Court'];
+    }
+
+    /**
+     * Calculer l'espace de stockage utilisé par l'article
+     */
+    public function getStorageUsage()
+    {
+        $size = $this->storage_size ?: $this->file_size ?: 0;
+        
+        if ($size >= 1073741824) { // GB
+            return round($size / 1073741824, 2) . ' GB';
+        } elseif ($size >= 1048576) { // MB
+            return round($size / 1048576, 2) . ' MB';
+        } elseif ($size >= 1024) { // KB
+            return round($size / 1024, 2) . ' KB';
+        }
+        
+        return $size . ' B';
     }
 
     public function getDocumentUrl()

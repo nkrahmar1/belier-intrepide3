@@ -1,3 +1,6 @@
+{{-- 
+    COMMENTÉ : Contenu de gestion des catégories désactivé
+    Cette fonctionnalité a été désactivée pour simplifier l'interface
 <div class="p-6 md:p-10 bg-gradient-to-br from-pink-50 via-white to-indigo-100 min-h-screen">
     <h1 class="text-3xl md:text-4xl font-extrabold text-pink-700 mb-8 flex items-center gap-3">
         <span class="inline-block bg-pink-100 text-pink-600 rounded-full p-2 shadow-md">📂</span>
@@ -36,5 +39,8 @@
                 {{ $categories->links() }}
             </div>
         </div>
+    </div>
+</div>
+--}}
     </div>
 </div>

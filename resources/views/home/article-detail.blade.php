@@ -312,7 +312,7 @@
 
     <!-- Bouton retour -->
     <div style="margin-top: 40px; text-align: center;">
-        <a href="{{ route('app_home') }}" style="color: #666; text-decoration: none; font-size: 1rem;">
+        <a href="{{ route('home') }}" style="color: #666; text-decoration: none; font-size: 1rem;">
             <i class="fas fa-arrow-left me-2"></i> Retour à l'accueil
         </a>
     </div>

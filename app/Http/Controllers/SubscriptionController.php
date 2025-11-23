@@ -68,6 +68,17 @@ class SubscriptionController extends Controller
             'phone_number' => 'required|string|size:10',
         ]);
 
+        // Vérifier s'il y a déjà un abonnement actif pour cet utilisateur
+        $activeSubscription = Subscription::where('user_id', Auth::id())
+                                        ->where('status', 'active')
+                                        ->where('ends_at', '>', now())
+                                        ->first();
+
+        if ($activeSubscription) {
+            return back()->withErrors('Vous avez déjà un abonnement actif jusqu\'au ' . 
+                                    $activeSubscription->ends_at->format('d/m/Y') . '.');
+        }
+
         $plans = [
             1 => ['name' => 'Basique', 'price' => 5000, 'duration' => 1],
             2 => ['name' => 'Premium', 'price' => 10000, 'duration' => 1],
@@ -268,5 +279,57 @@ class SubscriptionController extends Controller
             ->with('success', "Vous avez souscrit à la formule : {$plan['name']}");
     }
 
+    /**
+     * Annuler un abonnement
+     */
+    public function cancelSubscription($subscriptionId)
+    {
+        try {
+            $subscription = Subscription::where('id', $subscriptionId)
+                                      ->where('user_id', Auth::id())
+                                      ->first();
 
+            if (!$subscription) {
+                return back()->withErrors('Abonnement non trouvé.');
+            }
+
+            if ($subscription->status === 'cancelled') {
+                return back()->withErrors('Cet abonnement est déjà annulé.');
+            }
+
+            // Mettre à jour le statut
+            $subscription->update(['status' => 'cancelled']);
+
+            // Désactiver le statut premium de l'utilisateur
+            $user = Auth::user();
+            $user->is_premium = false;
+            $user->subscription_type = null;
+            $user->subscription_expires_at = null;
+            $user->save();
+
+            Log::info('Abonnement annulé', [
+                'user_id' => Auth::id(),
+                'subscription_id' => $subscriptionId
+            ]);
+
+            return redirect()->route('subscriptions.index')
+                           ->with('success', 'Votre abonnement a été annulé avec succès.');
+
+        } catch (\Exception $e) {
+            Log::error('Erreur lors de l\'annulation: ' . $e->getMessage());
+            return back()->withErrors('Impossible d\'annuler l\'abonnement.');
+        }
+    }
+
+    /**
+     * Obtenir l'historique des paiements d'un utilisateur
+     */
+    public function paymentHistory()
+    {
+        $subscriptions = Subscription::where('user_id', Auth::id())
+                                   ->orderBy('created_at', 'desc')
+                                   ->paginate(10);
+
+        return view('subscriptions.history', compact('subscriptions'));
+    }
 }

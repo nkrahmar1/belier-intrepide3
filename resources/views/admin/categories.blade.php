@@ -1,3 +1,6 @@
+{{-- 
+    COMMENTÉ : Vue de gestion des catégories désactivée
+    Cette fonctionnalité a été désactivée pour simplifier l'interface
 @extends('layouts.admin')
 
 @section('content')
@@ -51,3 +54,4 @@
         </div>
     </div>
 @endsection
+--}}

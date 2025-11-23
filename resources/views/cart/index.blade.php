@@ -20,7 +20,7 @@
             <i class="bi bi-cart-x display-1 text-muted"></i>
             <h3 class="mt-3">Votre panier est vide</h3>
             <p class="text-muted">Commencez par télécharger des articles ou faire des achats</p>
-            <a href="{{ route('app_home') }}" class="btn btn-primary">
+            <a href="{{ route('home') }}" class="btn btn-primary">
                 <i class="bi bi-house"></i> Retour à l'accueil
             </a>
         </div>

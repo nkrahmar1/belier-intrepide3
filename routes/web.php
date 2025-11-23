@@ -105,6 +105,7 @@ Route::get('/test-simple-bootstrap', function () {
 // Pages principales (AVANT les routes admin pour éviter les conflits)
 // --------------------
 Route::get('/', [HomeController::class, 'home'])->name('app_home');
+Route::get('/home', [HomeController::class, 'home'])->name('home'); // Route alias pour compatibilité
 Route::get('/about', [HomeController::class, 'about'])->name('app_about');
 
 // Route pour afficher un article avec contrôle d'abonnement
@@ -113,7 +114,8 @@ Route::get('/article/{id}', [HomeController::class, 'showArticle'])->name('artic
 // --------------------
 // Route pour les catégories
 // --------------------
-Route::get('/category/{categorie}', [HomeController::class, 'showByCategorie'])->name('app_category');
+// COMMENTÉ : Fonctionnalité de filtrage par catégorie désactivée
+// Route::get('/category/{categorie}', [HomeController::class, 'showByCategorie'])->name('app_category');
 
 // --------------------
 // Dashboards (routes spécifiques avant les génériques)
@@ -332,8 +334,8 @@ Route::prefix('articles')->group(function () {
     //Route::get('/sport', [ArticleController::class, 'sport'])->name('articles.sport');
     //Route::get('/politique', [ArticleController::class, 'politique'])->name('articles.politique');
     //Route::get('/populaires', [ArticleController::class, 'populaires'])->name('articles.populaires');
-    Route::get('/category/{slug}', [ArticleController::class, 'byCategory'])->name('articles.byCategory');
-
+    // COMMENTÉ : Route de catégorie article désactivée
+    //Route::get('/category/{slug}', [ArticleController::class, 'byCategory'])->name('articles.byCategory');
 });
 
 // --------------------

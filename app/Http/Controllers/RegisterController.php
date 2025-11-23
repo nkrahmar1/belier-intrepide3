@@ -64,7 +64,7 @@ class RegisterController extends Controller
             $request->session()->regenerate();
 
             // Redirection vers la page d'accueil avec message de bienvenue
-            return redirect()->route('app_home')->with('welcome_message', 'Bienvenue ' . $user->firstname . ' ! Votre compte a été créé avec succès.');
+            return redirect()->route('home')->with('welcome_message', 'Bienvenue ' . $user->firstname . ' ! Votre compte a été créé avec succès.');
 
         } catch (\Exception $e) {
             // En cas d'erreur lors de la création

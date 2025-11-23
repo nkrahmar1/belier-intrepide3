@@ -76,7 +76,7 @@ class LoginController extends Controller
                     ->with('status', 'Connexion réussie (admin) !');
             }
 
-            return redirect()->intended(route('app_home'))
+            return redirect()->intended(route('home'))
                 ->with('status', 'Connexion réussie !');
         }
 
@@ -123,6 +123,6 @@ class LoginController extends Controller
     {
         return $user->is_admin
             ? redirect()->route('admin.dashboard')
-            : redirect()->route('app_home');
+            : redirect()->route('home');
     }
 }

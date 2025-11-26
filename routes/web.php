@@ -114,8 +114,8 @@ Route::get('/article/{id}', [HomeController::class, 'showArticle'])->name('artic
 // --------------------
 // Route pour les catégories
 // --------------------
-// COMMENTÉ : Fonctionnalité de filtrage par catégorie désactivée
-// Route::get('/category/{categorie}', [HomeController::class, 'showByCategorie'])->name('app_category');
+// Réactivée : fonctionnalité de filtrage par catégorie
+Route::get('/category/{categorie}', [HomeController::class, 'showByCategorie'])->name('app_category');
 
 // --------------------
 // Dashboards (routes spécifiques avant les génériques)
@@ -329,13 +329,13 @@ Route::get('/articles/{id}', [ArticleController::class, 'show'])->name('articles
 
 // Routes d'articles par catégories/thèmes
 Route::prefix('articles')->group(function () {
-    //Route::get('/category/{category}', [ArticleController::class, 'byCategory'])->name('articles.category');
-    //Route::get('/economie', [ArticleController::class, 'economie'])->name('articles.economie');
-    //Route::get('/sport', [ArticleController::class, 'sport'])->name('articles.sport');
-    //Route::get('/politique', [ArticleController::class, 'politique'])->name('articles.politique');
-    //Route::get('/populaires', [ArticleController::class, 'populaires'])->name('articles.populaires');
-    // COMMENTÉ : Route de catégorie article désactivée
-    //Route::get('/category/{slug}', [ArticleController::class, 'byCategory'])->name('articles.byCategory');
+    Route::get('/category/{category}', [ArticleController::class, 'byCategory'])->name('articles.category');
+    Route::get('/economie', [ArticleController::class, 'economie'])->name('articles.economie');
+    Route::get('/sport', [ArticleController::class, 'sport'])->name('articles.sport');
+    Route::get('/politique', [ArticleController::class, 'politique'])->name('articles.politique');
+    Route::get('/populaires', [ArticleController::class, 'populaires'])->name('articles.populaires');
+    // Route de catégorie article (réactivée)
+    Route::get('/category/{slug}', [ArticleController::class, 'byCategory'])->name('articles.byCategory');
 });
 
 // --------------------

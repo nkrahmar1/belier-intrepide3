@@ -13,7 +13,8 @@ class HomeController extends Controller
     // Accueil
     public function home()
     {
-        // Récupération des articles publiés sur la homepage avec tous leurs éléments
+        try {
+            // Récupération des articles publiés sur la homepage avec tous leurs éléments
         // Récupère les articles mis en avant pour la homepage.
         // Supporte les deux colonnes `is_featured` (admin) et l'ancienne `featured_on_homepage`.
         $featuredArticles = Article::where('is_published', true)
@@ -84,7 +85,7 @@ class HomeController extends Controller
         // Utilisateur connecté
         $user = Auth::user();
 
-        return view('home.home', compact(
+            return view('home.home', compact(
             'user',
             'featuredArticles',
             'articlesByCategory',
@@ -94,7 +95,12 @@ class HomeController extends Controller
             'featuredProducts',
             'categories',
             'cartItemCount'
-        ));
+            ));
+        } catch (\Throwable $e) {
+            // Log the error for debugging but show a friendly offline page
+            \Log::error('HomeController::home error: '. $e->getMessage());
+            return view('home.offline');
+        }
     }
 
     // À propos

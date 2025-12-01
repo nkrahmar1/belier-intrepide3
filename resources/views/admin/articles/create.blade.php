@@ -173,6 +173,76 @@
                     @enderror
                 </div>
 
+                <!-- New article meta fields -->
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <label for="article_type" class="form-label">Type d'article</label>
+                        <select id="article_type" name="article_type" class="form-select @error('article_type') is-invalid @enderror">
+                            <option value="">-- Sélectionner un type --</option>
+                            <option value="breve" {{ old('article_type', $article->article_type ?? '') == 'breve' ? 'selected' : '' }}>Brève</option>
+                            <option value="communique" {{ old('article_type', $article->article_type ?? '') == 'communique' ? 'selected' : '' }}>Communiqué</option>
+                            <option value="analyse" {{ old('article_type', $article->article_type ?? '') == 'analyse' ? 'selected' : '' }}>Analyse</option>
+                            <option value="enquete" {{ old('article_type', $article->article_type ?? '') == 'enquete' ? 'selected' : '' }}>Enquête</option>
+                            <option value="interview" {{ old('article_type', $article->article_type ?? '') == 'interview' ? 'selected' : '' }}>Interview</option>
+                            <option value="tutoriel" {{ old('article_type', $article->article_type ?? '') == 'tutoriel' ? 'selected' : '' }}>Tutoriel</option>
+                            <option value="explicatif" {{ old('article_type', $article->article_type ?? '') == 'explicatif' ? 'selected' : '' }}>Explicatif</option>
+                        </select>
+                        @error('article_type')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                        <small class="text-muted">Influence l'accès (gratuit / premium) et le rendu.</small>
+                    </div>
+
+                    <div class="col-md-4 mb-3">
+                        <label for="unit_price" class="form-label">Prix unitaire (achat à l'unité)</label>
+                        <input type="number" step="0.01" min="0" id="unit_price" name="unit_price"
+                               class="form-control @error('unit_price') is-invalid @enderror"
+                               value="{{ old('unit_price', isset($article) ? $article->unit_price : '') }}">
+                        @error('unit_price')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                        <small class="text-muted">Laisser vide pour désactiver l'achat unitaire.</small>
+                    </div>
+
+                    <div class="col-md-4 mb-3">
+                        <label for="free_download_limit" class="form-label">Limite de téléchargements gratuits</label>
+                        <input type="number" id="free_download_limit" name="free_download_limit" min="0"
+                               class="form-control @error('free_download_limit') is-invalid @enderror"
+                               value="{{ old('free_download_limit', isset($article) ? $article->free_download_limit : '') }}">
+                        @error('free_download_limit')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                        <small class="text-muted">0 = illimité (pour les articles gratuits).</small>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="content_quality" class="form-label">Qualité du contenu (0-100)</label>
+                        <div class="input-group">
+                            <input type="range" id="content_quality" name="content_quality" min="0" max="100" step="1"
+                                   class="form-range @error('content_quality') is-invalid @enderror"
+                                   value="{{ old('content_quality', isset($article) ? $article->content_quality : 50) }}">
+                            <span class="input-group-text" id="content_quality_value">{{ old('content_quality', isset($article) ? $article->content_quality : 50) }}</span>
+                        </div>
+                        @error('content_quality')
+                            <div class="invalid-feedback d-block">{{ $message }}</div>
+                        @enderror
+                        <small class="text-muted">Valeur indicative de 0 (court) à 100 (très approfondi).</small>
+                    </div>
+
+                    <div class="col-md-6 mb-3 d-flex align-items-center">
+                        <div class="form-check mt-4">
+                            <input type="checkbox" class="form-check-input" id="is_featured" name="is_featured"
+                                   value="1" {{ old('is_featured', $article->is_featured ?? false) ? 'checked' : '' }}>
+                            <label class="form-check-label" for="is_featured">Mettre en avant (featured)</label>
+                            <div><small class="text-muted">L'article sera éligible pour la page d'accueil ou les sections 'en vedette'.</small></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- /New article meta fields -->
+
                 <div class="mb-3 form-check">
                     <input type="checkbox" class="form-check-input" id="is_premium" name="is_premium"
                            value="1" {{ old('is_premium', $article->is_premium ?? false) ? 'checked' : '' }}>
@@ -346,6 +416,27 @@
                     alert('⚠️ La taille du document ne doit pas dépasser 10MB');
                     clearDocumentPreview();
                     return;
+                }
+            });
+        }
+
+        // Content quality slider display
+        const qualityInput = document.getElementById('content_quality');
+        const qualityValue = document.getElementById('content_quality_value');
+        if (qualityInput && qualityValue) {
+            qualityInput.addEventListener('input', function() {
+                qualityValue.textContent = this.value;
+            });
+        }
+
+        // Unit price validation (non-negative)
+        const priceInput = document.getElementById('unit_price');
+        if (priceInput) {
+            priceInput.addEventListener('change', function() {
+                const val = parseFloat(this.value);
+                if (!isNaN(val) && val < 0) {
+                    alert('⚠️ Le prix unitaire ne peut pas être négatif');
+                    this.value = '';
                 }
             });
         }

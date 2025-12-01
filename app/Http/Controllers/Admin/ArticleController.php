@@ -45,6 +45,11 @@ class ArticleController extends Controller
             'category_id' => 'required|exists:categories,id',
             'is_premium' => 'nullable|boolean',
             'is_published' => 'nullable|boolean',
+            'is_featured' => 'nullable|boolean',
+            'article_type' => 'nullable|string|max:50',
+            'content_quality' => 'nullable|integer|min:0|max:100',
+            'unit_price' => 'nullable|numeric|min:0',
+            'free_download_limit' => 'nullable|integer|min:0',
             'document' => 'nullable|file|mimes:pdf,doc,docx,txt,xls,xlsx,ppt,pptx|max:10240', // 10MB max
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048', // 2MB max
         ], [
@@ -58,18 +63,30 @@ class ArticleController extends Controller
             'image.max' => 'L\'image ne doit pas dépasser 2MB.',
             'document.mimes' => 'Le document doit être un fichier PDF, DOC, DOCX, TXT, XLS, XLSX, PPT ou PPTX.',
             'document.max' => 'Le document ne doit pas dépasser 10MB.',
+            'content_quality.integer' => 'La qualité de contenu doit être un entier entre 0 et 100.',
+            'unit_price.numeric' => 'Le prix unitaire doit être un nombre valide.',
+            'free_download_limit.integer' => 'Le nombre de téléchargements gratuits doit être un entier.',
         ]);
 
-        // Sécurisation des données
+        // Sécurisation et valeurs par défaut
         $validated['user_id'] = Auth::id();
         $validated['slug'] = Str::slug($validated['titre']);
         $validated['is_premium'] = $request->has('is_premium') ? 1 : 0;
         $validated['is_published'] = $request->has('is_published') ? 1 : 0;
+        $validated['is_featured'] = $request->has('is_featured') ? 1 : 0;
+        $validated['article_type'] = $validated['article_type'] ?? null;
+        $validated['content_quality'] = $validated['content_quality'] ?? null;
+        $validated['unit_price'] = isset($validated['unit_price']) ? $validated['unit_price'] : null;
+        $validated['free_download_limit'] = isset($validated['free_download_limit']) ? $validated['free_download_limit'] : null;
+        $validated['views_count'] = 0;
+        $validated['downloads_count'] = 0;
 
         // Si publié, mettre la date de publication
         if ($validated['is_published']) {
             $validated['published_at'] = now();
         }
+
+        $totalStorageBytes = 0;
 
         // Upload sécurisé du document
         if ($request->hasFile('document')) {
@@ -81,6 +98,15 @@ class ArticleController extends Controller
             // Stocker des infos sur le fichier
             $validated['file_original_name'] = $file->getClientOriginalName();
             $validated['file_size'] = $file->getSize();
+
+            // Taille réelle sur le disque (en octets)
+            try {
+                $diskSize = Storage::disk('public')->size($path);
+                $totalStorageBytes += $diskSize;
+            } catch (\Exception $e) {
+                // Fallback to uploaded size
+                $totalStorageBytes += $file->getSize();
+            }
         }
 
         // Upload sécurisé de l'image
@@ -89,6 +115,18 @@ class ArticleController extends Controller
             $imagename = time() . '_' . Str::slug($validated['titre']) . '.' . $image->getClientOriginalExtension();
             $path = $image->storeAs('articles/images', $imagename, 'public');
             $validated['image'] = $path;
+
+            try {
+                $diskSize = Storage::disk('public')->size($path);
+                $totalStorageBytes += $diskSize;
+            } catch (\Exception $e) {
+                $totalStorageBytes += $image->getSize();
+            }
+        }
+
+        // Populate storage_size if any file uploaded
+        if ($totalStorageBytes > 0) {
+            $validated['storage_size'] = $totalStorageBytes; // in bytes
         }
 
         try {
@@ -125,6 +163,11 @@ class ArticleController extends Controller
             'category_id' => 'required|exists:categories,id',
             'is_premium' => 'boolean',
             'is_published' => 'boolean',
+            'is_featured' => 'nullable|boolean',
+            'article_type' => 'nullable|string|max:50',
+            'content_quality' => 'nullable|integer|min:0|max:100',
+            'unit_price' => 'nullable|numeric|min:0',
+            'free_download_limit' => 'nullable|integer|min:0',
             'document' => 'nullable|file|mimes:pdf,doc,docx,txt,xls,xlsx,ppt,pptx|max:10240',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
         ], [
@@ -137,6 +180,9 @@ class ArticleController extends Controller
             'image.max' => 'L\'image ne doit pas dépasser 2MB.',
             'document.mimes' => 'Le document doit être un fichier PDF, DOC, DOCX, TXT, XLS, XLSX, PPT ou PPTX.',
             'document.max' => 'Le document ne doit pas dépasser 10MB.',
+            'content_quality.integer' => 'La qualité de contenu doit être un entier entre 0 et 100.',
+            'unit_price.numeric' => 'Le prix unitaire doit être un nombre valide.',
+            'free_download_limit.integer' => 'Le nombre de téléchargements gratuits doit être un entier.',
         ]);
 
         // Mise à jour du slug si le titre a changé
@@ -144,12 +190,21 @@ class ArticleController extends Controller
             $validated['slug'] = Str::slug($validated['titre']);
         }
 
+        // Values and homepage/feature flags
+        $validated['is_featured'] = $request->has('is_featured') ? 1 : ($validated['is_featured'] ?? $article->is_featured);
+        $validated['article_type'] = $validated['article_type'] ?? $article->article_type;
+        $validated['content_quality'] = $validated['content_quality'] ?? $article->content_quality;
+        $validated['unit_price'] = isset($validated['unit_price']) ? $validated['unit_price'] : $article->unit_price;
+        $validated['free_download_limit'] = isset($validated['free_download_limit']) ? $validated['free_download_limit'] : $article->free_download_limit;
+
         // Gestion de la publication
         if ($validated['is_published'] && !$article->is_published) {
             $validated['published_at'] = now();
         } elseif (!$validated['is_published']) {
             $validated['published_at'] = null;
         }
+
+        $totalStorageBytes = $article->storage_size ?? 0;
 
         // Upload nouveau document
         if ($request->hasFile('document')) {
@@ -164,6 +219,13 @@ class ArticleController extends Controller
             $validated['document_path'] = $path;
             $validated['file_original_name'] = $file->getClientOriginalName();
             $validated['file_size'] = $file->getSize();
+
+            try {
+                $diskSize = Storage::disk('public')->size($path);
+                $totalStorageBytes += $diskSize;
+            } catch (\Exception $e) {
+                $totalStorageBytes += $file->getSize();
+            }
         }
 
         // Upload nouvelle image
@@ -177,6 +239,17 @@ class ArticleController extends Controller
             $imagename = time() . '_' . Str::slug($validated['titre']) . '.' . $image->getClientOriginalExtension();
             $path = $image->storeAs('articles/images', $imagename, 'public');
             $validated['image'] = $path;
+
+            try {
+                $diskSize = Storage::disk('public')->size($path);
+                $totalStorageBytes += $diskSize;
+            } catch (\Exception $e) {
+                $totalStorageBytes += $image->getSize();
+            }
+        }
+
+        if ($totalStorageBytes > 0) {
+            $validated['storage_size'] = $totalStorageBytes;
         }
 
         try {
@@ -351,9 +424,27 @@ class ArticleController extends Controller
                 abort(404, 'Document non trouvé sur le serveur');
             }
 
+            // Vérifier les droits via le modèle
+            $user = auth()->user();
+            $permission = $article->canUserDownload($user);
+
+            if (!is_array($permission) || empty($permission['can_download'])) {
+                // Si réponse structurée indiquant raison
+                $reason = is_array($permission) && isset($permission['reason']) ? $permission['reason'] : 'forbidden';
+                Log::warning("Téléchargement refusé pour l'article {$article->id}: {$reason}");
+                abort(403, 'Vous n\'êtes pas autorisé à télécharger ce document. Raison: ' . $reason);
+            }
+
             $originalName = $article->file_original_name ?? 'document_' . $article->id . '.pdf';
 
-            Log::info("Téléchargement du document pour l'article {$article->id}");
+            Log::info("Téléchargement du document pour l'article {$article->id} par utilisateur " . ($user->id ?? 'guest'));
+
+            // Incrémenter le compteur de téléchargements
+            try {
+                $article->incrementDownloads();
+            } catch (\Exception $e) {
+                Log::warning('Impossible d\'incrémenter downloads: ' . $e->getMessage());
+            }
 
             return response()->download(
                 storage_path('app/public/' . $article->document_path),

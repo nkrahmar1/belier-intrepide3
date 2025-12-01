@@ -125,6 +125,16 @@ Route::middleware(['auth', \App\Http\Middleware\AdminMiddleware::class])
     ->get('/admin/dashboard', [AdminDashboardController::class, 'dashboard'])
     ->name('admin.dashboard');
 Route::middleware(['auth', \App\Http\Middleware\AdminMiddleware::class])
+    ->get('/admin/enhanced-dashboard', function () {
+        return view('admin.enhanced-dashboard');
+    })
+    ->name('admin.enhanced-dashboard');
+Route::middleware(['auth', \App\Http\Middleware\AdminMiddleware::class])
+    ->get('/admin/test-improvements', function () {
+        return view('admin.test-four-improvements');
+    })
+    ->name('admin.test-improvements');
+Route::middleware(['auth', \App\Http\Middleware\AdminMiddleware::class])
     ->post('/admin/dashboard/quick-article', [AdminDashboardController::class, 'quickCreateArticle'])
     ->name('admin.dashboard.quick-article');
 

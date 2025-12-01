@@ -39,6 +39,25 @@
             overflow-x: hidden;
         }
 
+        /* Badge animations */
+        .rounded-full {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .group:hover .rounded-full {
+            transform: scale(1.1);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        /* Gradient backgrounds */
+        .gradient-text {
+            @apply bg-gradient-to-r from-green-600 to-green-500 dark:from-green-400 dark:to-green-300 bg-clip-text text-transparent;
+        }
+
+        .gradient-bg {
+            @apply bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900/10 dark:to-green-900/20;
+        }
+
         /* Ensure proper layout structure */
         .min-h-screen.xl\:flex {
             display: flex;
@@ -186,6 +205,46 @@
         .shadow-theme-md {
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
         }
+
+        /* Enhanced badges with colors */
+        .badge-green {
+            @apply inline-flex items-center gap-2 px-3 py-1 bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300 text-xs rounded-full font-medium;
+        }
+
+        .badge-blue {
+            @apply inline-flex items-center gap-2 px-3 py-1 bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 text-xs rounded-full font-medium;
+        }
+
+        .badge-purple {
+            @apply inline-flex items-center gap-2 px-3 py-1 bg-purple-100 dark:bg-purple-900 text-purple-700 dark:text-purple-300 text-xs rounded-full font-medium;
+        }
+
+        .badge-orange {
+            @apply inline-flex items-center gap-2 px-3 py-1 bg-orange-100 dark:bg-orange-900 text-orange-700 dark:text-orange-300 text-xs rounded-full font-medium;
+        }
+
+        /* Smooth animations */
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .animate-slideIn {
+            animation: slideIn 0.3s ease-out;
+        }
+
+        /* Dark mode transitions */
+        .transition-colors {
+            transition-property: background-color, border-color, color;
+            transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+            transition-duration: 200ms;
+        }
     </style>
 
     <!-- Alpine.js -->
@@ -232,6 +291,31 @@
                     </template>
                 </a>
             </div>
+
+            <!-- Quick Stats -->
+            <template x-if="sidebarExpanded || sidebarHovered || mobileSidebarOpen">
+                <div class="px-4 py-4 mb-6 bg-gradient-to-r from-green-50 to-blue-50 dark:from-green-900/20 dark:to-blue-900/20 rounded-lg border border-green-100 dark:border-green-800">
+                    <p class="text-xs font-bold text-gray-600 dark:text-gray-400 mb-3 uppercase tracking-wider">Vue Rapide</p>
+                    <div class="space-y-2 text-xs">
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-600 dark:text-gray-400">📄 Articles</span>
+                            <span class="font-bold text-green-600 dark:text-green-400">{{ \App\Models\Article::count() }}</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-600 dark:text-gray-400">👥 Utilisateurs</span>
+                            <span class="font-bold text-blue-600 dark:text-blue-400">{{ \App\Models\User::count() }}</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-600 dark:text-gray-400">⭐ Premium</span>
+                            <span class="font-bold text-purple-600 dark:text-purple-400">{{ \App\Models\User::where('is_premium', true)->count() }}</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-600 dark:text-gray-400">✉️ Messages</span>
+                            <span class="font-bold text-orange-600 dark:text-orange-400">{{ \App\Models\Message::where('is_read', false)->count() }}</span>
+                        </div>
+                    </div>
+                </div>
+            </template>
 
             <!-- Navigation -->
             <div class="flex flex-col overflow-y-auto duration-300 ease-linear no-scrollbar custom-scrollbar">
@@ -290,92 +374,66 @@
                                     </a>
                                 </li>
 
-                                <li x-data="{ subOpen: false }">
-                                    <button
-                                        @click="subOpen = !subOpen"
-                                        :class="[
-                                            'menu-item group w-full',
-                                            subOpen ? 'menu-item-active' : 'menu-item-inactive',
-                                        ]"
-                                    >
-                                        <span
-                                            :class="[
-                                                subOpen ? 'menu-item-icon-active' : 'menu-item-icon-inactive',
-                                            ]"
-                                        >
+                                <li>
+                                    <a href="{{ route('admin.articles.index') }}" class="menu-item menu-item-inactive group relative">
+                                        <span class="menu-item-icon-inactive">
                                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
                                             </svg>
                                         </span>
                                         <template x-if="sidebarExpanded || sidebarHovered || mobileSidebarOpen">
                                             <span class="menu-item-text flex-1 text-left">Articles</span>
+                                            <span class="inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white transform translate-x-0 group-hover:translate-x-1 transition-transform bg-green-600 rounded-full">
+                                                {{ \App\Models\Article::count() }}
+                                            </span>
                                         </template>
-                                        <template x-if="sidebarExpanded || sidebarHovered || mobileSidebarOpen">
-                                            <svg
-                                                :class="[
-                                                    'ml-auto w-5 h-5 transition-transform duration-200',
-                                                    { 'rotate-180 text-brand-500': subOpen },
-                                                ]"
-                                                fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                                            >
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                                            </svg>
-                                        </template>
-                                    </button>
-                                    <div
-                                        x-show="subOpen && (sidebarExpanded || sidebarHovered || mobileSidebarOpen)"
-                                        x-transition
-                                    >
-                                        <ul class="mt-2 space-y-1 ml-9">
-                                            <li>
-                                                <a href="{{ route('admin.articles.index') }}" class="block py-2 px-3 text-sm text-gray-700 dark:text-gray-300 hover:text-brand-600 dark:hover:text-brand-400 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
-                                                    Tous les articles
-                                                </a>
-                                            </li>
-                                            <li>
-                                                <a href="{{ route('admin.articles.create') }}" class="block py-2 px-3 text-sm text-gray-700 dark:text-gray-300 hover:text-brand-600 dark:hover:text-brand-400 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
-                                                    Créer un article
-                                                </a>
-                                            </li>
-                                        </ul>
-                                    </div>
+                                    </a>
                                 </li>
 
                                 <li>
-                                    <a href="{{ route('admin.users.index') }}" class="menu-item menu-item-inactive group">
+                                    <a href="{{ route('admin.users.index') }}" class="menu-item menu-item-inactive group relative">
                                         <span class="menu-item-icon-inactive">
                                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
                                             </svg>
                                         </span>
                                         <template x-if="sidebarExpanded || sidebarHovered || mobileSidebarOpen">
-                                            <span class="menu-item-text">Utilisateurs</span>
+                                            <span class="menu-item-text flex-1 text-left">Utilisateurs</span>
+                                            <span class="inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white transform translate-x-0 group-hover:translate-x-1 transition-transform bg-blue-600 rounded-full">
+                                                {{ \App\Models\User::count() }}
+                                            </span>
                                         </template>
                                     </a>
                                 </li>
 
                                 <li>
-                                    <a href="{{ route('admin.products.index') }}" class="menu-item menu-item-inactive group">
+                                    <a href="{{ route('admin.products.index') }}" class="menu-item menu-item-inactive group relative">
                                         <span class="menu-item-icon-inactive">
                                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
                                             </svg>
                                         </span>
                                         <template x-if="sidebarExpanded || sidebarHovered || mobileSidebarOpen">
-                                            <span class="menu-item-text">Produits</span>
+                                            <span class="menu-item-text flex-1 text-left">Produits</span>
+                                            <span class="inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white transform translate-x-0 group-hover:translate-x-1 transition-transform bg-purple-600 rounded-full">
+                                                {{ \App\Models\Product::count() ?? 0 }}
+                                            </span>
                                         </template>
                                     </a>
                                 </li>
 
                                 <li>
-                                    <a href="{{ route('admin.orders.index') }}" class="menu-item menu-item-inactive group">
+                                    <a href="{{ route('admin.orders.index') }}" class="menu-item menu-item-inactive group relative">
                                         <span class="menu-item-icon-inactive">
                                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                                             </svg>
                                         </span>
                                         <template x-if="sidebarExpanded || sidebarHovered || mobileSidebarOpen">
-                                            <span class="menu-item-text">Commandes</span>
+                                            <span class="menu-item-text flex-1 text-left">Commandes</span>
+                                            <span class="inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white transform translate-x-0 group-hover:translate-x-1 transition-transform bg-orange-600 rounded-full">
+                                                {{ \App\Models\Order::count() ?? 0 }}
+                                            </span>
                                         </template>
                                     </a>
                                 </li>
@@ -399,7 +457,7 @@
                             </h2>
                             <ul class="flex flex-col gap-4">
                                 <li>
-                                    <a href="#stats" class="menu-item menu-item-inactive group">
+                                    <a href="{{ route('admin.dashboard') }}" class="menu-item menu-item-inactive group">
                                         <span class="menu-item-icon-inactive">
                                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
@@ -423,6 +481,66 @@
                                             <span class="menu-item-text">Paramètres</span>
                                         </template>
                                     </a>
+                                </li>
+
+                                <!-- Quick Actions -->
+                                <li x-data="{ quickOpen: false }" class="relative">
+                                    <button
+                                        @click="quickOpen = !quickOpen"
+                                        :class="[
+                                            'menu-item group w-full',
+                                            quickOpen ? 'menu-item-active' : 'menu-item-inactive',
+                                        ]"
+                                    >
+                                        <span :class="[quickOpen ? 'menu-item-icon-active' : 'menu-item-icon-inactive']">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                                            </svg>
+                                        </span>
+                                        <template x-if="sidebarExpanded || sidebarHovered || mobileSidebarOpen">
+                                            <span class="menu-item-text flex-1 text-left">Actions Rapides</span>
+                                            <svg
+                                                :class="[
+                                                    'ml-auto w-5 h-5 transition-transform duration-200',
+                                                    { 'rotate-180 text-brand-500': quickOpen },
+                                                ]"
+                                                fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                                            >
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                            </svg>
+                                        </template>
+                                    </button>
+                                    <div
+                                        x-show="quickOpen && (sidebarExpanded || sidebarHovered || mobileSidebarOpen)"
+                                        x-transition
+                                    >
+                                        <ul class="mt-2 space-y-1 ml-9">
+                                            <li>
+                                                <a href="{{ route('admin.articles.create') }}" class="block py-2 px-3 text-sm text-gray-700 dark:text-gray-300 hover:text-brand-600 dark:hover:text-brand-400 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors flex items-center gap-2">
+                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                                                    </svg>
+                                                    Nouvel Article
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a href="{{ route('admin.users.create') }}" class="block py-2 px-3 text-sm text-gray-700 dark:text-gray-300 hover:text-brand-600 dark:hover:text-brand-400 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors flex items-center gap-2">
+                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                                                    </svg>
+                                                    Nouvel Utilisateur
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a href="{{ route('admin.products.create') }}" class="block py-2 px-3 text-sm text-gray-700 dark:text-gray-300 hover:text-brand-600 dark:hover:text-brand-400 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors flex items-center gap-2">
+                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                                                    </svg>
+                                                    Nouveau Produit
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </div>
                                 </li>
                             </ul>
                         </div>

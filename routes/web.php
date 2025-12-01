@@ -215,6 +215,7 @@ Route::middleware(['auth', \App\Http\Middleware\AdminMiddleware::class])
 
         // Utilisateurs (admin) - CRUD Complet
         Route::get('/users', [UserController::class, 'index'])->name('users.index');
+        Route::get('/users/create', [UserController::class, 'create'])->name('users.create'); // 👈 ROUTE MANQUANTE AJOUTÉE
         Route::post('/users', [UserController::class, 'store'])->name('users.store');
         Route::get('/users/{user}', [UserController::class, 'show'])->name('users.show');
         Route::get('/users/{user}/edit', [UserController::class, 'edit'])->name('users.edit');
@@ -301,8 +302,6 @@ Route::middleware(['auth', \App\Http\Middleware\AdminMiddleware::class])
         Route::get('/modal/settings', function () {
             return view('admin.settings')->render();
         })->name('modal.settings');
-
-        // Routes de catégories supprimées car nous utilisons maintenant Category
     });
 
 // --------------------

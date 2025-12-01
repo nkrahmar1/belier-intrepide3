@@ -46,10 +46,11 @@ class AdminDashboardController extends Controller
             'active_subscriptions' => \App\Models\Subscription::where('status', 'active')
                                          ->where('ends_at', '>', now())->count(),
             // Nouvelles statistiques pour les utilisateurs
-            'active_users' => User::where('status', 'active')->count(),
-            'inactive_users' => User::where('status', 'inactive')->count(),
-            'pending_users' => User::whereNull('email_verified_at')->count(),
-            'premium_users' => User::where('is_premium', true)->count(),
+            'users_active' => User::where('status', 'active')->count(),
+            'users_inactive' => User::where('status', 'inactive')->count(),
+            'users_pending' => User::whereNull('email_verified_at')->count(),
+            'users_premium' => User::where('is_premium', true)->count(),
+            'messages_unread' => \App\Models\Message::where('is_read', false)->count(),
         ];
 
         // Données pour les graphiques
@@ -64,9 +65,12 @@ class AdminDashboardController extends Controller
         $chartData = [
             'labels' => $months->map(fn($m) => $m->format('M Y'))->toArray(),
             'articles' => $months->map(function ($month) {
-                return Article::whereYear('created_at', $month->year)
-                              ->whereMonth('created_at', $month->month)
-                              ->count();
+                return [
+                    'count' => Article::whereYear('created_at', $month->year)
+                                      ->whereMonth('created_at', $month->month)
+                                      ->count(),
+                    'month' => $month->format('M Y')
+                ];
             })->toArray(),
             'revenue' => $months->map(function ($month) {
                 // Simuler les revenus basés sur les abonnements actifs du mois
@@ -74,7 +78,10 @@ class AdminDashboardController extends Controller
                     ->whereYear('created_at', $month->year)
                     ->whereMonth('created_at', $month->month)
                     ->count();
-                return $subscriptions * 29.99; // Prix moyen d'abonnement
+                return [
+                    'amount' => $subscriptions * 29.99, // Prix moyen d'abonnement
+                    'month' => $month->format('M Y')
+                ];
             })->toArray(),
         ];
 

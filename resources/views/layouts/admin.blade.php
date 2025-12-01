@@ -39,6 +39,12 @@
             overflow-x: hidden;
         }
 
+        /* Ensure proper layout structure */
+        .min-h-screen.xl\:flex {
+            display: flex;
+            flex-direction: row;
+        }
+
         /* Sidebar customization */
         .sidebar-expanded {
             width: 290px;
@@ -56,6 +62,28 @@
             .sidebar-mobile-closed {
                 transform: translateX(-100%);
             }
+        }
+
+        /* Main content should always be flex-1 for responsive layout */
+        .flex-col.flex-1 {
+            flex: 1 1 auto;
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            min-width: 0;
+        }
+
+        /* Ensure header doesn't overlap content */
+        .sticky.top-0 {
+            position: sticky;
+            top: 0;
+            z-index: 9999;
+        }
+
+        /* Main content padding */
+        main {
+            flex: 1 1 auto;
+            overflow-y: auto;
         }
 
         /* Menu item styles */
@@ -314,7 +342,7 @@
                                 </li>
 
                                 <li>
-                                    <a href="#users" class="menu-item menu-item-inactive group">
+                                    <a href="{{ route('admin.users.index') }}" class="menu-item menu-item-inactive group">
                                         <span class="menu-item-icon-inactive">
                                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
@@ -327,7 +355,7 @@
                                 </li>
 
                                 <li>
-                                    <a href="#products" class="menu-item menu-item-inactive group">
+                                    <a href="{{ route('admin.products.index') }}" class="menu-item menu-item-inactive group">
                                         <span class="menu-item-icon-inactive">
                                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
@@ -340,7 +368,7 @@
                                 </li>
 
                                 <li>
-                                    <a href="#orders" class="menu-item menu-item-inactive group">
+                                    <a href="{{ route('admin.orders.index') }}" class="menu-item menu-item-inactive group">
                                         <span class="menu-item-icon-inactive">
                                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
@@ -419,11 +447,11 @@
 
         <!-- Main Content -->
         <div
-            class="flex-1 transition-all duration-300 ease-in-out"
+            class="flex flex-col flex-1 min-h-screen w-full transition-all duration-300 ease-in-out"
             :class="[sidebarExpanded || sidebarHovered ? 'lg:ml-[290px]' : 'lg:ml-[90px]']"
         >
             <!-- Header -->
-            <header class="sticky top-0 flex w-full bg-white border-gray-200 z-[9999] dark:border-gray-800 dark:bg-gray-900 lg:border-b">
+            <header class="sticky top-0 left-0 right-0 flex w-full bg-white border-gray-200 z-[9999] dark:border-gray-800 dark:bg-gray-900 lg:border-b">
                 <div class="flex flex-col items-center justify-between grow lg:flex-row lg:px-6">
                     <div class="flex items-center justify-between w-full gap-2 px-3 py-3 border-b border-gray-200 dark:border-gray-800 sm:gap-4 lg:justify-normal lg:border-b-0 lg:px-0 lg:py-4">
                         <!-- Toggle Button -->

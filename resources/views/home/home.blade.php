@@ -940,7 +940,7 @@
     <div class="user-welcome-section" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 15px; border-radius: 10px; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
         <div class="row align-items-center">
             <div class="col-12 col-md-8 text-center text-md-start">
-                <h2 class="mb-2" style="font-size: 1.5rem;">👋 Bienvenue, {{ Auth::user()->firstname }} !</h2>
+                <h2 class="mb-2" style="font-size: 1.5rem;">👋 Bienvenue, {{ Auth::user()->lastname }} !</h2>
                 <p class="mb-0" style="opacity: 0.9; font-size: 0.9rem;">Restez informé des dernières actualités</p>
             </div>
             <div class="col-12 col-md-4 text-center text-md-end mt-3 mt-md-0">
@@ -1347,22 +1347,22 @@
 @auth
 <div id="dashboardPanel" class="dashboard-panel">
     <div class="dashboard-header d-flex justify-content-between align-items-center">
-        <h5 class="mb-0">Dashboard</h5>
+        <h5 class="mb-0">Tableau de bord</h5>
         <div class="d-flex align-items-center gap-3">
             <div class="dropdown">
                 <a class="dropdown-toggle text-decoration-none d-flex align-items-center" href="#" role="button" data-bs-toggle="dropdown">
                     <div class="user-initials me-2">
-                        {{ strtoupper(substr(Auth::user()->firstname, 0, 1) . substr(Auth::user()->lastname, 0, 1)) }}
+                        {{ strtoupper(substr(Auth::user()->lastname, 0, 1) . substr(Auth::user()->firstname, 0, 1)) }}
                     </div>
                 </a>
                 <ul class="dropdown-menu dropdown-menu-end">
-                    <li><button class="dropdown-item" onclick="closeDashboard()">Close</button></li>
+                    <li><button class="dropdown-item" onclick="closeDashboard()">Fermé</button></li>
                     <li>
                         <form id="logout-form" action="{{ route('app_logout') }}" method="POST" style="display: none;">
                             @csrf
                         </form>
                         <a class="dropdown-item text-danger" href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-                            Logout
+                            Se déconnecter
                         </a>
                     </li>
                 </ul>
@@ -1371,26 +1371,26 @@
     </div>
 
     <div class="dashboard-content">
-        <h3>Welcome, {{ Auth::user()->firstname }} 👋</h3>
+        <h3>Bienvenue, {{ Auth::user()->lastname }} 👋</h3>
 
         <div class="card border-0 shadow-sm mb-3">
             <div class="card-body">
-                <h5 class="card-title">My Articles</h5>
-                <a href="{{ route('articles.index') }}" class="btn btn-sm btn-primary">Manage</a>
+                <h5 class="card-title">Mes Articles</h5>
+                <a href="{{ route('articles.index') }}" class="btn btn-sm btn-primary">Gérer</a>
             </div>
         </div>
 
         <div class="card border-0 shadow-sm mb-3">
             <div class="card-body">
                 <h5 class="card-title toggle-title" onclick="toggleSection('profileSection')">
-                    Profile
+                    Profil
                 </h5>
                 <div id="profileSection" class="collapse-section" style="display: none;">
                     <ul class="list-group list-group-flush">
-                        <li class="list-group-item"><strong>First Name:</strong> {{ Auth::user()->firstname }}</li>
-                        <li class="list-group-item"><strong>Last Name:</strong> {{ Auth::user()->lastname }}</li>
-                        <li class="list-group-item"><strong>Email:</strong> {{ Auth::user()->email }}</li>
-                        <li class="list-group-item"><strong>Password:</strong> <code>{{ str_repeat('*', 8) }}</code></li>
+                        <li class="list-group-item"><strong>Prénom :</strong> {{ Auth::user()->firstname }}</li>
+                        <li class="list-group-item"><strong>Nom :</strong> {{ Auth::user()->lastname }}</li>
+                        <li class="list-group-item"><strong>Email :</strong> {{ Auth::user()->email }}</li>
+                        <li class="list-group-item"><strong>Mot de passe :</strong> <code>{{ str_repeat('*', 8) }}</code></li>
                     </ul>
                 </div>
             </div>
@@ -1399,13 +1399,13 @@
         <div class="card border-0 shadow-sm mb-3">
             <div class="card-body">
                 <h5 class="card-title toggle-title" onclick="toggleSection('addressSection')">
-                    Address
+                    Adresse
                 </h5>
                 <div id="addressSection" class="collapse-section" style="display: none;">
                     @if(Auth::user()->address)
                         <p>{{ Auth::user()->address }}</p>
                     @else
-                        <p class="text-muted fst-italic">No address registered</p>
+                        <p class="text-muted fst-italic">Aucune adresse enregistrée</p>
                     @endif
                 </div>
             </div>
@@ -1413,8 +1413,8 @@
 
         <div class="card border-0 shadow-sm mb-3">
             <div class="card-body">
-                <h5 class="card-title">Settings</h5>
-                <button class="btn btn-sm btn-secondary" disabled>Coming Soon</button>
+                <h5 class="card-title">Paramètres</h5>
+                <button class="btn btn-sm btn-secondary" disabled>À venir</button>
             </div>
         </div>
     </div>

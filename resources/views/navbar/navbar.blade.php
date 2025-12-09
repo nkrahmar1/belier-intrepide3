@@ -312,7 +312,7 @@
                 Mon compte
             </button>
             <ul class="dropdown-menu" aria-labelledby="accountDropdownGuest">
-                <li><a class="dropdown-item" href="{{ route('login') }}">Se Connecter</a></li>
+                <li><a class="dropdown-item" href="{{ route('login') }}">Se connecter</a></li>
                 <li><a class="dropdown-item" href="{{ route('register') }}">S'inscrire</a></li>
             </ul>
             @endguest

@@ -10,7 +10,7 @@
         "php": "^8.2",
         "ably/ably-php": "^1.1",
         "barryvdh/laravel-dompdf": "^3.1",
-        "cinetpay/cinetpay-php": "^2.0",
+        "cinetpay/cinetpay-php": "^1.9.1,
         "doctrine/orm": "^3.3",
         "laravel/fortify": "^1.25",
         "laravel/framework": "^12.0",

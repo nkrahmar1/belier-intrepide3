@@ -940,7 +940,7 @@
     <div class="user-welcome-section" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 15px; border-radius: 10px; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
         <div class="row align-items-center">
             <div class="col-12 col-md-8 text-center text-md-start">
-                <h2 class="mb-2" style="font-size: 1.5rem;">👋 Bienvenue, {{ Auth::user()->lastname }} !</h2>
+                <h2 class="mb-2" style="font-size: 1.5rem;">👋 Bienvenue, {{ Auth::user()->firstname }} {{ Auth::user()->lastname }} !</h2>
                 <p class="mb-0" style="opacity: 0.9; font-size: 0.9rem;">Restez informé des dernières actualités</p>
             </div>
             <div class="col-12 col-md-4 text-center text-md-end mt-3 mt-md-0">

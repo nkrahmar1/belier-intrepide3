@@ -50,7 +50,7 @@
             </div>
 
             <div class="col-12 col-md-6 text-center text-md-end mt-2 mt-md-0">
-                <a href="#" class="text-decoration-none">Mot de pass oublié?</a>
+                <a href="{{ route('password.request') }}" class="text-decoration-none">Mot de pass oublié?</a>
             </div>
          </div>
 
@@ -59,7 +59,7 @@
 </div>
 
 <p class="text-center text-muted mt-4 mt-md-5" style="font-size: clamp(0.9rem, 2.5vw, 1rem);">
-    Vous n'êtes pas encore enregistré? 
+    Vous n'êtes pas encore enregistré?
     <a href="{{ route('register')}}" class="text-decoration-none fw-bold">Créer un compte</a>
 </p>
         </form>

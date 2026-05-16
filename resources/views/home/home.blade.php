@@ -1262,7 +1262,15 @@
                     </div>
                 </div>
                 <div style="display: flex; gap: 5px; flex-wrap: wrap;">
-                    <a href="{{ route('articles.index') }}" class="btn btn-sm" style="background: #667eea; color: white; font-size: 0.8rem; padding: 5px 10px;">Mes Articles</a>
+                    @auth
+                        @if(Auth::user()->is_admin)
+                            <a href="{{ route('admin.articles.index') }}" class="btn btn-sm" style="background: #667eea; color: white; font-size: 0.8rem; padding: 5px 10px;">Mes Articles</a>
+                        @else
+                            <a href="{{ route('articles.index') }}" class="btn btn-sm" style="background: #667eea; color: white; font-size: 0.8rem; padding: 5px 10px;">Mes Articles</a>
+                        @endif
+                    @else
+                        <a href="{{ route('articles.index') }}" class="btn btn-sm" style="background: #667eea; color: white; font-size: 0.8rem; padding: 5px 10px;">Mes Articles</a>
+                    @endauth
                     <button onclick="toggleDashboard()" class="btn btn-sm btn-outline-secondary" style="font-size: 0.8rem; padding: 5px 10px;">Dashboard</button>
                 </div>
             </div>
@@ -1334,10 +1342,13 @@
             <div class="sidebar-section">
                 <h3 class="sidebar-title">Newsletter</h3>
                 <p style="font-size: 0.9rem; color: #666; margin-bottom: 1rem;">Restez informé de nos dernières actualités</p>
-                <div style="display: flex; gap: 0.5rem;">
-                    <input type="email" placeholder="Votre email" style="flex: 1; padding: 0.5rem; border: 1px solid #ddd; border-radius: 5px;">
-                    <button style="background: #ff6b35; color: white; border: none; padding: 0.5rem 1rem; border-radius: 5px; cursor: pointer;">S'inscrire</button>
-                </div>
+                <form method="POST" action="{{ route('newsletter.subscribe') }}">
+                    @csrf
+                    <div style="display: flex; gap: 0.5rem;">
+                        <input type="email" name="email" placeholder="Votre email" required style="flex: 1; padding: 0.5rem; border: 1px solid #ddd; border-radius: 5px;">
+                        <button type="submit" style="background: #ff6b35; color: white; border: none; padding: 0.5rem 1rem; border-radius: 5px; cursor: pointer;">S'inscrire</button>
+                    </div>
+                </form>
             </div>
         </aside>
     </div>
@@ -1374,9 +1385,17 @@
         <h3>Bienvenue, {{ Auth::user()->lastname }} 👋</h3>
 
         <div class="card border-0 shadow-sm mb-3">
-            <div class="card-body">
+                <div class="card-body">
                 <h5 class="card-title">Mes Articles</h5>
-                <a href="{{ route('articles.index') }}" class="btn btn-sm btn-primary">Gérer</a>
+                @auth
+                    @if(Auth::user()->is_admin)
+                        <a href="{{ route('admin.articles.index') }}" class="btn btn-sm btn-primary">Gérer</a>
+                    @else
+                        <a href="{{ route('articles.index') }}" class="btn btn-sm btn-primary">Gérer</a>
+                    @endif
+                @else
+                    <a href="{{ route('articles.index') }}" class="btn btn-sm btn-primary">Gérer</a>
+                @endauth
             </div>
         </div>
 

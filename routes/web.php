@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ArticleController;
+use App\Http\Controllers\NewsletterController;
 use App\Http\Controllers\TestArticleController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\RegisterController;
@@ -329,6 +330,9 @@ Route::post('/subscription/cinetpay/notify', [SubscriptionController::class, 'ha
 
 // Route publique pour la page d'abonnement (accessible à tous)
 Route::get('/abonnement', [AbonnementController::class, 'index'])->name('home.abonnement');
+
+// Newsletter subscription (simple handler)
+Route::post('/newsletter/subscribe', [NewsletterController::class, 'subscribe'])->name('newsletter.subscribe');
 
 // --------------------
 // Articles (publiques)

@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diagnostic Navbar - Bélier Intrépide</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+
+    <style>
+        .diagnostic-panel {
+            max-width: 1000px;
+            margin: 20px auto;
+            padding: 20px;
+        }
+        .test-section {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+        .success { border-left: 4px solid #28a745; }
+        .warning { border-left: 4px solid #ffc107; }
+        .error { border-left: 4px solid #dc3545; }
+        .info { border-left: 4px solid #17a2b8; }
+
+        .navbar-test {
+            background-color: #04672a !important;
+            margin-bottom: 20px;
+        }
+        .navbar-test .navbar-brand,
+        .navbar-test .nav-link {
+            color: #fff !important;
+        }
+        .cart-icon {
+            color: #fff;
+            font-size: 1.5rem;
+            text-decoration: none;
+        }
+        .cart-badge {
+            background-color: #dc3545;
+            color: white;
+            font-size: 0.75rem;
+            padding: 2px 6px;
+            border-radius: 50%;
+            margin-left: 5px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container diagnostic-panel">
+    <h1 class="text-center mb-4">🔍 Diagnostic Navbar & Authentification</h1>
+
+    <!-- Test de la navbar -->
+    <div class="test-section info">
+        <h3><i class="bi bi-ui-checks"></i> Test de la Navbar</h3>
+        <nav class="navbar navbar-expand-lg navbar-test">
+            <div class="container">
+                <a class="navbar-brand" href="#">Bélier-Intrépide</a>
+
+                <div class="d-flex align-items-center">
+                    <!-- Test utilisateur connecté -->
+                    <span class="navbar-text me-2 text-warning fw-bold">AK</span>
+                    <div class="btn-group me-3">
+                        <button type="button" class="btn btn-light dropdown-toggle" data-bs-toggle="dropdown">
+                            Account
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li>
+                                <button class="dropdown-item" onclick="testLogout()">
+                                    <i class="bi bi-box-arrow-right"></i> Se déconnecter
+                                </button>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Test panier -->
+                    <div class="dropdown">
+                        <a href="#" class="cart-icon dropdown-toggle" data-bs-toggle="dropdown">
+                            <i class="bi bi-cart3"></i>
+                            <span class="cart-badge">3</span>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li class="p-3">
+                                <div>
+                                    <div class="fw-bold">
+                                        <i class="bi bi-download text-success"></i> Article téléchargé
+                                    </div>
+                                    <small class="text-muted">Téléchargé 1 fois</small>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </nav>
+        <div class="alert alert-info">
+            👆 Testez les boutons ci-dessus pour vérifier les interactions
+        </div>
+    </div>
+
+    <!-- Vérifications techniques -->
+    <div class="test-section success">
+        <h3><i class="bi bi-gear"></i> Vérifications techniques</h3>
+        <div id="technical-checks">
+            <div class="d-flex justify-content-between">
+                <span>Bootstrap CSS chargé :</span>
+                <span id="bootstrap-css-status">⏳ Test...</span>
+            </div>
+            <div class="d-flex justify-content-between">
+                <span>Bootstrap JS chargé :</span>
+                <span id="bootstrap-js-status">⏳ Test...</span>
+            </div>
+            <div class="d-flex justify-content-between">
+                <span>Dropdowns fonctionnels :</span>
+                <span id="dropdown-status">⏳ Test...</span>
+            </div>
+            <div class="d-flex justify-content-between">
+                <span>État authentification :</span>
+                <span id="auth-status">⏳ Test...</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tests manuels -->
+    <div class="test-section warning">
+        <h3><i class="bi bi-hand-index"></i> Tests manuels requis</h3>
+        <div class="row">
+            <div class="col-md-6">
+                <h5>🎯 Sur votre site principal :</h5>
+                <ol>
+                    <li>Actualiser http://127.0.0.1:8003</li>
+                    <li>Vérifier que la navbar est visible en haut</li>
+                    <li>Cliquer sur "Account" → dropdown doit s'ouvrir</li>
+                    <li>Cliquer sur "Se déconnecter" → confirmation + redirection</li>
+                    <li>Vérifier l'icône panier avec badge</li>
+                </ol>
+            </div>
+            <div class="col-md-6">
+                <h5>🔧 Si problèmes persistent :</h5>
+                <ul>
+                    <li>Vider le cache navigateur (Ctrl+F5)</li>
+                    <li>Vérifier la console (F12) pour erreurs JS</li>
+                    <li>Tester avec un autre navigateur</li>
+                    <li>Vérifier que vous êtes bien connecté</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Actions rapides -->
+    <div class="test-section info">
+        <h3><i class="bi bi-lightning"></i> Actions rapides</h3>
+        <div class="d-flex gap-2 flex-wrap">
+            <button class="btn btn-primary" onclick="window.open('http://127.0.0.1:8003', '_blank')">
+                🌐 Ouvrir le site
+            </button>
+            <button class="btn btn-warning" onclick="window.open('http://127.0.0.1:8003/login', '_blank')">
+                🔐 Page de connexion
+            </button>
+            <button class="btn btn-info" onclick="window.open('http://127.0.0.1:8003/api/auth-status', '_blank')">
+                📊 État d'authentification
+            </button>
+            <button class="btn btn-success" onclick="testDropdowns()">
+                🧪 Tester dropdowns
+            </button>
+        </div>
+    </div>
+
+    <!-- Informations de connexion -->
+    <div class="test-section success">
+        <h3><i class="bi bi-person-check"></i> Informations de test</h3>
+        <div class="row">
+            <div class="col-md-6">
+                <strong>Utilisateur de test :</strong><br>
+                Email : aimee.krah@test.com<br>
+                Mot de passe : password123<br>
+                Nom : Aimée Krah<br>
+                Initiales : AK
+            </div>
+            <div class="col-md-6">
+                <strong>Fonctionnalités à tester :</strong><br>
+                ✅ Connexion/Déconnexion<br>
+                ✅ Dropdown Account<br>
+                ✅ Dropdown Panier<br>
+                ✅ Affichage des initiales
+            </div>
+        </div>
+    </div>
+
+    <!-- Résultats des tests -->
+    <div class="test-section" id="test-results" style="display: none;">
+        <h3><i class="bi bi-clipboard-check"></i> Résultats des tests</h3>
+        <div id="results-content"></div>
+    </div>
+</div>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Test Bootstrap CSS
+    const testEl = document.createElement('div');
+    testEl.className = 'container';
+    document.body.appendChild(testEl);
+    const computedStyle = getComputedStyle(testEl);
+    const hasBootstrapCSS = computedStyle.width !== '100%';
+    document.body.removeChild(testEl);
+
+    document.getElementById('bootstrap-css-status').innerHTML =
+        hasBootstrapCSS ? '✅ Chargé' : '❌ Non chargé';
+
+    // Test Bootstrap JS
+    const hasBootstrapJS = typeof bootstrap !== 'undefined';
+    document.getElementById('bootstrap-js-status').innerHTML =
+        hasBootstrapJS ? '✅ Chargé' : '❌ Non chargé';
+
+    // Test dropdowns
+    try {
+        const dropdown = new bootstrap.Dropdown(document.querySelector('[data-bs-toggle="dropdown"]'));
+        document.getElementById('dropdown-status').innerHTML = '✅ Fonctionnels';
+    } catch (e) {
+        document.getElementById('dropdown-status').innerHTML = '❌ Erreur: ' + e.message;
+    }
+
+    // Test état auth
+    fetch('http://127.0.0.1:8003/api/auth-status')
+        .then(response => response.json())
+        .then(data => {
+            const status = data.authenticated
+                ? `✅ Connecté (${data.user?.name || 'Utilisateur'})`
+                : '❌ Non connecté';
+            document.getElementById('auth-status').innerHTML = status;
+        })
+        .catch(() => {
+            document.getElementById('auth-status').innerHTML = '⚠️ Impossible de vérifier';
+        });
+});
+
+function testLogout() {
+    alert('🧪 Test de déconnexion !\nCeci devrait normalement vous déconnecter.');
+}
+
+function testDropdowns() {
+    const dropdowns = document.querySelectorAll('[data-bs-toggle="dropdown"]');
+    let working = 0;
+
+    dropdowns.forEach(dropdown => {
+        try {
+            const instance = new bootstrap.Dropdown(dropdown);
+            instance.toggle();
+            setTimeout(() => instance.hide(), 1000);
+            working++;
+        } catch (e) {
+            console.error('Erreur dropdown:', e);
+        }
+    });
+
+    const results = document.getElementById('test-results');
+    const content = document.getElementById('results-content');
+    content.innerHTML = `
+        <div class="alert alert-${working > 0 ? 'success' : 'danger'}">
+            ${working > 0 ? '✅' : '❌'} ${working}/${dropdowns.length} dropdowns fonctionnels
+        </div>
+    `;
+    results.style.display = 'block';
+}
+</script>
+
+</body>
+</html>

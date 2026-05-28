@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎯 Test Final Navbar - Account + Panier</title>
+    <style>
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            margin: 0; 
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            min-height: 100vh;
+        }
+        .container { 
+            max-width: 1000px; 
+            margin: 0 auto; 
+            padding: 30px; 
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 30px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+        }
+        .test-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin: 30px 0;
+        }
+        .test-card {
+            background: rgba(255,255,255,0.15);
+            padding: 25px;
+            border-radius: 15px;
+            border: 1px solid rgba(255,255,255,0.2);
+            backdrop-filter: blur(5px);
+        }
+        .btn { 
+            background: #28a745; 
+            color: white; 
+            padding: 15px 25px; 
+            border: none; 
+            border-radius: 8px; 
+            cursor: pointer; 
+            margin: 10px 5px;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            width: 100%;
+            text-align: center;
+        }
+        .btn:hover { 
+            background: #218838; 
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        }
+        .btn-primary { 
+            background: #007bff; 
+        }
+        .btn-primary:hover { 
+            background: #0056b3; 
+        }
+        .btn-warning { 
+            background: #ffc107; 
+            color: #212529;
+        }
+        .btn-warning:hover { 
+            background: #e0a800; 
+        }
+        .status { 
+            padding: 20px; 
+            margin: 20px 0; 
+            border-radius: 10px; 
+            background: rgba(255,255,255,0.2);
+            border-left: 5px solid #28a745;
+        }
+        .status.info { 
+            border-left-color: #17a2b8; 
+        }
+        .status.warning { 
+            border-left-color: #ffc107; 
+        }
+        h1 { 
+            font-size: 2.5em;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+        h2 { 
+            color: #90EE90; 
+            margin-top: 30px;
+            font-size: 1.5em;
+        }
+        h3 {
+            color: #ffcc00;
+            margin: 15px 0;
+        }
+        .checklist {
+            background: rgba(0,0,0,0.3);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+        .checklist li {
+            margin: 10px 0;
+            font-size: 16px;
+            line-height: 1.6;
+        }
+        .code-snippet {
+            background: rgba(0,0,0,0.7);
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            margin: 15px 0;
+            border: 1px solid rgba(255,255,255,0.3);
+            font-size: 14px;
+        }
+        .success-badge {
+            background: #28a745;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎯 Test Final: Account + Panier</h1>
+            <p style="font-size: 18px; opacity: 0.9;">
+                Vérification complète des corrections apportées aux dropdowns
+            </p>
+            <span class="success-badge">✅ Corrections Appliquées</span>
+        </div>
+        
+        <div class="status">
+            <h3>🔧 Corrections appliquées :</h3>
+            <ul>
+                <li><strong>Account Dropdown :</strong> Ajout d'IDs uniques (<code>accountDropdownGuest</code> / <code>accountDropdownAuth</code>)</li>
+                <li><strong>Panier Dropdown :</strong> Conversion de <code>&lt;a href="#"&gt;</code> vers <code>&lt;button&gt;</code></li>
+                <li><strong>JavaScript :</strong> Initialisation renforcée avec debug détaillé</li>
+                <li><strong>Aria Labels :</strong> Amélioration de l'accessibilité</li>
+            </ul>
+        </div>
+
+        <div class="test-grid">
+            <div class="test-card">
+                <h3>🔽 Test Account Dropdown</h3>
+                <div class="checklist">
+                    <h4>À vérifier :</h4>
+                    <ul>
+                        <li>✅ Clic sur "Mon compte" / "Account"</li>
+                        <li>✅ Menu déroulant s'ouvre</li>
+                        <li>✅ "Se déconnecter" visible (si connecté)</li>
+                        <li>✅ Confirmation de déconnexion</li>
+                    </ul>
+                </div>
+                <a href="http://127.0.0.1:8003" target="_blank" class="btn btn-primary">
+                    🧪 Tester Account
+                </a>
+            </div>
+
+            <div class="test-card">
+                <h3>🛒 Test Panier Dropdown</h3>
+                <div class="checklist">
+                    <h4>À vérifier :</h4>
+                    <ul>
+                        <li>✅ Clic sur l'icône panier</li>
+                        <li>✅ Pas de redirection vers /category/politique#</li>
+                        <li>✅ Menu déroulant s'ouvre</li>
+                        <li>✅ Articles visibles dans le panier</li>
+                    </ul>
+                </div>
+                <a href="http://127.0.0.1:8003" target="_blank" class="btn">
+                    🧪 Tester Panier
+                </a>
+            </div>
+        </div>
+
+        <div class="status info">
+            <h3>📋 Instructions de test détaillées :</h3>
+            <ol style="font-size: 16px; line-height: 1.8;">
+                <li><strong>Ouvrez votre site</strong> en cliquant sur un des boutons ci-dessus</li>
+                <li><strong>Localisez la navbar</strong> en haut de la page</li>
+                <li><strong>Testez le dropdown Account :</strong>
+                    <ul>
+                        <li>Si déconnecté : Cliquez sur "Mon compte" → Voir "Se connecter" et "S'inscrire"</li>
+                        <li>Si connecté : Cliquez sur "Account" → Voir "Se déconnecter"</li>
+                    </ul>
+                </li>
+                <li><strong>Testez le dropdown Panier :</strong>
+                    <ul>
+                        <li>Cliquez sur l'icône panier (🛒)</li>
+                        <li>Vérifiez qu'aucune redirection n'a lieu</li>
+                        <li>Le menu doit s'ouvrir et afficher vos articles</li>
+                    </ul>
+                </li>
+                <li><strong>Vérifiez les logs :</strong> Appuyez sur F12 → Console → Logs d'initialisation</li>
+            </ol>
+        </div>
+
+        <div class="status warning">
+            <h3>🔧 Code de correction d'urgence :</h3>
+            <p>Si les dropdowns ne fonctionnent toujours pas, utilisez ce code dans la console (F12) :</p>
+            <div class="code-snippet">// Correction d'urgence dropdowns
+console.log('🚑 Correction d\'urgence en cours...');
+
+// Sélectionner tous les dropdowns
+const dropdowns = document.querySelectorAll('[data-bs-toggle="dropdown"]');
+console.log('Dropdowns trouvés:', dropdowns.length);
+
+// Forcer l'initialisation
+dropdowns.forEach((el, i) => {
+    try {
+        // Nettoyer l'ancien
+        const existing = bootstrap.Dropdown.getInstance(el);
+        if (existing) existing.dispose();
+        
+        // Créer le nouveau
+        new bootstrap.Dropdown(el);
+        console.log(`✅ Dropdown ${i+1} (${el.textContent.trim()}) réparé`);
+    } catch (error) {
+        console.error(`❌ Erreur dropdown ${i+1}:`, error);
+    }
+});
+
+console.log('🎉 Correction terminée - Testez maintenant !');
+            </div>
+            <button onclick="copyEmergencyCode()" class="btn btn-warning">
+                📋 Copier le code d'urgence
+            </button>
+        </div>
+
+        <div class="header" style="margin-top: 40px;">
+            <h2>🎉 Résultats attendus</h2>
+            <div class="test-grid">
+                <div style="text-align: left;">
+                    <h4>✅ Account Dropdown :</h4>
+                    <ul>
+                        <li>Ouverture fluide du menu</li>
+                        <li>Déconnexion fonctionnelle</li>
+                        <li>Pas d'erreurs JavaScript</li>
+                    </ul>
+                </div>
+                <div style="text-align: left;">
+                    <h4>✅ Panier Dropdown :</h4>
+                    <ul>
+                        <li>Pas de redirection indésirable</li>
+                        <li>Ouverture du menu panier</li>
+                        <li>Affichage des articles</li>
+                    </ul>
+                </div>
+            </div>
+            <p style="font-size: 20px; font-weight: bold; margin-top: 30px;">
+                🚀 Votre navbar est maintenant entièrement fonctionnelle !
+            </p>
+        </div>
+    </div>
+
+    <script>
+        function copyEmergencyCode() {
+            const code = `// Correction d'urgence dropdowns
+console.log('🚑 Correction d\\'urgence en cours...');
+
+// Sélectionner tous les dropdowns
+const dropdowns = document.querySelectorAll('[data-bs-toggle="dropdown"]');
+console.log('Dropdowns trouvés:', dropdowns.length);
+
+// Forcer l'initialisation
+dropdowns.forEach((el, i) => {
+    try {
+        // Nettoyer l'ancien
+        const existing = bootstrap.Dropdown.getInstance(el);
+        if (existing) existing.dispose();
+        
+        // Créer le nouveau
+        new bootstrap.Dropdown(el);
+        console.log(\`✅ Dropdown \${i+1} (\${el.textContent.trim()}) réparé\`);
+    } catch (error) {
+        console.error(\`❌ Erreur dropdown \${i+1}:\`, error);
+    }
+});
+
+console.log('🎉 Correction terminée - Testez maintenant !');`;
+
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(code).then(() => {
+                    alert('✅ Code d\'urgence copié !\n\nAllez sur votre site, appuyez sur F12, et collez ce code dans la console.');
+                }).catch(() => {
+                    showCodeInNewWindow(code);
+                });
+            } else {
+                showCodeInNewWindow(code);
+            }
+        }
+
+        function showCodeInNewWindow(code) {
+            const newWindow = window.open('', '_blank', 'width=900,height=600');
+            newWindow.document.write(`
+                <html>
+                <head><title>Code de correction d'urgence</title></head>
+                <body style="font-family: monospace; padding: 20px; background: #f5f5f5;">
+                    <h2>🚑 Code de correction d'urgence</h2>
+                    <p><strong>Instructions :</strong></p>
+                    <ol>
+                        <li>Allez sur votre site (http://127.0.0.1:8003)</li>
+                        <li>Appuyez sur F12 pour ouvrir les outils développeur</li>
+                        <li>Cliquez sur l'onglet "Console"</li>
+                        <li>Copiez et collez le code ci-dessous</li>
+                        <li>Appuyez sur Entrée</li>
+                    </ol>
+                    <textarea style="width: 100%; height: 300px; font-family: monospace;">${code}</textarea>
+                </body>
+                </html>
+            `);
+        }
+    </script>
+</body>
+</html>

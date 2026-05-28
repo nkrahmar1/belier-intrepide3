@@ -1,0 +1,364 @@
+@if(session('warning'))
+    <div class="alert alert-warning">
+        <i class="fas fa-exclamation-triangle"></i> {{ session('warning') }}
+    </div>
+@endif
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="widt                    <form method="POST" action="{{ route('subscriptions.subscribe', ['planId' => $plan['id']]) }}">
+                        @csrf
+                        <input type="hidden" name="plan_id" value="{{ $plan['id'] }}">
+                        <select name="methode" class="form-select" required>
+                            <option value="">-- Moyen de paiement --</option>
+                            <option value="stripe">💳 Carte Bancaire (Stripe)</option>
+                            <option value="orange_money">📱 Orange Money</option>
+                            <option value="mtn_money">📱 MTN Money</option>
+                            <option value="wave">🌊 Wave</option>
+                        </select>
+                        <button type="button" class="btn-success" onclick="openModal(this.form, '{{ $plan['name'] }}')">
+                            <i class="fas fa-check-circle"></i> S'abonner
+                        </button>
+                    </form>, initial-scale=1" />
+    <title>Abonnements annuels</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f0f2f5;
+            color: #333;
+            padding: 30px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #007bff;
+            margin-bottom: 30px;
+            font-size: 2.2em;
+        }
+
+        .alert-warning, .alert-success, .alert-error {
+            max-width: 960px;
+            margin: 20px auto;
+            padding: 15px 20px;
+            border-radius: 8px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .alert-warning {
+            background-color: #fff3cd;
+            border: 1px solid #ffeeba;
+            color: #856404;
+        }
+        .alert-success {
+            background-color: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+        .alert-error {
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+
+        .subscription-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 30px;
+        }
+
+        .card {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
+            max-width: 350px;
+            padding: 25px;
+            transition: all 0.3s ease-in-out;
+        }
+        .card:hover {
+            transform: translateY(-10px);
+        }
+
+        .plan-name {
+            font-size: 1.6em;
+            font-weight: 600;
+            text-align: center;
+            color: #007bff;
+        }
+
+        .price {
+            text-align: center;
+            font-size: 2.2em;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        ul.features {
+            list-style: none;
+            padding-left: 0;
+            margin-bottom: 20px;
+        }
+        ul.features li::before {
+            content: '✔';
+            color: #28a745;
+            margin-right: 8px;
+        }
+
+        .btn-subscribe, .btn-success {
+            width: 100%;
+            background: #28a745;
+            color: white;
+            font-size: 1.1em;
+            padding: 12px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+        .btn-success:hover {
+            background: #218838;
+        }
+
+        .form-select {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 12px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+            font-size: 1em;
+        }
+
+        .current-subscription {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+            padding: 15px 20px;
+            border-radius: 8px;
+            max-width: 960px;
+            margin: 0 auto 25px auto;
+            font-size: 1.1em;
+            text-align: center;
+        }
+
+        /* MODALE */
+        #confirmationModal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+
+        #confirmationModal .modal-content {
+            background: #fff;
+            padding: 30px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+        }
+
+        #confirmationModal button {
+            padding: 10px 20px;
+            margin: 10px;
+            font-weight: bold;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        #confirmationModal .confirm {
+            background-color: #28a745;
+            color: white;
+        }
+
+        #confirmationModal .cancel {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        footer {
+            background-color: #1c1c1c;
+            color: #fff;
+            text-align: center;
+            padding: 40px 20px;
+            margin-top: 60px;
+        }
+
+        .footer-content {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 40px;
+            margin-bottom: 30px;
+        }
+
+        .footer-column {
+            min-width: 220px;
+            text-align: left;
+        }
+
+        .footer-column p i {
+            margin-right: 8px;
+            color: #f0ad4e;
+        }
+
+        .social-icons a {
+            color: #fff;
+            margin: 0 10px;
+            font-size: 1.5em;
+            transition: transform 0.2s ease;
+        }
+
+        .social-icons a:hover {
+            transform: scale(1.2);
+            color: #007bff;
+        }
+
+        .footer-bottom {
+            opacity: 0.7;
+            font-size: 0.9em;
+        }
+
+        @media (max-width: 768px) {
+            .subscription-container {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Page d'abonnements annuels</h1>
+
+    @if(session('success'))
+        <div class="alert-success">
+            <i class="fas fa-check-circle"></i> {{ session('success') }}
+        </div>
+    @endif
+
+    @if($errors->any())
+        <div class="alert-error">
+            <ul style="list-style: none; padding-left: 0;">
+                @foreach($errors->all() as $error)
+                    <li><i class="fas fa-exclamation-circle"></i> {{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
+
+    @auth
+        @if($userSubscription)
+            <div class="current-subscription">
+                📅 Abonnement actuel : <strong>{{ $userSubscription->plan_name }}</strong><br>
+                Début : {{ \Illuminate\Support\Carbon::parse($userSubscription->started_at)->format('d/m/Y') }}<br>
+                Expire : {{ \Illuminate\Support\Carbon::parse($userSubscription->ends_at)->format('d/m/Y') }}
+            </div>
+        @endif
+
+        <div class="subscription-container">
+            @foreach($plans as $plan)
+                <div class="card">
+                    <h2 class="plan-name">{{ $plan['name'] }}</h2>
+                    <div class="price">{{ $plan['price'] }}€ <small>/ an</small></div>
+
+                    <ul class="features">
+                        @foreach($plan['features'] as $feature)
+                            <li>{{ $feature }}</li>
+                        @endforeach
+                    </ul>
+
+                    <form method="POST" action="{{ route('paiement.mobile') }}">
+                        @csrf
+                        <input type="hidden" name="plan_id" value="{{ $plan['id'] }}">
+                        <select name="methode" class="form-select" required>
+                            <option value="">-- Moyen de paiement --</option>
+                            <option value="stripe">💳 Carte Bancaire (Stripe)</option>
+                            <option value="orange_money">📱 Orange Money</option>
+                            <option value="mtn_money">📱 MTN Money</option>
+                            <option value="wave">🌊 Wave</option>
+                        </select>
+                        <button type="button" class="btn-success" onclick="openModal(this.form, '{{ $plan['name'] }}')">
+                            <i class="fas fa-check-circle"></i> S’abonner
+                        </button>
+                    </form>
+                </div>
+            @endforeach
+        </div>
+    @else
+        <p style="text-align: center; font-size: 1.1em;">Vous devez <a href="{{ route('login') }}">vous connecter</a> pour accéder aux abonnements.</p>
+    @endauth
+
+    {{-- MODALE --}}
+    <div id="confirmationModal">
+        <div class="modal-content">
+            <h2>Confirmation</h2>
+            <p id="modalPlanInfo">Confirmer l’abonnement au plan sélectionné ?</p>
+            <div>
+                <button class="confirm" onclick="confirmSubscription()">Oui</button>
+                <button class="cancel" onclick="closeModal()">Annuler</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let selectedForm = null;
+        function openModal(form, planName) {
+            selectedForm = form;
+            document.getElementById('modalPlanInfo').textContent =
+                `Souhaitez-vous vraiment vous abonner au plan « ${planName} » ?`;
+            document.getElementById('confirmationModal').style.display = 'flex';
+        }
+
+        function closeModal() {
+            selectedForm = null;
+            document.getElementById('confirmationModal').style.display = 'none';
+        }
+
+        function confirmSubscription() {
+            if (selectedForm) selectedForm.submit();
+        }
+    </script>
+
+    {{-- ======= FOOTER ======= --}}
+    <footer>
+        <div class="footer-content">
+            <div class="footer-column">
+                <p><i class="fas fa-phone"></i> +225 07 49 30 86 05</p>
+                <p><i class="fab fa-facebook"></i> Le Bélier Intrépide</p>
+                <p><i class="fab fa-instagram"></i> @lebelierci</p>
+            </div>
+
+            <div class="footer-column">
+                <p><i class="fab fa-whatsapp"></i> 07 49 38 10 656</p>
+                <p><i class="fas fa-envelope"></i> lebelierintrepide@gmail.com</p>
+                <p><i class="fab fa-twitter"></i> @lebelier_ci</p>
+            </div>
+        </div>
+
+        <div class="social-icons">
+            <a href="#"><i class="fab fa-facebook-f"></i></a>
+            <a href="#"><i class="fab fa-instagram"></i></a>
+            <a href="#"><i class="fab fa-whatsapp"></i></a>
+            <a href="#"><i class="fab fa-twitter"></i></a>
+            <a href="#"><i class="fab fa-linkedin-in"></i></a>
+            <a href="#"><i class="fab fa-youtube"></i></a>
+            <a href="#"><i class="fab fa-tiktok"></i></a>
+        </div>
+
+        <div class="footer-bottom">
+            &copy; 2025 Le Bélier-Intrépide. Tous droits réservés.
+        </div>
+    </footer>
+
+</body>
+</html>

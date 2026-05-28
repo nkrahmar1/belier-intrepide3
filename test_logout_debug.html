@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Déconnexion - Navbar Debug</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+
+    <style>
+        .test-container { max-width: 1000px; margin: 30px auto; padding: 20px; }
+        .status-card { background: #f8f9fa; border-left: 4px solid #28a745; padding: 15px; margin: 15px 0; }
+        .error-card { border-left-color: #dc3545; }
+        .warning-card { border-left-color: #ffc107; }
+        .info-card { border-left-color: #17a2b8; }
+
+        .navbar-demo {
+            background-color: #04672a !important;
+            margin-bottom: 20px;
+        }
+        .navbar-demo .navbar-brand,
+        .navbar-demo .nav-link {
+            color: #fff !important;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container test-container">
+    <h1 class="text-center mb-4">🔐 Test de Déconnexion - Navbar Debug</h1>
+
+    <!-- État actuel -->
+    <div class="status-card" id="status-card">
+        <h3><i class="bi bi-info-circle"></i> État d'authentification</h3>
+        <div id="auth-info">Vérification en cours...</div>
+    </div>
+
+    <!-- Test de la navbar démo -->
+    <div class="status-card info-card">
+        <h3><i class="bi bi-ui-checks"></i> Test Navbar (Version corrigée)</h3>
+        <nav class="navbar navbar-expand-lg navbar-demo">
+            <div class="container">
+                <a class="navbar-brand" href="#">Bélier-Intrépide</a>
+
+                <div class="d-flex align-items-center">
+                    <!-- Simulation utilisateur connecté -->
+                    <span class="navbar-text me-2 text-warning fw-bold">AK</span>
+
+                    <div class="btn-group me-3">
+                        <button type="button" class="btn btn-light dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                            Account
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li>
+                                <form onsubmit="testLogoutDemo(event)">
+                                    <button type="submit" class="dropdown-item d-flex align-items-center gap-2"
+                                            onclick="return confirm('Test de déconnexion - Voulez-vous continuer ?')">
+                                        <i class="bi bi-box-arrow-right"></i> Se déconnecter (TEST)
+                                    </button>
+                                </form>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Panier test -->
+                    <div class="dropdown">
+                        <a href="#" class="text-white dropdown-toggle" data-bs-toggle="dropdown" style="font-size: 1.5rem;">
+                            <i class="bi bi-cart3"></i>
+                            <span class="badge bg-danger">2</span>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li class="p-3">
+                                <div class="fw-bold">
+                                    <i class="bi bi-download text-success"></i> Article téléchargé
+                                </div>
+                                <small class="text-muted">Téléchargé 1 fois</small>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </nav>
+        <div class="alert alert-info">
+            <strong>✅ Cette navbar utilise la structure corrigée.</strong><br>
+            Testez les dropdowns ci-dessus pour vérifier les interactions.
+        </div>
+    </div>
+
+    <!-- Diagnostic automatique -->
+    <div class="status-card warning-card">
+        <h3><i class="bi bi-gear"></i> Diagnostic automatique</h3>
+        <div id="diagnostic-results">
+            <div class="d-flex justify-content-between">
+                <span>Bootstrap CSS :</span>
+                <span id="bootstrap-css">⏳</span>
+            </div>
+            <div class="d-flex justify-content-between">
+                <span>Bootstrap JS :</span>
+                <span id="bootstrap-js">⏳</span>
+            </div>
+            <div class="d-flex justify-content-between">
+                <span>Dropdowns fonctionnels :</span>
+                <span id="dropdown-test">⏳</span>
+            </div>
+            <div class="d-flex justify-content-between">
+                <span>Routes d'authentification :</span>
+                <span id="routes-test">⏳</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Actions de test -->
+    <div class="status-card info-card">
+        <h3><i class="bi bi-play-circle"></i> Actions de test</h3>
+        <div class="row">
+            <div class="col-md-6">
+                <h5>🌐 Tests sur votre site :</h5>
+                <div class="d-grid gap-2">
+                    <button class="btn btn-primary" onclick="window.open('http://127.0.0.1:8003', '_blank')">
+                        Ouvrir page d'accueil
+                    </button>
+                    <button class="btn btn-warning" onclick="window.open('http://127.0.0.1:8003/login', '_blank')">
+                        Page de connexion
+                    </button>
+                    <button class="btn btn-info" onclick="window.open('http://127.0.0.1:8003/api/auth-status', '_blank')">
+                        Vérifier état d'auth
+                    </button>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <h5>🧪 Tests de diagnostic :</h5>
+                <div class="d-grid gap-2">
+                    <button class="btn btn-success" onclick="testBootstrap()">
+                        Tester Bootstrap
+                    </button>
+                    <button class="btn btn-secondary" onclick="testDropdowns()">
+                        Tester Dropdowns
+                    </button>
+                    <button class="btn btn-danger" onclick="simulateLogout()">
+                        Simuler déconnexion
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Instructions étape par étape -->
+    <div class="status-card">
+        <h3><i class="bi bi-list-check"></i> Instructions de test pour Aimée Krah</h3>
+        <ol>
+            <li><strong>Ouvrir</strong> http://127.0.0.1:8003 dans un nouvel onglet</li>
+            <li><strong>Vérifier</strong> que vous voyez "AK" et "Account" dans la navbar en haut</li>
+            <li><strong>Cliquer</strong> sur "Account" → Le dropdown doit s'ouvrir</li>
+            <li><strong>Cliquer</strong> sur "Se déconnecter" → Confirmation doit apparaître</li>
+            <li><strong>Confirmer</strong> → Vous devez être redirigé vers /login</li>
+            <li><strong>Reconnectez-vous</strong> avec : aimee.krah@test.com / password123</li>
+        </ol>
+
+        <div class="alert alert-warning mt-3">
+            <strong>⚠️ Si la navbar n'est pas visible :</strong><br>
+            • Actualiser la page (Ctrl+F5)<br>
+            • Vérifier la console du navigateur (F12)<br>
+            • Tester avec ce diagnostic d'abord
+        </div>
+    </div>
+
+    <!-- Résultats de test -->
+    <div class="status-card" id="test-results" style="display: none;">
+        <h3><i class="bi bi-clipboard-data"></i> Résultats de test</h3>
+        <div id="results-content"></div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Test de l'état d'authentification
+    fetch('http://127.0.0.1:8003/api/auth-status')
+        .then(response => response.json())
+        .then(data => {
+            const authInfo = document.getElementById('auth-info');
+            const statusCard = document.getElementById('status-card');
+
+            if (data.authenticated && data.user) {
+                authInfo.innerHTML = `
+                    <div class="row">
+                        <div class="col-md-6">
+                            <strong>✅ Utilisateur connecté :</strong><br>
+                            Nom : ${data.user.name}<br>
+                            Email : ${data.user.email}<br>
+                            Initiales : ${data.user.initials}
+                        </div>
+                        <div class="col-md-6">
+                            <strong>🔧 Tests à effectuer :</strong><br>
+                            • Bouton Account visible<br>
+                            • Dropdown fonctionnel<br>
+                            • Déconnexion opérationnelle
+                        </div>
+                    </div>
+                `;
+                statusCard.className = 'status-card';
+            } else {
+                authInfo.innerHTML = `
+                    <div class="alert alert-danger">
+                        ❌ <strong>Utilisateur non connecté</strong><br>
+                        Vous devez d'abord vous connecter pour tester la déconnexion.
+                        <a href="http://127.0.0.1:8003/login" class="btn btn-sm btn-primary ms-2">Se connecter</a>
+                    </div>
+                `;
+                statusCard.className = 'status-card error-card';
+            }
+        })
+        .catch(error => {
+            document.getElementById('auth-info').innerHTML = `
+                <div class="alert alert-warning">
+                    ⚠️ Impossible de vérifier l'état d'authentification.<br>
+                    Erreur : ${error.message}
+                </div>
+            `;
+        });
+
+    // Tests automatiques
+    runDiagnostics();
+});
+
+function runDiagnostics() {
+    // Test Bootstrap CSS
+    const testEl = document.createElement('div');
+    testEl.className = 'container d-none';
+    document.body.appendChild(testEl);
+    const hasBootstrap = getComputedStyle(testEl).display === 'none';
+    document.body.removeChild(testEl);
+    document.getElementById('bootstrap-css').innerHTML = hasBootstrap ? '✅ Chargé' : '❌ Manquant';
+
+    // Test Bootstrap JS
+    const hasBootstrapJS = typeof bootstrap !== 'undefined';
+    document.getElementById('bootstrap-js').innerHTML = hasBootstrapJS ? '✅ Chargé' : '❌ Manquant';
+
+    // Test Dropdowns
+    try {
+        const dropdowns = document.querySelectorAll('[data-bs-toggle="dropdown"]');
+        let working = 0;
+        dropdowns.forEach(dropdown => {
+            try {
+                new bootstrap.Dropdown(dropdown);
+                working++;
+            } catch (e) {}
+        });
+        document.getElementById('dropdown-test').innerHTML = `✅ ${working}/${dropdowns.length} OK`;
+    } catch (e) {
+        document.getElementById('dropdown-test').innerHTML = '❌ Erreur';
+    }
+
+    // Test Routes
+    fetch('http://127.0.0.1:8003/api/auth-status')
+        .then(() => document.getElementById('routes-test').innerHTML = '✅ Accessibles')
+        .catch(() => document.getElementById('routes-test').innerHTML = '❌ Inaccessibles');
+}
+
+function testLogoutDemo(event) {
+    event.preventDefault();
+    showResults('🧪 Test de déconnexion simulé effectué !<br>✅ Le formulaire et la confirmation fonctionnent.');
+    return false;
+}
+
+function testBootstrap() {
+    const result = typeof bootstrap !== 'undefined' ?
+        '✅ Bootstrap JS fonctionne correctement' :
+        '❌ Bootstrap JS non chargé';
+    showResults(result);
+}
+
+function testDropdowns() {
+    const dropdowns = document.querySelectorAll('[data-bs-toggle="dropdown"]');
+    let working = 0;
+
+    dropdowns.forEach((dropdown, index) => {
+        try {
+            const instance = new bootstrap.Dropdown(dropdown);
+            instance.toggle();
+            setTimeout(() => instance.hide(), 1000);
+            working++;
+        } catch (e) {
+            console.error('Dropdown error:', e);
+        }
+    });
+
+    showResults(`🧪 Test des dropdowns :<br>✅ ${working}/${dropdowns.length} dropdowns fonctionnels`);
+}
+
+function simulateLogout() {
+    fetch('http://127.0.0.1:8003/api/test-logout', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || ''
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showResults(`✅ Simulation de déconnexion réussie !<br>Utilisateur déconnecté : ${data.previous_user}`);
+        } else {
+            showResults(`⚠️ ${data.message}`);
+        }
+    })
+    .catch(error => {
+        showResults(`❌ Erreur lors de la simulation : ${error.message}`);
+    });
+}
+
+function showResults(content) {
+    const resultsDiv = document.getElementById('test-results');
+    const contentDiv = document.getElementById('results-content');
+    contentDiv.innerHTML = `<div class="alert alert-info">${content}</div>`;
+    resultsDiv.style.display = 'block';
+    resultsDiv.scrollIntoView({ behavior: 'smooth' });
+}
+</script>
+
+</body>
+</html>

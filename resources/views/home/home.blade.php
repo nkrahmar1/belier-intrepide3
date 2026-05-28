@@ -1,0 +1,1819 @@
+@extends('home.base')
+
+@section('title', 'Home')
+
+@section('content')
+
+<!-- Font Awesome pour les icônes -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+<style>
+    /* === VARIABLES GLOBALES === */
+    :root {
+    --color-primary: #28a745;
+    --color-secondary: #ff6b35;
+    --color-dark: #2c3e50;
+    --color-light: #f8f9fa;
+    --font-main: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    /* === RESET SPÉCIFIQUE AU CONTENU PRINCIPAL === */
+    .home-content * {
+    box-sizing: border-box;
+    }
+
+    .home-content {
+    font-family: var(--font-main);
+    background-color: var(--color-light);
+    color: #333;
+    line-height: 1.6;
+    padding: 2rem 0;
+    min-height: 100vh;
+    }
+
+    /* === NAVBAR TOUJOURS VISIBLE === */
+    .navbar {
+    position: relative !important;
+    z-index: 9999 !important;
+    }
+
+    /* === FLOATING ELEMENTS === */
+    .floating-elements {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    pointer-events: none;
+    }
+
+    /* === HEADER === */
+    header {
+    position: relative;
+    background: linear-gradient(rgba(255,255,255,0.7), rgba(255,255,255,0.7)),
+                url("https://th.bing.com/th/id/OIP.EoUzkqtSoMGZFkP9_4DyigHaEz?cb=iwp2&rs=1&pid=ImgDetMain");
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    text-align: center;
+    padding: 60px 20px;
+    overflow: hidden;
+    transition: filter 0.3s ease;
+    color: var(--color-dark);
+    }
+
+    header.scrolled {
+    filter: blur(6px);
+    }
+
+    header > * {
+    position: relative;
+    z-index: 2;
+    }
+
+    h1 {
+    font-size: 4rem;
+    font-weight: 800;
+    margin-bottom: 30px;
+    color: var(--color-dark);
+    }
+
+    .logo-container {
+    margin: 30px 0;
+    display: inline-block;
+    width: 140px;
+    height: 70px;
+    border-radius: 10%;
+    overflow: hidden;
+    border: 2px solid rgba(0, 0, 0, 0.1);
+    background: transparent;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    transition: box-shadow 0.3s ease;
+    }
+
+    .logo-container:hover {
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+    }
+
+    .logo-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    border-radius: 10%;
+    background: transparent;
+    display: block;
+    transition: transform 0.3s ease;
+    }
+
+    .sous-titres {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    color: var(--color-dark);
+    }
+
+    .phrase-principale {
+    font-size: 1.4rem;
+    font-weight: 600;
+    margin-bottom: 15px;
+    text-align: center;
+    }
+
+    .abonnement {
+    font-size: 1rem;
+    margin: 15px 0;
+    opacity: 0.95;
+    text-align: center;
+    }
+
+    /* Tablette et desktop */
+    @media (min-width: 768px) {
+        .phrase-principale {
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+        }
+
+        .abonnement {
+            font-size: 1.2rem;
+            margin: 20px 0;
+        }
+    }
+
+    .encadre-jaune {
+    background: linear-gradient(45deg, #f1c40f, #f39c12);
+    color: var(--color-dark);
+    display: inline-block;
+    padding: 12px 24px;
+    border-radius: 25px;
+    margin-top: 20px;
+    font-weight: bold;
+    font-size: 1.1rem;
+    box-shadow: 0 8px 25px rgba(241,196,15,0.4);
+    transition: all 0.3s ease;
+    text-align: center;
+    width: auto;
+    }
+
+    /* Desktop */
+    @media (min-width: 768px) {
+        .encadre-jaune {
+            padding: 15px 30px;
+            margin-top: 30px;
+            font-size: 1.3rem;
+        }
+    }
+
+    .encadre-jaune:hover {
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 12px 35px rgba(241,196,15,0.6);
+    }
+
+   /* === CONTENU PRINCIPAL RESPONSIVE === */
+    /* Container responsive de base */
+.container {
+    width: 100%;
+    max-width: 100%;
+    margin: 0 auto;
+    padding: 0 15px;
+    box-sizing: border-box;
+    }
+
+    /* Mobile First: Styles de base pour mobile */
+    @media (min-width: 576px) {
+        .container {
+            padding: 0 20px;
+        }
+    }
+
+    @media (min-width: 768px) {
+        .container {
+            padding: 0 30px;
+        }
+    }
+
+    @media (min-width: 1200px) {
+        .container {
+            max-width: 1200px;
+            padding: 0 20px;
+        }
+    }
+
+    .content-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+    }
+
+    /* Tablette et plus */
+    @media (min-width: 768px) {
+        .content-grid {
+            grid-template-columns: 2fr 1fr;
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+    }
+
+    /* Styles de base pour les sections responsive */
+    .main-content,
+    .sidebar-section,
+    .popular-section {
+    background: white;
+    border-radius: 10px;
+    padding: 1rem;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Tablette et desktop */
+    @media (min-width: 768px) {
+        .main-content,
+        .sidebar-section,
+        .popular-section {
+            padding: 2rem;
+        }
+    }
+    }
+
+    /* === ANIMATIONS POUR LES LIENS DE CATEGORIES === */
+
+    /* Style de base pour la liste */
+    .categories-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    }
+
+    .categories-list li {
+    margin-bottom: 0.5rem;
+    }
+
+  /* === OPTION 1: Animation de glissement avec couleur === */
+    .categories-list a {
+    display: block;
+    padding: 12px 16px;
+    text-decoration: none;
+    color: #333;
+    border-radius: 8px;
+    position: relative;
+    transition: all 0.3s ease;
+    overflow: hidden;
+    }
+
+    .categories-list a::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, #05a105f1, #3cd505dd);
+    transition: left 0.3s ease;
+    z-index: -1;
+    }
+
+    .categories-list a:hover {
+    color: white;
+    transform: translateX(5px);
+    box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+    }
+
+    .categories-list a:hover::before {
+    left: 0;
+    }
+
+    /* === ARTICLES === */
+    .featured-article {
+    margin-bottom: 2rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid #eee;
+    }
+
+    .featured-article img,
+    .article-card img {
+    width: 100%;
+    object-fit: cover;
+    border-radius: 8px;
+    }
+
+    .featured-article img {
+    height: 300px;
+    }
+
+    .article-card img {
+    height: 200px;
+    }
+
+    .article-category,
+    .category-tag {
+    display: inline-block;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+    color: white;
+    }
+
+    .article-category.sport,
+    .category-tag.sport {
+    background: #007bff;
+    }
+
+    .article-category.economie,
+    .category-tag.economie {
+    background: #28a745;
+    }
+
+    .article-category.culture,
+    .category-tag.culture {
+        background: #ffc107;
+    color: #333;
+    }
+
+    .article-category.politique,
+    .category-tag.politique {
+    background: #dc3545;
+    }
+
+    .article-category.pdci,
+    .category-tag.pdci {
+    background: #ff6b35;
+    }
+
+    .article-title,
+    .article-card-title,
+    .popular-title {
+    font-size: 1.2rem;
+    margin-bottom: 0.5rem;
+    color: var(--color-dark);
+    transition: color 0.3s ease;
+    line-height: 1.4;
+    }
+
+    /* Tablette et desktop */
+    @media (min-width: 768px) {
+        .article-title,
+        .article-card-title,
+        .popular-title {
+            font-size: 1.5rem;
+        }
+    }
+
+    .article-excerpt,
+    .article-card-excerpt {
+    color: #666;
+    margin-bottom: 1rem;
+    font-size: 0.9rem;
+    }
+
+    .article-meta,
+    .popular-meta {
+    font-size: 0.8rem;
+    color: #888;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    }
+
+    /* Tablette et desktop */
+    @media (min-width: 768px) {
+        .article-meta,
+        .popular-meta {
+            font-size: 0.85rem;
+            gap: 1rem;
+        }
+    }
+
+    /* === SIDEBAR RESPONSIVE === */
+    .sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    }
+
+    /* Tablette et desktop */
+    @media (min-width: 768px) {
+        .sidebar {
+            gap: 2rem;
+        }
+    }
+
+    .sidebar-title {
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
+    color: var(--color-dark);
+    border-bottom: 2px solid var(--color-secondary);
+    padding-bottom: 0.5rem;
+    }
+
+    .sidebar-article {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #f0f0f0;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    }
+
+    .sidebar-article:hover {
+    background-color: #f8f9fa;
+    border-radius: 5px;
+    padding: 1rem;
+    margin: 0 -1rem 1rem -1rem;
+    }
+
+    .sidebar-article img {
+    width: 80px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 5px;
+    }
+
+    .sidebar-article-title {
+    font-size: 0.9rem;
+    margin-bottom: 0.3rem;
+    color: var(--color-dark);
+    }
+
+    .sidebar-article-date {
+    font-size: 0.8rem;
+    }
+
+    /* === ARTICLES EN VEDETTE HOMEPAGE === */
+    .homepage-featured-articles {
+    animation: fadeInUp 0.8s ease-out;
+    }
+
+    .featured-article-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 15px 35px rgba(0,0,0,0.15) !important;
+    }
+
+    .featured-article-card:hover .article-image img {
+    transform: scale(1.05);
+    }
+
+    .featured-article-card a:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    }
+
+    .category-section {
+    animation: fadeIn 0.6s ease-out;
+    animation-fill-mode: both;
+    }
+
+    .category-section:nth-child(1) { animation-delay: 0.1s; }
+    .category-section:nth-child(2) { animation-delay: 0.2s; }
+    .category-section:nth-child(3) { animation-delay: 0.3s; }
+
+    @keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    }
+
+    @keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+    color: #888;
+    }
+
+    /* === LISTE D’ARTICLES (GRID) === */
+    .articles-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+    margin-top: 1.5rem;
+    }
+
+    /* Mobile large */
+    @media (min-width: 576px) {
+        .articles-grid {
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        }
+    }
+
+    /* Tablette */
+    @media (min-width: 768px) {
+        .articles-grid {
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+    }
+
+    .article-card {
+    background: white;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    transition: transform 0.3s, box-shadow 0.3s;
+    cursor: pointer;
+    }
+
+    .article-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+    }
+
+    /* === POPULAIRES RESPONSIVE === */
+    .popular-item {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #f0f0f0;
+    transition: all 0.3s ease;
+    }
+
+    /* Tablette et desktop */
+    @media (min-width: 768px) {
+        .popular-item {
+            margin-bottom: 1.5rem;
+            padding-bottom: 1.5rem;
+        }
+    }
+
+    .popular-item:hover {
+    background-color: #f8f9fa;
+    padding: 1rem;
+    margin: 0 -1rem 1.5rem -1rem;
+    border-radius: 8px;
+    transform: translateX(5px);
+    }
+
+    .popular-number {
+    background: var(--color-primary);
+    color: white;
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 1rem;
+    margin-right: 0.75rem;
+    flex-shrink: 0;
+    }
+
+    /* Tablette et desktop */
+    @media (min-width: 768px) {
+        .popular-number {
+            width: 40px;
+            height: 40px;
+            font-size: 1.2rem;
+            margin-right: 1rem;
+        }
+    }
+
+    /* === VIDÉO EMBED RESPONSIVE === */
+    .video-container {
+    position: relative;
+    width: 100%;
+    padding-bottom: 56.25%; /* ratio 16:9 */
+    height: 0;
+    overflow: hidden;
+    margin: 1rem 0;
+    border-radius: 10px;
+    }
+
+    /* Mobile : pleine largeur mais contenue */
+    @media (max-width: 767px) {
+        .video-container {
+            width: calc(100vw - 30px);
+            left: 50%;
+            transform: translateX(-50%);
+            margin: 1rem 0;
+        }
+    }
+
+
+    .video-container iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+    }
+
+    /* === DASHBOARD PANEL === */
+    .dashboard-panel {
+    position: fixed;
+    top: 0;
+    right: -100vw; /* caché initialement à droite */
+    width: 100vw; /* prend toute la largeur */
+    height: 100vh;
+    background-color: white;
+    box-shadow: -4px 0 15px rgba(0, 0, 0, 0.2);
+    overflow-y: auto;
+    z-index: 1050;
+    padding: 20px;
+    border-left: 5px solid #667eea;
+    transition: right 0.4s ease-in-out;
+    }
+
+
+    .dashboard-panel.show {
+    right: 0;
+    }
+
+    .backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.4);
+    z-index: 1049;
+    backdrop-filter: blur(2px);
+    display: none;
+    }
+
+    .backdrop.show {
+    display: block;
+    }
+
+    /* === CONTENU RESPONSIVE (Tablette) === */
+    @media (max-width: 1024px) {
+    .container {
+        width: 100%;
+        margin: 0 auto;
+        padding: 0 30px;
+    }
+    }
+
+    /* === CONTENU RESPONSIVE (Mobile) === */
+    @media (max-width: 768px) {
+    .container {
+        width: 100vw;
+        max-width: 100%;
+        margin: 0;
+        padding: 0 20px;
+    }
+    }
+
+    /* === CONTENU RESPONSIVE (Très petit mobile) === */
+    @media (max-width: 480px) {
+    .container {
+        width: 100vw;
+        max-width: 100%;
+        margin: 0;
+        padding: 0 15px;
+    }
+    }
+
+    .popular-number {
+        width: 35px;
+        height: 35px;
+        font-size: 1rem;
+    }
+
+    .popular-title {
+        font-size: 1rem;
+    }
+
+    .popular-image {
+        width: 100%;
+        max-width: 200px;
+        height: 120px;
+    }
+
+    .encadre-jaune {
+        font-size: 1.1rem;
+        padding: 12px 25px;
+    }
+
+    .abonnement {
+        font-size: 1rem;
+    }
+
+    .sous-titres {
+        padding: 10px;
+    }
+    }
+
+    /* === AMÉLIORATION PROFESSIONNELLE === */
+
+    /* Container principal unifié */
+    .home-content .container {
+        max-width: 1200px !important;
+        margin: 0 auto !important;
+    }
+
+    /* Bordures subtiles pour toutes les sections */
+    .main-content,
+    .sidebar,
+    .popular-section,
+    .video-container {
+        background: white;
+        border: 1px solid #e0e0e0;
+        border-radius: 12px;
+        padding: 2rem;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        margin-bottom: 2rem;
+    }
+
+    /* Cards articles avec bordures */
+    .article-card,
+    .featured-article,
+    .sidebar-article {
+        border: 1px solid #f0f0f0;
+        padding: 1rem;
+        border-radius: 10px;
+    }
+
+    /* Système "Voir plus" pour textes longs */
+    .article-excerpt,
+    .article-card-excerpt,
+    .popular-content p {
+        position: relative;
+        overflow: hidden;
+        max-height: 4.5em; /* 3 lignes environ */
+        line-height: 1.5em;
+        transition: max-height 0.3s ease;
+    }
+
+    .article-excerpt.expanded,
+    .article-card-excerpt.expanded {
+        max-height: none;
+    }
+
+    .read-more-btn {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        padding: 6px 16px;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        cursor: pointer;
+        margin-top: 8px;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    .read-more-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    }
+
+    .read-more-btn i {
+        transition: transform 0.3s ease;
+    }
+
+    .read-more-btn.expanded i {
+        transform: rotate(180deg);
+    }
+
+    /* Vidéo avec bordure */
+    .video-container {
+        position: relative;
+        padding-bottom: 56.25%;
+        height: 0;
+        overflow: hidden;
+        border: 2px solid #e0e0e0;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+
+    .video-container iframe {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        border: 0;
+    }
+
+    /* Section populaires améliorée */
+    .popular-item {
+        border: 1px solid #f5f5f5;
+        padding: 1rem;
+        border-radius: 8px;
+        margin-bottom: 1rem;
+        transition: all 0.3s ease;
+    }
+
+    .popular-item:hover {
+        border-color: #667eea;
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+    }
+
+    .popular-image {
+        border: 2px solid #f0f0f0;
+        border-radius: 8px;
+        object-fit: cover;
+    }
+
+    /* Textes tronqués avec ellipsis */
+    .popular-title,
+    .sidebar-article-title {
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    /* Amélioration responsive */
+    @media (max-width: 768px) {
+        .main-content,
+        .sidebar,
+        .popular-section {
+            padding: 1.5rem;
+        }
+
+        .article-card,
+        .popular-item {
+            padding: 0.75rem;
+        }
+
+        /* Amélioration des liens sur mobile */
+        a {
+            word-break: break-word;
+            hyphens: auto;
+        }
+
+        /* Liens des articles plus grands sur mobile */
+        .article-title,
+        .article-card-title {
+            font-size: 1.1rem !important;
+            line-height: 1.4 !important;
+        }
+
+        /* Bouton téléchargement PDF plus visible sur mobile */
+        .article-meta a {
+            display: inline-block;
+            padding: 8px 12px;
+            margin-top: 8px;
+            background: #28a745;
+            color: white !important;
+            border-radius: 6px;
+            text-decoration: none !important;
+            font-weight: bold;
+            font-size: 0.95rem;
+        }
+
+        .article-meta a:hover {
+            background: #218838;
+        }
+
+        /* Espacement des liens dans la sidebar sur mobile */
+        .sidebar-article a {
+            display: block;
+            padding: 10px;
+            margin-bottom: 5px;
+        }
+
+        /* Grid plus étroit sur mobile */
+        .articles-grid {
+            grid-template-columns: 1fr !important;
+            gap: 1rem !important;
+        }
+
+        /* Amélioration navigation mobile */
+        .categories-list li a {
+            padding: 12px 15px;
+            font-size: 1rem;
+            display: block;
+        }
+    }
+</style>
+
+<div class="floating-elements">
+    <div class="floating-element" style="left: 10%; animation-delay: 0s;"></div>
+    <div class="floating-element" style="left: 20%; animation-delay: 1s;"></div>
+    <div class="floating-element" style="left: 30%; animation-delay: 2s;"></div>
+    <div class="floating-element" style="left: 40%; animation-delay: 3s;"></div>
+    <div class="floating-element" style="left: 50%; animation-delay: 4s;"></div>
+    <div class="floating-element" style="left: 60%; animation-delay: 5s;"></div>
+    <div class="floating-element" style="left: 70%; animation-delay: 6s;"></div>
+    <div class="floating-element" style="left: 80%; animation-delay: 7s;"></div>
+    <div class="floating-element" style="left: 90%; animation-delay: 8s;"></div>
+</div>
+
+<div class="home-content">
+   <header>
+    <div class="logo-container">
+        <img src="https://images.squarespace-cdn.com/content/v1/67a35ff4b707014510c5bb88/da1128d8-83e5-4d1c-81cd-bfaea379e590/belier+2.jpg?format=1500w" alt="Logo Le Bélier-Intrépide">
+    </div>
+    <div class="sous-titres">
+        <p class="phrase-principale">VOIR PLUS LOIN, COMPRENDRE MIEUX L'INFO, EN TEMPS RÉEL ET SANS FILTRE</p>
+        <p class="abonnement">Abonnez-vous massivement pour 30 000 F CFA par an, recevez le journal du jour en PDF, ne manquez rien de l'actualité</p>
+        <div class="encadre-jaune">
+            <i class="fas fa-newspaper"></i> Echos du PDCI-RDA
+        </div>
+    </div>
+</header>
+
+
+<div class="container">
+
+    <!-- Message de bienvenue spécial pour nouveaux utilisateurs -->
+    @if (session('welcome_message'))
+    <div class="alert alert-success alert-dismissible fade show" style="background: linear-gradient(135deg, #28a745 0%, #20c997 100%); color: white; border: none; border-radius: 10px; margin-bottom: 20px;">
+        <div class="d-flex align-items-center">
+            <i class="fas fa-check-circle me-3" style="font-size: 1.5rem;"></i>
+            <div>
+                <h5 class="mb-1">🎉 {{ session('welcome_message') }}</h5>
+                <p class="mb-0" style="opacity: 0.9;">Explorez nos articles et personnalisez votre expérience !</p>
+            </div>
+        </div>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert"></button>
+    </div>
+    @endif
+
+    <!-- Section de bienvenue responsive pour utilisateur connecté -->
+    @auth
+    <div class="user-welcome-section" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 15px; border-radius: 10px; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+        <div class="row align-items-center">
+            <div class="col-12 col-md-8 text-center text-md-start">
+                <h2 class="mb-2" style="font-size: 1.5rem;">👋 Bienvenue, {{ Auth::user()->firstname }} {{ Auth::user()->lastname }} !</h2>
+                <p class="mb-0" style="opacity: 0.9; font-size: 0.9rem;">Restez informé des dernières actualités</p>
+            </div>
+            <div class="col-12 col-md-4 text-center text-md-end mt-3 mt-md-0">
+                <!--<button class="btn btn-light btn-sm" onclick="toggleDashboard()" style="background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.3); color: white;">
+                    <i class="fas fa-user-circle me-2"></i>Mon Dashboard
+                </button> -->
+            </div>
+        </div>
+    </div>
+    @endauth
+
+
+
+    <div class="content-grid">
+        <main class="main-content">
+            @if($featuredArticles->count() > 0)
+                {{-- ============================================
+                    ARTICLE PRINCIPAL (ARTICLE EN VEDETTE)
+                    Modifiable facilement : Affiche le premier article en vedette
+                    - Image : Ligne suivante ($mainArticle->image)
+                    - Titre : $mainArticle->titre
+                    - Texte : $mainArticle->extrait
+                ============================================ --}}
+                @php $mainArticle = $featuredArticles->first(); @endphp
+                <article class="featured-article">
+                    {{-- IMAGE DE L'ARTICLE PRINCIPAL - Facile à modifier --}}
+                    @if($mainArticle->image)
+                        <img src="{{ asset('storage/' . $mainArticle->image) }}" alt="{{ $mainArticle->titre }}">
+                    @else
+                        {{-- Image par défaut si pas d'image uploadée - Modifiable ici : --}}
+                        <img src="{{asset('image/pdci1.jpg')}}" alt="Article principal">
+                    @endif
+
+                    {{-- CATÉGORIE --}}
+                    <div class="article-category {{ strtolower($mainArticle->category->nom ?? 'general') }}">
+                        {{ strtoupper($mainArticle->category->nom ?? 'GÉNÉRAL') }}
+                    </div>
+
+                    {{-- TITRE DE L'ARTICLE --}}
+                    <h2 class="article-title">{{ $mainArticle->titre }}</h2>
+
+                    {{-- EXTRAIT/DESCRIPTION --}}
+                    <p class="article-excerpt">{{ $mainArticle->extrait ?: Str::limit(strip_tags($mainArticle->contenu), 200) }}</p>
+
+                    {{-- MÉTADONNÉES (Date, Auteur, Temps de lecture) --}}
+                    <div class="article-meta">
+                        <span>📅 {{ $mainArticle->created_at->format('d M Y') }}</span>
+                        @if($mainArticle->user)
+                            <span>👤 {{ $mainArticle->user->firstname }} {{ $mainArticle->user->lastname }}</span>
+                        @endif
+                        <span>📖 {{ ceil(str_word_count(strip_tags($mainArticle->contenu)) / 200) }} min de lecture</span>
+                    </div>
+                </article>
+
+                {{-- ============================================
+                    GRILLE DES 6 ARTICLES SECONDAIRES
+                    Articles organisés par catégorie
+                ============================================ --}}
+                <div class="articles-grid">
+                @php
+                    // ===== ORGANISATION DES ARTICLES PAR CATÉGORIE =====
+                    $articlesByCategory = [];
+                    foreach($featuredArticles->skip(1)->take(6) as $article) {
+                        $categoryKey = strtolower($article->category->nom ?? 'general');
+                        if (!isset($articlesByCategory[$categoryKey])) {
+                            $articlesByCategory[$categoryKey] = [];
+                        }
+                        $articlesByCategory[$categoryKey][] = $article;
+                    }
+
+                    // ===== ARTICLES PAR DÉFAUT (SI PAS D'ARTICLES EN BDD) =====
+                    // 💡 FACILE À MODIFIER : Change les images, titres, textes ici
+                    $defaultArticles = [
+                        'economie' => [
+                            'image' => 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=400&h=200&fit=crop',
+                            'category' => 'ÉCONOMIE',
+                            'title' => 'Commerce africain : L\'Afreximbank dévoile son rapport 2025 et révèle les défis et opportunités',
+                            'excerpt' => 'Analyse complète des tendances du commerce intra-africain et des perspectives d\'investissement pour le développement économique...',
+                            'date' => '25 Juin 2025'
+                        ],
+                        'sport' => [
+                            'image' => 'https://images.unsplash.com/photo-1461896836934-ffe607ba8211?w=400&h=200&fit=crop',
+                            'category' => 'SPORT',
+                            'title' => 'CAN 2025 : Préparatifs intensifs pour les Éléphants de Côte d\'Ivoire',
+                            'excerpt' => 'L\'équipe nationale se prépare activement pour la prochaine Coupe d\'Afrique des Nations avec un programme d\'entraînement renforcé...',
+                            'date' => '24 Juin 2025'
+                        ],
+                        'politique' => [
+                            'image' => 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=400&h=200&fit=crop',
+                            'category' => 'POLITIQUE',
+                            'title' => 'Coopération Côte d\'Ivoire-Ghana : Renforcement des liens bilatéraux',
+                            'excerpt' => 'Nouvelles initiatives de coopération économique et politique entre les deux pays voisins pour un développement mutuel...',
+                            'date' => '23 Juin 2025'
+                        ],
+                        'culture et média' => [
+                            'image' => 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=400&h=200&fit=crop',
+                            'category' => 'CULTURE',
+                            'title' => 'Festival des Arts de Côte d\'Ivoire : Célébration de la diversité culturelle',
+                            'excerpt' => 'Une semaine dédiée à la promotion des arts et de la culture ivoirienne avec des événements dans tout le pays...',
+                            'date' => '22 Juin 2025'
+                        ],
+                        'pdci-rda' => [
+                            'image' => asset('image/pdci.jpg'),
+                            'category' => 'PDCI-RDA',
+                            'title' => 'AAM2025 à Abuja : Afreximbank trace la route de l\'Afrique résiliente et innovante',
+                            'excerpt' => 'Participation active du PDCI-RDA aux discussions sur l\'avenir économique de l\'Afrique lors de la conférence d\'Abuja...',
+                            'date' => '21 Juin 2025'
+                        ],
+                        'society' => [
+                            'image' => asset('image/justice.webp'),
+                            'category' => 'POLITIQUE',
+                            'title' => 'Cour de cassation : Un manuel didactique mis à la disposition des praticiens du droit',
+                            'excerpt' => 'Initiative pour améliorer l\'accès à la justice et renforcer les compétences des professionnels du secteur juridique...',
+                            'date' => '20 Juin 2025'
+                        ]
+                    ];
+
+                    $categoriesOrder = ['economie', 'sport', 'politique', 'culture et média', 'pdci-rda', 'society'];
+                    $articleCount = 0;
+                @endphp
+
+                @foreach($categoriesOrder as $categoryKey)
+                    @if($articleCount >= 6) @break @endif
+
+                    @if(isset($articlesByCategory[$categoryKey]) && count($articlesByCategory[$categoryKey]) > 0)
+                        {{-- Article dynamique de la base de données --}}
+                        @php $article = $articlesByCategory[$categoryKey][0]; @endphp
+                        <article class="article-card">
+                            @if($article->image)
+                                <img src="{{ asset('storage/' . $article->image) }}" alt="{{ $article->titre }}">
+                            @else
+                                <img src="{{ $defaultArticles[$categoryKey]['image'] ?? 'https://via.placeholder.com/400x200' }}" alt="{{ $article->titre }}">
+                            @endif
+                            <div class="article-card-content">
+                                @php
+                                    $categoryClass = 'general';
+                                    $categoryName = $article->category->nom ?? 'Général';
+                                    switch(strtolower($categoryName)) {
+                                        case 'economie': $categoryClass = 'economie'; break;
+                                        case 'sport': $categoryClass = 'sport'; break;
+                                        case 'culture et média': $categoryClass = 'culture'; break;
+                                        case 'politique': $categoryClass = 'politique'; break;
+                                        case 'pdci-rda': $categoryClass = 'pdci'; break;
+                                        case 'afrique': $categoryClass = 'afrique'; break;
+                                        case 'société': $categoryClass = 'societe'; break;
+                                        case 'dossiers': $categoryClass = 'dossiers'; break;
+                                    }
+                                @endphp
+                                <div class="article-category {{ $categoryClass }}">{{ strtoupper($categoryName) }}</div>
+                                <h3 class="article-card-title">{{ $article->titre }}</h3>
+                                <p class="article-card-excerpt">{{ Str::limit($article->extrait ?: strip_tags($article->contenu), 120) }}</p>
+                                <div class="article-meta">
+                                    <span>📅 {{ $article->created_at->format('d M Y') }}</span>
+
+                                    {{-- ===== BOUTON TÉLÉCHARGEMENT PDF (SI DOCUMENT EXISTE) ===== --}}
+                                    @if($article->document_path)
+                                        @auth
+                                            @if(Auth::user()->isAdmin() || Auth::user()->hasActiveSubscription())
+                                                <span style="margin-left: 10px;">
+                                                    <a href="{{ route('articles.download', $article->id) }}"
+                                                       style="color: #28a745; font-weight: bold; text-decoration: none;"
+                                                       title="Télécharger le document PDF"
+                                                       download>
+                                                        <i class="fas fa-file-download"></i> Télécharger PDF
+                                                    </a>
+                                                </span>
+                                            @else
+                                                <span style="margin-left: 10px;">
+                                                    <a href="{{ route('home.abonnement') }}" title="Réservé aux abonnés" style="color: #ff6b35; font-weight: 700; text-decoration: none;">
+                                                        🔒 Réservé aux abonnés
+                                                    </a>
+                                                </span>
+                                            @endif
+                                        @else
+                                            <span style="margin-left: 10px;">
+                                                <a href="{{ route('login') }}" title="Connectez-vous pour télécharger" style="color: #0069d9; font-weight: 700; text-decoration: none;">
+                                                    Se connecter pour télécharger
+                                                </a>
+                                            </span>
+                                        @endauth
+                                    @endif
+                                </div>
+                            </div>
+                        </article>
+                        @php $articleCount++; @endphp
+                    @elseif(isset($defaultArticles[$categoryKey]))
+                        {{-- Article statique par défaut --}}
+                        @php $defaultArticle = $defaultArticles[$categoryKey]; @endphp
+                        <article class="article-card">
+                            <img src="{{ $defaultArticle['image'] }}" alt="{{ $defaultArticle['category'] }}">
+                            <div class="article-card-content">
+                                <div class="article-category {{ strtolower(str_replace(['É', ' '], ['e', ''], $defaultArticle['category'])) }}">{{ $defaultArticle['category'] }}</div>
+                                <h3 class="article-card-title">{{ $defaultArticle['title'] }}</h3>
+                                <p class="article-card-excerpt">{{ $defaultArticle['excerpt'] }}</p>
+                                <div class="article-meta">
+                                    <span>📅 {{ $defaultArticle['date'] }}</span>
+                                </div>
+                            </div>
+                        </article>
+                        @php $articleCount++; @endphp
+                    @endif
+                @endforeach
+            </div>
+            @else
+                {{-- ============================================
+                    ARTICLES PAR DÉFAUT (SI AUCUN ARTICLE EN VEDETTE)
+                    💡 MODIFIABLE : Ces articles s'affichent quand la BDD est vide
+                    Modifie les images et textes directement ci-dessous
+                ============================================ --}}
+
+                {{-- ARTICLE PRINCIPAL PAR DÉFAUT --}}
+                <article class="featured-article">
+                    <img src="{{asset('image/pdci1.jpg')}}" alt="Article principal">
+                    <div class="article-category pdci">PDCI-RDA</div>
+                    <h2 class="article-title">PDCI-RDA 2025 : Une première journée entre héritage partagé, résilience institutionnelle et intégration panafricaine</h2>
+                    <p class="article-excerpt">Le Parti Démocratique de Côte d'Ivoire - Rassemblement Démocratique Africain trace la voie vers une Afrique résiliente et innovante avec des initiatives concrètes pour le développement socio-économique du continent.</p>
+                    <div class="article-meta">
+                        <span>📅 26 Juin 2025</span>
+                        <span>👤 Rédaction PDCI</span>
+                        <span>📖 5 min de lecture</span>
+                    </div>
+                </article>
+
+                <div class="articles-grid">
+                    <article class="article-card">
+                        <img src="https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=400&h=200&fit=crop" alt="Économie">
+                        <div class="article-card-content">
+                            <div class="article-category economie">ÉCONOMIE</div>
+                            <h3 class="article-card-title">Commerce africain : L'Afreximbank dévoile son rapport 2025 et révèle les défis et opportunités</h3>
+                            <p class="article-card-excerpt">Analyse complète des tendances du commerce intra-africain et des perspectives d'investissement pour le développement économique...</p>
+                            <div class="article-meta">
+                                <span>📅 25 Juin 2025</span>
+                            </div>
+                        </div>
+                    </article>
+
+                    <article class="article-card">
+                        <img src="https://images.unsplash.com/photo-1461896836934-ffe607ba8211?w=400&h=200&fit=crop" alt="Sport">
+                        <div class="article-card-content">
+                            <div class="article-category sport">SPORT</div>
+                            <h3 class="article-card-title">CAN 2025 : Préparatifs intensifs pour les Éléphants de Côte d'Ivoire</h3>
+                            <p class="article-card-excerpt">L'équipe nationale se prépare activement pour la prochaine Coupe d'Afrique des Nations avec un programme d'entraînement renforcé...</p>
+                            <div class="article-meta">
+                                <span>📅 24 Juin 2025</span>
+                            </div>
+                        </div>
+                    </article>
+
+                    <article class="article-card">
+                        <img src="https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=400&h=200&fit=crop" alt="Politique">
+                        <div class="article-card-content">
+                            <div class="article-category politique">POLITIQUE</div>
+                            <h3 class="article-card-title">Coopération Côte d'Ivoire-Ghana : Renforcement des liens bilatéraux</h3>
+                            <p class="article-card-excerpt">Nouvelles initiatives de coopération économique et politique entre les deux pays voisins pour un développement mutuel...</p>
+                            <div class="article-meta">
+                                <span>📅 23 Juin 2025</span>
+                            </div>
+                        </div>
+                    </article>
+
+                    <article class="article-card">
+                        <img src="https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=400&h=200&fit=crop" alt="Culture">
+                        <div class="article-card-content">
+                            <div class="article-category culture">CULTURE</div>
+                            <h3 class="article-card-title">Festival des Arts de Côte d'Ivoire : Célébration de la diversité culturelle</h3>
+                            <p class="article-card-excerpt">Une semaine dédiée à la promotion des arts et de la culture ivoirienne avec des événements dans tout le pays...</p>
+                            <div class="article-meta">
+                                <span>📅 22 Juin 2025</span>
+                            </div>
+                        </div>
+                    </article>
+
+                    <article class="article-card">
+                        <img src="{{asset('image/pdci.jpg')}}" alt="PDCI">
+                        <div class="article-card-content">
+                            <div class="article-category pdci">PDCI-RDA</div>
+                            <h3 class="article-card-title">AAM2025 à Abuja : Afreximbank trace la route de l'Afrique résiliente et innovante</h3>
+                            <p class="article-card-excerpt">Participation active du PDCI-RDA aux discussions sur l'avenir économique de l'Afrique lors de la conférence d'Abuja...</p>
+                            <div class="article-meta">
+                                <span>📅 21 Juin 2025</span>
+                            </div>
+                        </div>
+                    </article>
+
+                    <article class="article-card">
+                        <img src="{{asset('image/justice.webp')}}" alt="Justice">
+                        <div class="article-card-content">
+                            <div class="article-category politique">POLITIQUE</div>
+                            <h3 class="article-card-title">Cour de cassation : Un manuel didactique mis à la disposition des praticiens du droit</h3>
+                            <p class="article-card-excerpt">Initiative pour améliorer l'accès à la justice et renforcer les compétences des professionnels du secteur juridique...</p>
+                            <div class="article-meta">
+                                <span>📅 20 Juin 2025</span>
+                            </div>
+                        </div>
+                    </article>
+            </div>
+        @endif
+        </main>
+
+        {{-- ============================================
+            SIDEBAR (BARRE LATÉRALE DROITE)
+            Contient : Profil utilisateur, Articles à la une, Catégories, etc.
+            💡 Facile à personnaliser
+        ============================================ --}}
+        <aside class="sidebar">
+            {{-- ===== SECTION PROFIL UTILISATEUR (si connecté) ===== --}}
+            @auth
+            <div class="sidebar-section" style="background: #f8f9fa; border-left: 4px solid #667eea; padding: 15px; margin-bottom: 20px;">
+                <h3 class="sidebar-title" style="color: #667eea; display: flex; align-items: center;">
+                    <i class="fas fa-user-circle me-2"></i>Mon Profil
+                </h3>
+                <div style="display: flex; align-items: center; margin-bottom: 10px;">
+                    <div style="width: 40px; height: 40px; background: #667eea; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; margin-right: 10px;">
+                        {{ strtoupper(substr(Auth::user()->firstname, 0, 1) . substr(Auth::user()->lastname, 0, 1)) }}
+                    </div>
+                    <div>
+                        <div style="font-weight: bold; font-size: 0.9rem;">{{ Auth::user()->firstname }} {{ Auth::user()->lastname }}</div>
+                        <div style="font-size: 0.8rem; color: #666;">{{ Auth::user()->email }}</div>
+                    </div>
+                </div>
+                <div style="display: flex; gap: 5px; flex-wrap: wrap;">
+                    @auth
+                        @if(Auth::user()->is_admin)
+                            <a href="{{ route('admin.articles.index') }}" class="btn btn-sm" style="background: #667eea; color: white; font-size: 0.8rem; padding: 5px 10px;">Mes Articles</a>
+                        @else
+                            <a href="{{ route('articles.index') }}" class="btn btn-sm" style="background: #667eea; color: white; font-size: 0.8rem; padding: 5px 10px;">Mes Articles</a>
+                        @endif
+                    @else
+                        <a href="{{ route('articles.index') }}" class="btn btn-sm" style="background: #667eea; color: white; font-size: 0.8rem; padding: 5px 10px;">Mes Articles</a>
+                    @endauth
+                    <button onclick="toggleDashboard()" class="btn btn-sm btn-outline-secondary" style="font-size: 0.8rem; padding: 5px 10px;">Dashboard</button>
+                </div>
+            </div>
+            @endauth
+
+            {{-- ===== ARTICLES À LA UNE (sidebar) =====
+                 💡 MODIFIABLE : Change les images et titres ci-dessous
+            --}}
+            <div class="sidebar-section">
+                <h3 class="sidebar-title">À la Une</h3>
+                <article class="sidebar-article">
+                    <img src="{{asset('image/politique.jpg')}}" alt="Actualité">
+                    <div class="sidebar-article-content">
+                        <h4 class="sidebar-article-title">AAM2025 à Abuja : Afreximbank trace la route de l'Afrique résiliente</h4>
+                        <div class="sidebar-article-date">26 Juin 2025</div>
+                    </div>
+                </article>
+                <article class="sidebar-article">
+                    <img src="{{asset('image/justice.webp')}}" alt="Justice">
+                    <div class="sidebar-article-content">
+                        <h4 class="sidebar-article-title">Cour de cassation : Un manuel didactique pour les praticiens du droit</h4>
+                        <div class="sidebar-article-date">25 Juin 2025</div>
+                    </div>
+                </article>
+                <article class="sidebar-article">
+                    <img src="{{asset('image/economie2.webp')}}" alt="Économie numérique">
+                    <div class="sidebar-article-content">
+                        <h4 class="sidebar-article-title">Économie numérique africaine : Trajectoire vers 712 milliards $</h4>
+                        <div class="sidebar-article-date">24 Juin 2025</div>
+                    </div>
+                </article>
+                <article class="sidebar-article">
+                    <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=80&h=60&fit=crop" alt="Sport">
+                    <div class="sidebar-article-content">
+                        <h4 class="sidebar-article-title">Championnat national : Résultats et classements</h4>
+                        <div class="sidebar-article-date">23 Juin 2025</div>
+                    </div>
+                </article>
+            </div>
+
+            {{-- ===== LISTE DES CATÉGORIES (sidebar) ===== --}}
+            <div class="sidebar-section">
+                <h3 class="sidebar-title">Catégories</h3>
+                <ul class="categories-list">
+                    <li><a href="{{ route('app_category', ['categorie' => 'PDCI-RDA']) }}">🏛️ PDCI-RDA</a></li>
+                    <li><a href="{{ route('app_category', ['categorie' => 'Politique']) }}">⚖️ Politique</a></li>
+                    <li><a href="{{ route('app_category', ['categorie' => 'Economie']) }}">💰 Économie</a></li>
+                    <li><a href="{{ route('app_category', ['categorie' => 'Sport']) }}">⚽ Sport</a></li>
+                    <li><a href="{{ route('app_category', ['categorie' => 'Culture et média']) }}">🎭 Culture & Média</a></li>
+                    <li><a href="{{ route('app_category', ['categorie' => 'Afrique']) }}">🌍 Afrique</a></li>
+                </ul>
+            </div>
+
+            {{-- ===== RÉSEAUX SOCIAUX =====
+                 💡 MODIFIABLE : Ajoute tes vrais liens sociaux
+            --}}
+            <div class="sidebar-section">
+                <h3 class="sidebar-title">Suivez-nous</h3>
+                <div class="social-links">
+                    <a href="#" title="Facebook">📘</a>
+                    <a href="#" title="Twitter">🐦</a>
+                    <a href="#" title="Instagram">📷</a>
+                    <a href="#" title="YouTube">📺</a>
+                    <a href="#" title="LinkedIn">💼</a>
+                </div>
+            </div>
+
+            {{-- ===== NEWSLETTER (Inscription) ===== --}}
+            <div class="sidebar-section">
+                <h3 class="sidebar-title">Newsletter</h3>
+                <p style="font-size: 0.9rem; color: #666; margin-bottom: 1rem;">Restez informé de nos dernières actualités</p>
+                <form method="POST" action="{{ route('newsletter.subscribe') }}">
+                    @csrf
+                    <div style="display: flex; gap: 0.5rem;">
+                        <input type="email" name="email" placeholder="Votre email" required style="flex: 1; padding: 0.5rem; border: 1px solid #ddd; border-radius: 5px;">
+                        <button type="submit" style="background: #ff6b35; color: white; border: none; padding: 0.5rem 1rem; border-radius: 5px; cursor: pointer;">S'inscrire</button>
+                    </div>
+                </form>
+            </div>
+        </aside>
+    </div>
+</div>
+
+<!-- Dashboard Panel (caché par défaut) -->
+@auth
+<div id="dashboardPanel" class="dashboard-panel">
+    <div class="dashboard-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">Tableau de bord</h5>
+        <div class="d-flex align-items-center gap-3">
+            <div class="dropdown">
+                <a class="dropdown-toggle text-decoration-none d-flex align-items-center" href="#" role="button" data-bs-toggle="dropdown">
+                    <div class="user-initials me-2">
+                        {{ strtoupper(substr(Auth::user()->lastname, 0, 1) . substr(Auth::user()->firstname, 0, 1)) }}
+                    </div>
+                </a>
+                <ul class="dropdown-menu dropdown-menu-end">
+                    <li><button class="dropdown-item" onclick="closeDashboard()">Fermé</button></li>
+                    <li>
+                        <form id="logout-form" action="{{ route('app_logout') }}" method="POST" style="display: none;">
+                            @csrf
+                        </form>
+                        <a class="dropdown-item text-danger" href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                            Se déconnecter
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="dashboard-content">
+        <h3>Bienvenue, {{ Auth::user()->lastname }} 👋</h3>
+
+        <div class="card border-0 shadow-sm mb-3">
+                <div class="card-body">
+                <h5 class="card-title">Mes Articles</h5>
+                @auth
+                    @if(Auth::user()->is_admin)
+                        <a href="{{ route('admin.articles.index') }}" class="btn btn-sm btn-primary">Gérer</a>
+                    @else
+                        <a href="{{ route('articles.index') }}" class="btn btn-sm btn-primary">Gérer</a>
+                    @endif
+                @else
+                    <a href="{{ route('articles.index') }}" class="btn btn-sm btn-primary">Gérer</a>
+                @endauth
+            </div>
+        </div>
+
+        <div class="card border-0 shadow-sm mb-3">
+            <div class="card-body">
+                <h5 class="card-title toggle-title" onclick="toggleSection('profileSection')">
+                    Profil
+                </h5>
+                <div id="profileSection" class="collapse-section" style="display: none;">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item"><strong>Prénom :</strong> {{ Auth::user()->firstname }}</li>
+                        <li class="list-group-item"><strong>Nom :</strong> {{ Auth::user()->lastname }}</li>
+                        <li class="list-group-item"><strong>Email :</strong> {{ Auth::user()->email }}</li>
+                        <li class="list-group-item"><strong>Mot de passe :</strong> <code>{{ str_repeat('*', 8) }}</code></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="card border-0 shadow-sm mb-3">
+            <div class="card-body">
+                <h5 class="card-title toggle-title" onclick="toggleSection('addressSection')">
+                    Adresse
+                </h5>
+                <div id="addressSection" class="collapse-section" style="display: none;">
+                    @if(Auth::user()->address)
+                        <p>{{ Auth::user()->address }}</p>
+                    @else
+                        <p class="text-muted fst-italic">Aucune adresse enregistrée</p>
+                    @endif
+                </div>
+            </div>
+        </div>
+
+        <div class="card border-0 shadow-sm mb-3">
+            <div class="card-body">
+                <h5 class="card-title">Paramètres</h5>
+                <button class="btn btn-sm btn-secondary" disabled>À venir</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="backdrop" class="backdrop" onclick="closeDashboard()"></div>
+@endauth
+
+<br><br>
+
+{{-- ============================================
+    SECTION VIDÉO DE PRÉSENTATION
+    💡 MODIFIABLE : Change l'URL YouTube ci-dessous
+============================================ --}}
+<!-- Section vidéo de présentation -->
+<div class="container">
+    <div class="video-container">
+        <iframe
+            src="https://www.youtube.com/embed/dQw4w9WgXcQ"
+            title="Vidéo de présentation - Le Bélier Intrépide"
+            frameborder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen>
+        </iframe>
+    </div>
+</div>
+
+<br><br>
+
+    {{-- ============================================
+        SECTION "LES + POPULAIRES"
+        Liste des articles les plus consultés
+        💡 MODIFIABLE : Images, titres, liens, etc.
+    ============================================ --}}
+    <!--pour la deuxieme sections --->
+
+    <div class="container">
+        <div class="popular-section">
+            <h2 class="section-title">Les + Populaires</h2>
+
+            <ul class="popular-list">
+                <li class="popular-item">
+                    <a href="#" class="popular-link">
+                        <div class="popular-number">1</div>
+                        <img src="https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=300&h=200&fit=crop" alt="Résultats BEPC" class="popular-image">
+                        <div class="popular-content">
+                            <div class="category-tag economie">ÉCONOMIE</div>
+                            <h3 class="popular-title">BEPC 2023 : Les résultats fin prêt, voici où les trouver</h3>
+                            <div class="popular-meta">
+                                <span>📅 26 Juin 2025</span>
+                                <span>👁️ 12,543 vues</span>
+                            </div>
+                        </div>
+                    </a>
+                </li>
+
+                <li class="popular-item">
+                    <a href="#" class="popular-link">
+                        <div class="popular-number">2</div>
+                        <img src="https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=300&h=200&fit=crop" alt="Armée ivoirienne" class="popular-image">
+                        <div class="popular-content">
+                            <div class="category-tag sport">SPORT</div>
+                            <h3 class="popular-title">Armée ivoirienne: Un recrutement de sous-officiers et militaires du rang spécialistes ouvert</h3>
+                            <div class="popular-meta">
+                                <span>📅 25 Juin 2025</span>
+                                <span>👁️ 9,876 vues</span>
+                            </div>
+                        </div>
+                    </a>
+                </li>
+
+                <li class="popular-item">
+                    <a href="#" class="popular-link">
+                        <div class="popular-number">3</div>
+                        <img src="https://images.unsplash.com/photo-1577962917302-cd874c4e31d2?w=300&h=200&fit=crop" alt="Fonction publique" class="popular-image">
+                        <div class="popular-content">
+                            <div class="category-tag politique">POLITIQUE</div>
+                            <h3 class="popular-title">Concours d'entrée à la Fonction publique 2023: De nombreuses innovations au profit des jeunes</h3>
+                            <div class="popular-meta">
+                                <span>📅 24 Juin 2025</span>
+                                <span>👁️ 8,234 vues</span>
+                            </div>
+                        </div>
+                    </a>
+                </li>
+
+                <li class="popular-item">
+                    <a href="#" class="popular-link">
+                        <div class="popular-number">4</div>
+                        <img src="https://images.unsplash.com/photo-1529107386315-e1a2ed48a620?w=300&h=200&fit=crop" alt="PDCI-RDA Afrique" class="popular-image">
+                        <div class="popular-content">
+                            <div class="category-tag pdci">PDCI-RDA</div>
+                            <h3 class="popular-title">PDCI-RDA : Nouvelle stratégie pour l'intégration panafricaine</h3>
+                            <div class="popular-meta">
+                                <span>📅 23 Juin 2025</span>
+                                <span>👁️ 7,123 vues</span>
+                            </div>
+                        </div>
+                    </a>
+                </li>
+
+                <li class="popular-item">
+                    <a href="#" class="popular-link">
+                        <div class="popular-number">5</div>
+                        <img src="https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=300&h=200&fit=crop" alt="Festival MASA Culture" class="popular-image">
+                        <div class="popular-content">
+                            <div class="category-tag culture">CULTURE</div>
+                            <h3 class="popular-title">Festival MASA 2025 : La culture ivoirienne à l'honneur</h3>
+                            <div class="popular-meta">
+                                <span>📅 22 Juin 2025</span>
+                                <span>👁️ 6,445 vues</span>
+                            </div>
+                        </div>
+                    </a>
+                </li>
+
+                <li class="popular-item">
+                    <a href="#" class="popular-link">
+                        <div class="popular-number">6</div>
+                        <img src="https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=300&h=200&fit=crop" alt="Souveraineté Sanitaire Afrique" class="popular-image">
+                        <div class="popular-content">
+                            <div class="category-tag economie">ÉCONOMIE</div>
+                            <h3 class="popular-title">Souveraineté Sanitaire : L'Afrique prend son destin en main avec Afreximbank</h3>
+                            <div class="popular-meta">
+                                <span>📅 21 Juin 2025</span>
+                                <span>👁️ 5,889 vues</span>
+                            </div>
+                        </div>
+                    </a>
+                </li>
+
+                <li class="popular-item">
+                    <a href="#" class="popular-link">
+                        <div class="popular-number">7</div>
+                        <img src="https://images.unsplash.com/photo-1431324155629-1a6deb1dec8d?w=300&h=200&fit=crop" alt="Football championnat" class="popular-image">
+                        <div class="popular-content">
+                            <div class="category-tag sport">SPORT</div>
+                            <h3 class="popular-title">Championnat national de football : Résultats de la 15e journée</h3>
+                            <div class="popular-meta">
+                                <span>📅 20 Juin 2025</span>
+                                <span>👁️ 4,567 vues</span>
+                            </div>
+                        </div>
+                    </a>
+                </li>
+
+                <li class="popular-item">
+                    <a href="#" class="popular-link">
+                        <div class="popular-number">8</div>
+                        <img src="https://images.unsplash.com/photo-1541872705-1f73c6400ec9?w=300&h=200&fit=crop" alt="Dialogue politique" class="popular-image">
+                        <div class="popular-content">
+                            <div class="category-tag politique">POLITIQUE</div>
+                            <h3 class="popular-title">Dialogue politique national : Les recommandations du comité d'organisation</h3>
+                            <div class="popular-meta">
+                                <span>📅 19 Juin 2025</span>
+                                <span>👁️ 3,234 vues</span>
+                            </div>
+                        </div>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+<br><br><br>
+
+<script>
+function toggleDashboard() {
+    const panel = document.getElementById('dashboardPanel');
+    panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+}
+
+function closeDashboard() {
+    document.getElementById('dashboardPanel').style.display = 'none';
+}
+
+function toggleSection(sectionId) {
+    const section = document.getElementById(sectionId);
+    section.style.display = section.style.display === 'block' ? 'none' : 'block';
+}
+
+
+function toggleDashboard() {
+    const panel = document.getElementById('dashboardPanel');
+    const backdrop = document.getElementById('backdrop');
+    panel.classList.toggle('show');
+    backdrop.classList.toggle('show');
+}
+
+function closeDashboard() {
+    document.getElementById('dashboardPanel').classList.remove('show');
+    document.getElementById('backdrop').classList.remove('show');
+}
+
+function toggleSection(sectionId) {
+    const section = document.getElementById(sectionId);
+    section.style.display = section.style.display === 'block' ? 'none' : 'block';
+}
+
+</script>
+
+    <!--<form method="POST" action="{{ route('app_logout') }}">
+    @csrf
+    <button type="submit">TEST LOGOUT</button>
+</form>
+
+
+
+    <script>
+
+         // Ajoute le flou sur le header au scroll
+    window.addEventListener('scroll', () => {
+        const header = document.querySelector('header');
+        if(window.scrollY > 10){
+            header.classList.add('scrolled');
+        } else {
+            header.classList.remove('scrolled');
+        }
+    });
+
+        class DynamicCarousel {
+            constructor() {
+                this.currentSlide = 0;
+                this.totalSlides = 3;
+                this.autoSlideInterval = 5000;
+                this.progressInterval = 50;
+                this.isAutoPlay = true;
+
+                this.track = document.getElementById('carouselTrack');
+                this.prevBtn = document.getElementById('prevBtn');
+                this.nextBtn = document.getElementById('nextBtn');
+                this.progressFill = document.getElementById('progressFill');
+                this.indicatorsContainer = document.getElementById('indicators');
+
+                this.init();
+            }
+
+            init() {
+                this.createIndicators();
+                this.updateCarousel();
+                this.setupEventListeners();
+                this.startAutoSlide();
+                this.startProgressBar();
+                this.createFloatingElements();
+            }
+
+            createIndicators() {
+                for (let i = 0; i < this.totalSlides; i++) {
+                    const indicator = document.createElement('div');
+                    indicator.className = 'indicator';
+                    indicator.addEventListener('click', () => this.goToSlide(i));
+                    this.indicatorsContainer.appendChild(indicator);
+                }
+            }
+
+            setupEventListeners() {
+                this.prevBtn.addEventListener('click', () => this.prevSlide());
+                this.nextBtn.addEventListener('click', () => this.nextSlide());
+
+                const container = document.querySelector('.carousel-container');
+                container.addEventListener('mouseenter', () => this.pauseAutoSlide());
+                container.addEventListener('mouseleave', () => this.resumeAutoSlide());
+
+                document.addEventListener('keydown', (e) => {
+                    if (e.key === 'ArrowLeft') this.prevSlide();
+                    if (e.key === 'ArrowRight') this.nextSlide();
+                });
+
+                let startX = 0;
+                let startY = 0;
+
+                container.addEventListener('touchstart', (e) => {
+                    startX = e.touches[0].clientX;
+                    startY = e.touches[0].clientY;
+                });
+
+                container.addEventListener('touchend', (e) => {
+                    if (!startX || !startY) return;
+
+                    const endX = e.changedTouches[0].clientX;
+                    const endY = e.changedTouches[0].clientY;
+
+                    const diffX = startX - endX;
+                    const diffY = startY - endY;
+
+                    if (Math.abs(diffX) > Math.abs(diffY)) {
+                        if (Math.abs(diffX) > 50) {
+                            if (diffX > 0) {
+                                this.nextSlide();
+                            } else {
+                                this.prevSlide();
+                            }
+                        }
+                    }
+
+                    startX = 0;
+                    startY = 0;
+                });
+            }
+updateCarousel() {
+    const translateX = -this.currentSlide * 100;
+    this.track.style.transform = `translateX(${translateX}%)`;
+
+    const indicators = this.indicatorsContainer.querySelectorAll('.indicator');
+    indicators.forEach((indicator, index) => {
+        indicator.classList.toggle('active', index === this.currentSlide);
+    });
+}
+
+//pour la deuxieme section de javascripte
+
+ <script>
+        // Ajouter des événements de clic pour les liens
+        document.querySelectorAll('.popular-link').forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                console.log('Article cliqué:', this.querySelector('.popular-title').textContent);
+                // Ici vous pouvez ajouter votre logique de navigation
+                // Par exemple: window.location.href = 'article-details.html?id=' + articleId;
+            });
+        });
+
+        // Animation d'entrée
+        document.addEventListener('DOMContentLoaded', function() {
+            const items = document.querySelectorAll('.popular-item');
+            items.forEach((item, index) => {
+                item.style.opacity = '0';
+                item.style.transform = 'translateY(20px)';
+
+                setTimeout(() => {
+                    item.style.transition = 'all 0.5s ease';
+                    item.style.opacity = '1';
+                    item.style.transform = 'translateY(0)';
+                }, index * 100);
+            });
+
+            // === SYSTÈME "VOIR PLUS" POUR LES TEXTES LONGS ===
+            addReadMoreButtons();
+        });
+
+        // Fonction pour ajouter les boutons "Voir plus"
+        function addReadMoreButtons() {
+            // Sélectionner tous les extraits d'articles
+            const excerpts = document.querySelectorAll('.article-excerpt, .article-card-excerpt');
+
+            excerpts.forEach(excerpt => {
+                // Vérifier si le texte est tronqué (plus de 3 lignes)
+                if (excerpt.scrollHeight > excerpt.clientHeight + 5) {
+                    // Créer le bouton "Voir plus"
+                    const readMoreBtn = document.createElement('button');
+                    readMoreBtn.className = 'read-more-btn';
+                    readMoreBtn.innerHTML = '<span>Voir plus</span> <i class="fas fa-chevron-down"></i>';
+
+                    // Insérer le bouton après l'extrait
+                    excerpt.parentNode.insertBefore(readMoreBtn, excerpt.nextSibling);
+
+                    // Ajouter l'événement click
+                    readMoreBtn.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+
+                        // Toggle la classe expanded
+                        excerpt.classList.toggle('expanded');
+                        readMoreBtn.classList.toggle('expanded');
+
+                        // Changer le texte du bouton
+                        if (excerpt.classList.contains('expanded')) {
+                            readMoreBtn.innerHTML = '<span>Voir moins</span> <i class="fas fa-chevron-down"></i>';
+                        } else {
+                            readMoreBtn.innerHTML = '<span>Voir plus</span> <i class="fas fa-chevron-down"></i>';
+                        }
+                    });
+                }
+            });
+        }
+    </script>
+
+    <!-- Widget Chatbot (seulement pour les utilisateurs connectés) -->
+    @auth
+        @include('components.chatbot-widget')
+    @endauth
+
+</div> <!-- Fin home-content -->
+
+@endsection

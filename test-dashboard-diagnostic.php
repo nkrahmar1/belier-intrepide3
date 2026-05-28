@@ -9,7 +9,8 @@ echo "=== DIAGNOSTIC DASHBOARD ADMIN ===\n\n";
 // 1. Tester l'inclusion d'autoload
 echo "1. Test du bootstrap Laravel...\n";
 try {
-    require 'bootstrap/app.php';
+    require __DIR__.'/vendor/autoload.php';
+    require __DIR__.'/bootstrap/app.php';
     echo "✓ Bootstrap OK\n";
 } catch (Exception $e) {
     echo "✗ Erreur bootstrap: " . $e->getMessage() . "\n";

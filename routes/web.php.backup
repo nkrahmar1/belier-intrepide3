@@ -1,0 +1,221 @@
+<?php
+
+use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\Request;
+
+use App\Http\Controllers\HomeController;
+use App\Http\Controllers\TestController;
+use App\Http\Controllers\WelcomeController;
+// CORRECTION: Utilisez les contrôleurs du dossier principal Controllers
+use App\Http\Controllers\LoginController;
+use App\Http\Controllers\RegisterController;
+use App\Http\Controllers\ArticleController;
+use App\Http\Controllers\CartController;
+use App\Http\Controllers\SubscriptionController;
+use App\Http\Controllers\StripePaymentController;
+use App\Http\Controllers\StripeController;
+use App\Http\Controllers\InvoiceController;
+use App\Http\Controllers\PaiementController;
+use App\Http\Controllers\PdciController;
+use App\Http\Controllers\AdminController;
+use App\Http\Controllers\Admin\AdminArticleController;
+use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Admin\ProductController;
+use App\Http\Controllers\Admin\OrderController;
+use App\Http\Controllers\Admin\ChatbotController;
+
+// Route de test
+Route::get('/welcome', [WelcomeController::class, 'test']);
+
+// === Pages publiques ===
+Route::get('/', [HomeController::class, 'home'])->name('app_home');
+Route::get('/about', [HomeController::class, 'about'])->name('app_about');
+Route::get('/pdcirda', [HomeController::class, 'pdcirda'])->name('pdcirda');
+
+// === Authentification ===
+Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
+Route::post('/login', [LoginController::class, 'login']);
+Route::get('/register', [RegisterController::class, 'showRegistrationForm'])->name('register');
+Route::post('/register', [RegisterController::class, 'register']);
+Route::post('/logout', [LoginController::class, 'logout'])->name('app_logout');
+
+// === Dashboard utilisateur ===
+Route::get('/dashboard', [HomeController::class, 'dashboard'])->middleware('auth')->name('dashboard');
+
+// Route de test
+Route::get('/test', [TestController::class, 'test']);
+
+// === Articles ===
+Route::group(['prefix' => 'articles'], function () {
+    Route::get('/', function() {
+        return 'Page des articles';
+    });
+});
+
+// === Panier ===
+Route::get('/cart/count', [CartController::class, 'count'])->name('cart.count');
+
+// === Abonnements et paiements ===
+Route::middleware('auth')->group(function () {
+    Route::get('/abonnement', [SubscriptionController::class, 'index'])->name('subscriptions.index');
+    Route::post('/abonnement/souscrire', [SubscriptionController::class, 'subscribe'])->name('subscriptions.subscribe');
+    Route::get('/abonnement/succes', [SubscriptionController::class, 'success'])->name('subscriptions.success');
+
+    // Stripe
+    Route::post('/create-checkout-session', [StripePaymentController::class, 'createCheckoutSession'])->name('stripe.checkout.session');
+    Route::get('/subscription-success', [StripePaymentController::class, 'success'])->name('subscriptions.success.strip');
+    Route::get('/checkout/{plan}', [StripeController::class, 'checkout'])->name('stripe.checkout');
+    Route::post('/payment', [StripeController::class, 'payment'])->name('stripe.payment');
+
+    // Paiement mobile
+    Route::post('/choisir-paiement', [PaiementController::class, 'choisir'])->name('paiement.mobile');
+    Route::get('/paiement/cinetpay', function (Request $request) {
+        return 'Paiement mobile à venir pour ' . $request->get('methode') . ' avec le plan ' . $request->get('plan');
+    })->name('cinetpay.init');
+
+    // Factures
+    Route::get('/facture/{id}', [InvoiceController::class, 'download'])->name('facture.download');
+});
+
+// === Administration ===
+Route::middleware(['auth', \App\Http\Middleware\AdminMiddleware::class])
+    ->prefix('admin')
+    ->name('admin.')
+    ->group(function () {
+        
+        Route::get('/dashboard', [\App\Http\Controllers\DashboardController::class, 'index'])->name('dashboard');
+
+        Route::get('/articles', [AdminArticleController::class, 'index'])->name('articles');
+
+        Route::get('/categories', [\App\Http\Controllers\CategorieController::class, 'index'])->name('categories');
+
+        Route::resource('users', UserController::class)
+            ->only(['index', 'show', 'edit', 'update', 'destroy'])
+            ->names([
+                'index' => 'users',
+                'show' => 'users.show',
+                'edit' => 'users.edit',
+                'update' => 'users.update',
+                'destroy' => 'users.destroy',
+            ]);
+
+        Route::resource('products', ProductController::class)
+            ->only(['index', 'create', 'store', 'show', 'edit', 'update', 'destroy'])
+            ->names([
+                'index' => 'products',
+                'create' => 'products.create',
+                'store' => 'products.store',
+                'show' => 'products.show',
+                'edit' => 'products.edit',
+                'update' => 'products.update',
+                'destroy' => 'products.destroy',
+            ]);
+
+        Route::resource('orders', OrderController::class)
+            ->only(['index', 'show', 'edit', 'update', 'destroy'])
+            ->names([
+                'index' => 'orders',
+                'show' => 'orders.show',
+                'edit' => 'orders.edit',
+                'update' => 'orders.update',
+                'destroy' => 'orders.destroy',
+            ]);
+
+        Route::get('/stats', [AdminController::class, 'stats'])->name('stats');
+
+        Route::get('/messages', [AdminController::class, 'messages'])->name('messages');
+
+        Route::get('/settings', [AdminController::class, 'settings'])->name('settings');
+
+        Route::get('/ajax/users', [AdminController::class, 'ajaxUsers'])->name('ajax.users');
+        Route::get('/ajax/orders', [AdminController::class, 'ajaxOrders'])->name('ajax.orders');
+
+        // Dashboard avancé
+        Route::prefix('dashboard')->name('dashboard.')->group(function () {
+            Route::get('/data', [\App\Http\Controllers\DashboardController::class, 'getData'])->name('data');
+            Route::get('/export', [\App\Http\Controllers\DashboardController::class, 'export'])->name('export');
+            Route::get('/metrics/{type}', [\App\Http\Controllers\DashboardController::class, 'getMetrics'])->name('metrics');
+            Route::get('/sales-chart', [\App\Http\Controllers\DashboardController::class, 'getSalesChartData'])->name('sales-chart');
+            Route::get('/search', [\App\Http\Controllers\DashboardController::class, 'search'])->name('search');
+        });
+
+        // Notifications
+        Route::prefix('notifications')->name('notifications.')->group(function () {
+            Route::get('/check', [\App\Http\Controllers\Admin\NotificationController::class, 'check'])->name('check');
+            Route::post('/{notification}/read', [\App\Http\Controllers\Admin\NotificationController::class, 'markAsRead'])->name('mark-read');
+            Route::get('/all', [\App\Http\Controllers\Admin\NotificationController::class, 'getAll'])->name('all');
+            Route::post('/mark-all-read', [\App\Http\Controllers\Admin\NotificationController::class, 'markAllAsRead'])->name('mark-all-read');
+        });
+
+        // Chatbot API
+        Route::prefix('chatbot')->name('chatbot.')->group(function () {
+            Route::post('/message', [\App\Http\Controllers\Admin\ChatbotController::class, 'handleMessage'])->name('message');
+            Route::get('/history', [\App\Http\Controllers\Admin\ChatbotController::class, 'getHistory'])->name('history');
+            Route::post('/quick-action', [\App\Http\Controllers\Admin\ChatbotController::class, 'quickAction'])->name('quick-action');
+        });
+
+        // Analytics avancées
+        Route::prefix('analytics')->name('analytics.')->group(function () {
+            Route::get('/performance', [\App\Http\Controllers\Admin\AnalyticsController::class, 'performance'])->name('performance');
+            Route::post('/track', [\App\Http\Controllers\Admin\AnalyticsController::class, 'track'])->name('track');
+            Route::get('/usage', [\App\Http\Controllers\Admin\AnalyticsController::class, 'usage'])->name('usage');
+        });
+
+        // Système - Maintenance et monitoring
+        Route::prefix('system')->name('system.')->group(function () {
+            Route::get('/status', [\App\Http\Controllers\Admin\SystemController::class, 'status'])->name('status');
+            Route::get('/logs', [\App\Http\Controllers\Admin\SystemController::class, 'logs'])->name('logs');
+            Route::post('/cache/clear', [\App\Http\Controllers\Admin\SystemController::class, 'clearCache'])->name('cache.clear');
+            Route::post('/maintenance/{action}', [\App\Http\Controllers\Admin\SystemController::class, 'maintenance'])->name('maintenance');
+        });
+
+        // Routes AJAX supplémentaires dashboard avancé
+        Route::prefix('ajax')->name('ajax.')->group(function () {
+            Route::get('/real-time-stats', [\App\Http\Controllers\DashboardController::class, 'getRealTimeStats'])->name('real-time-stats');
+            Route::get('/global-search', [\App\Http\Controllers\DashboardController::class, 'globalSearch'])->name('global-search');
+            Route::get('/search-suggestions', [\App\Http\Controllers\DashboardController::class, 'getSearchSuggestions'])->name('search-suggestions');
+            Route::get('/recent-activities', [\App\Http\Controllers\DashboardController::class, 'getRecentActivities'])->name('recent-activities');
+            Route::get('/top-products', [\App\Http\Controllers\DashboardController::class, 'getTopProducts'])->name('top-products');
+            Route::get('/recent-orders', [\App\Http\Controllers\DashboardController::class, 'getRecentOrders'])->name('recent-orders');
+            Route::get('/recent-articles', [\App\Http\Controllers\DashboardController::class, 'getRecentArticles'])->name('recent-articles');
+        });
+
+        // API REST Dashboard
+        Route::prefix('api')->name('api.')->group(function () {
+            Route::get('/metrics', [\App\Http\Controllers\Api\DashboardApiController::class, 'metrics'])->name('metrics');
+            Route::get('/charts/{type}', [\App\Http\Controllers\Api\DashboardApiController::class, 'chartData'])->name('charts');
+            Route::get('/report', [\App\Http\Controllers\Api\DashboardApiController::class, 'report'])->name('report');
+        });
+    });
+
+// === Test rôle utilisateur connecté ===
+Route::get('/check-role', function () {
+    return Auth::check() ? Auth::user()->role : 'non connecté';
+});
+
+// Test middleware admin
+Route::get('/test-admin-middleware', function () {
+    return 'Middleware admin fonctionne !';
+})->middleware(['auth', \App\Http\Middleware\AdminMiddleware::class]);
+
+// === Notifications ===
+Route::middleware('auth')->group(function () {
+    Route::get('/notifications', function () {
+        return view('notifications.index', [
+            'notifications' => Auth::user()->notifications()->paginate(10)
+        ]);
+    })->name('notifications.index');
+
+    Route::post('/notifications/{notification}/mark-as-read', function ($id) {
+        Auth::user()->notifications()->findOrFail($id)->markAsRead();
+        return back()->with('success', 'Notification marquée comme lue');
+    })->name('notifications.markAsRead');
+});
+
+// === Chatbot ===
+Route::middleware('auth')->group(function () {
+    Route::get('/chat', [ChatbotController::class, 'index'])->name('chatbot.index');
+    Route::post('/chat/send', [ChatbotController::class, 'sendMessage'])->name('chatbot.send');
+    Route::get('/chat/messages', [ChatbotController::class, 'getMessages'])->name('chatbot.messages');
+});

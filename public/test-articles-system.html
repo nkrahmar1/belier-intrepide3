@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Articles System</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .card { border: 1px solid #ddd; margin: 10px 0; padding: 15px; border-radius: 5px; }
+        .btn { padding: 8px 15px; margin: 5px; text-decoration: none; border-radius: 3px; }
+        .btn-primary { background: #007bff; color: white; }
+        .btn-success { background: #28a745; color: white; }
+        .btn-warning { background: #ffc107; color: black; }
+        .btn-secondary { background: #6c757d; color: white; }
+    </style>
+</head>
+<body>
+    <h1>Test du Système d'Articles</h1>
+    
+    <div class="card">
+        <h3>Pages disponibles :</h3>
+        <a href="/articles" class="btn btn-primary">Liste des Articles</a>
+        <a href="/articles/1" class="btn btn-secondary">Article #1 (exemple)</a>
+        <a href="/login" class="btn btn-secondary">Page de Connexion</a>
+        <a href="/register" class="btn btn-secondary">Page d'Inscription</a>
+    </div>
+
+    <div class="card">
+        <h3>Test des fonctionnalités :</h3>
+        <p><strong>Scénario 1 :</strong> Utilisateur non connecté</p>
+        <ul>
+            <li>Peut voir la liste des articles</li>
+            <li>Bouton "Se connecter" pour télécharger</li>
+        </ul>
+        
+        <p><strong>Scénario 2 :</strong> Utilisateur connecté sans abonnement</p>
+        <ul>
+            <li>Peut télécharger les articles gratuits</li>
+            <li>Bouton "Premium" pour les articles payants → redirection vers abonnement</li>
+        </ul>
+        
+        <p><strong>Scénario 3 :</strong> Utilisateur connecté avec abonnement</p>
+        <ul>
+            <li>Peut télécharger tous les articles</li>
+        </ul>
+    </div>
+
+    <div class="card">
+        <h3>Instructions de test :</h3>
+        <ol>
+            <li>Ouvrir la page des articles : <a href="/articles">/articles</a></li>
+            <li>Vérifier que les articles s'affichent depuis la base de données</li>
+            <li>Tester les boutons de téléchargement selon votre statut</li>
+            <li>Vérifier la redirection vers l'abonnement pour les articles premium</li>
+        </ol>
+    </div>
+</body>
+</html>

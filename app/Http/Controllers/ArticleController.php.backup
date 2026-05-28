@@ -1,0 +1,204 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\Article;
+use App\Models\Categorie;
+use App\Models\Subscription;
+use App\Models\User;
+use App\Notifications\NewArticleNotification;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
+
+class ArticleController extends Controller
+{
+    /**
+     * Liste paginée des articles publics
+     */
+    public function index()
+    {
+        try {
+            $articles = Article::where('is_published', true)
+                ->with(['categorie', 'user'])
+                ->latest()
+                ->paginate(10);
+
+            return view('articles.index', compact('articles'));
+        } catch (\Exception $e) {
+            Log::error('Erreur dans ArticleController@index: ' . $e->getMessage());
+            return response()->json([
+                'error' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine()
+            ], 500);
+        }
+    }
+
+    /**
+     * Affiche un article unique (Lire la suite)
+     */
+    public function show($id)
+    {
+        try {
+            $article = Article::with(['categorie', 'user'])->findOrFail($id);
+            
+            // Incrémente le compteur de vues
+            $article->increment('views_count');
+
+            $relatedArticles = Article::where('categorie_id', $article->categorie_id)
+                ->where('id', '!=', $article->id)
+                ->where('is_published', true)
+                ->take(3)
+                ->get();
+
+            return view('articles.show', compact('article', 'relatedArticles'));
+        } catch (\Exception $e) {
+            Log::error('Erreur dans ArticleController@show: ' . $e->getMessage());
+            return redirect()->route('articles.index')
+                ->with('error', 'Article non trouvé.');
+        }
+
+        return view('articles.show', compact('article'));
+    }
+
+    /**
+     * Affiche les articles d'une catégorie
+     */
+    public function category($identifier)
+    {
+        try {
+            // Essayer de trouver par ID d'abord (pour la compatibilité)
+            if (is_numeric($identifier)) {
+                $categorie = Categorie::findOrFail($identifier);
+            } else {
+                // Essayer de trouver par slug
+                $categorie = Categorie::where('slug', Str::slug($identifier))->first();
+                
+                if (!$categorie) {
+                    // Si pas trouvé par slug, essayer de trouver par nom
+                    $categorie = Categorie::where('nom', 'like', '%' . $identifier . '%')->first();
+                }
+                
+                if (!$categorie) {
+                    throw new \Illuminate\Database\Eloquent\ModelNotFoundException('Catégorie non trouvée');
+                }
+            }
+
+            $articles = Article::where('categorie_id', $categorie->id)
+                ->where('is_published', true)
+                ->with(['user', 'categorie'])
+                ->latest()
+                ->paginate(12);
+                
+            return view('articles.category', compact('articles', 'categorie'));
+                
+        } catch (\Exception $e) {
+            return redirect()->route('articles.index')
+                ->with('error', 'Catégorie non trouvée.');
+        }
+    }
+
+    /**
+     * Téléchargement d'un article (protégé par abonnement)
+     */
+    public function download($id)
+    {
+        $article = Article::findOrFail($id);
+
+        if (!Auth::check()) {
+            return redirect()->route('login')
+                ->with('warning', 'Vous devez être connecté pour télécharger cet article.');
+        }
+
+        $userSubscription = Subscription::where('user_id', Auth::id())
+            ->where('ends_at', '>', now())
+            ->first();
+
+        if (!$userSubscription) {
+            return redirect()->route('subscriptions.index')
+                ->with('error', 'Vous devez être abonné pour télécharger cet article.');
+        }
+
+        if (!$article->file_name) {
+            abort(404, "Aucun fichier associé à cet article.");
+        }
+
+        return Storage::download('articles/files/' . $article->file_name);
+    }
+
+    private function sanitizeFileName($filename)
+    {
+        // Supprimer les caractères spéciaux
+        $filename = preg_replace('/[^a-zA-Z0-9\-_\s]/', '', $filename);
+        // Remplacer les espaces par des underscores
+        $filename = preg_replace('/\s+/', '_', $filename);
+        // Nettoyer les underscores multiples
+        $filename = preg_replace('/_+/', '_', $filename);
+        // Supprimer les underscores en début/fin
+        $filename = trim($filename, '_-');
+
+        return $filename ?: 'article';
+    }
+
+    // Affiche le formulaire de création d'article
+    public function create()
+    {
+        $categories = Categorie::all(); // Récupérer toutes les catégories
+        return view('articles.create', compact('categories'));
+    }
+
+    // Enregistre un nouvel article
+    public function store(Request $request)
+    {
+        $validatedData = $request->validate([
+            'titre' => 'required|max:255',
+            'contenu' => 'required',
+            'categorie_id' => 'required|exists:categories,id',
+            'image' => 'nullable|image|max:2048',
+            'file_name' => 'nullable|file|mimes:pdf,doc,docx|max:10240'
+        ]);
+
+        $article = new Article($validatedData);
+        $article->user_id = Auth::id();
+
+        if ($request->hasFile('image')) {
+            $path = $request->file('image')->store('articles/images', 'public');
+            $article->image = $path;
+        }
+
+        if ($request->hasFile('file_name')) {
+            $path = $request->file('file_name')->store('articles/files', 'public');
+            $article->file_name = $path;
+        }
+
+        $article->is_published = true;
+        $article->save();
+
+        // Notifier tous les utilisateurs abonnés
+        $subscribers = User::whereHas('subscriptions', function($query) {
+            $query->where('ends_at', '>', now());
+        })->get();
+
+        foreach ($subscribers as $subscriber) {
+            $subscriber->notify(new NewArticleNotification($article));
+        }
+
+        return redirect()->route('articles.index')
+            ->with('success', 'Article publié avec succès.');
+    }
+
+    // Méthode pour l'administration (si nécessaire)
+    public function adminIndex()
+    {
+        $articles = Article::with('categorie')->latest()->paginate(10);
+
+        if (request()->ajax()) {
+            return view('admin.articles-content', compact('articles'));
+        }
+
+        return view('articles.articles', compact('articles'));
+    }
+}

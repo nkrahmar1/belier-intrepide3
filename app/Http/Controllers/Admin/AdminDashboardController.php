@@ -6,58 +6,56 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Models\Article;
 use App\Models\Category;
+use App\Models\Subscription;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Schema;
 
 class AdminDashboardController extends Controller
 {
     public function dashboard(Request $request)
     {
-        // Statistiques principales
         $usersCount = User::count();
         $articlesCount = Article::count();
         $categoriesCount = Category::count();
-        
-        // Récupération des catégories pour le modal de création
         $categories = Category::all();
-
-        // Articles publiés avec statistiques complètes
-        $publishedArticles = Article::published()
-            ->with(['category', 'user'])
-            ->orderBy('created_at', 'desc')
-            ->get()
-            ->map(function ($article) {
-                // Calcul simulé des abonnés qui ont lu (à ajuster selon votre logique)
-                $article->subscribers_read = rand(5, 50);
-                return $article;
-            });
-
-        // Récupération des utilisateurs pour la section CRUD
         $users = User::orderBy('created_at', 'desc')->limit(10)->get();
+        $messagesUnread = \App\Models\Message::where('is_read', false)->count();
 
-        // Statistiques avancées
+        $activeSubscriptionsQuery = Subscription::where('status', 'active')
+            ->where(function ($query) {
+                $query->whereNull('ends_at')
+                    ->orWhere('ends_at', '>', now());
+            });
+        $activeSubscriptions = $activeSubscriptionsQuery->count();
+
+        $ordersCount = Schema::hasTable('orders') ? DB::table('orders')->count() : 0;
+        $ordersToday = Schema::hasTable('orders')
+            ? DB::table('orders')->whereDate('created_at', today())->count()
+            : 0;
+
         $stats = [
             'articles_today' => Article::whereDate('created_at', today())->count(),
             'articles_published' => Article::where('is_published', 1)->count(),
             'articles_draft' => Article::where('is_published', 0)->count(),
             'articles_premium' => Article::where('is_premium', 1)->count(),
             'users_today' => User::whereDate('created_at', today())->count(),
-            'active_subscriptions' => \App\Models\Subscription::where('status', 'active')
-                                         ->where('ends_at', '>', now())->count(),
-            // Nouvelles statistiques pour les utilisateurs
+            'active_subscriptions' => $activeSubscriptions,
+            'subscriptions_total' => Subscription::count(),
+            'featured_homepage' => Article::where(function ($query) {
+                $query->where('is_featured', true)
+                    ->orWhere('featured_on_homepage', true);
+            })->count(),
             'users_active' => User::where('status', 'active')->count(),
             'users_inactive' => User::where('status', 'inactive')->count(),
             'users_pending' => User::whereNull('email_verified_at')->count(),
             'users_premium' => User::where('is_premium', true)->count(),
-            'messages_unread' => \App\Models\Message::where('is_read', false)->count(),
+            'messages_unread' => $messagesUnread,
+            'orders_today' => $ordersToday,
         ];
 
-        // Données pour les graphiques
-        $salesData = [12, 19, 15, 25, 22, 30, 28, 35, 32];
-        $categoryData = [5, 8, 3, 7, 4];
-
-        // Générer les données pour les graphiques Chart.js (12 derniers mois)
         $months = collect(range(11, 0))->map(function ($i) {
             return now()->subMonths($i);
         });
@@ -65,40 +63,51 @@ class AdminDashboardController extends Controller
         $chartData = [
             'labels' => $months->map(fn($m) => $m->format('M Y'))->toArray(),
             'articles' => $months->map(function ($month) {
-                return [
-                    'count' => Article::whereYear('created_at', $month->year)
-                                      ->whereMonth('created_at', $month->month)
-                                      ->count(),
-                    'month' => $month->format('M Y')
-                ];
-            })->toArray(),
-            'revenue' => $months->map(function ($month) {
-                // Simuler les revenus basés sur les abonnements actifs du mois
-                $subscriptions = \App\Models\Subscription::where('status', 'active')
-                    ->whereYear('created_at', $month->year)
+                return Article::whereYear('created_at', $month->year)
                     ->whereMonth('created_at', $month->month)
                     ->count();
-                return [
-                    'amount' => $subscriptions * 29.99, // Prix moyen d'abonnement
-                    'month' => $month->format('M Y')
-                ];
+            })->toArray(),
+            'revenue' => $months->map(function ($month) {
+                return Subscription::where('status', 'active')
+                    ->whereYear('created_at', $month->year)
+                    ->whereMonth('created_at', $month->month)
+                    ->sum(DB::raw('COALESCE(amount, price, 0)'));
             })->toArray(),
         ];
 
-        // Calculs de revenus (simulés - à ajuster selon votre modèle)
-        $totalRevenue = $stats['active_subscriptions'] * 29.99; // Prix d'abonnement moyen
+        $totalRevenue = Subscription::where('status', 'active')
+            ->sum(DB::raw('COALESCE(amount, price, 0)'));
         $subscriptionsCount = $stats['active_subscriptions'];
-
-        // Statistiques pour le nouveau dashboard
-        $ordersCount = 0; // À remplacer par Order::count() si vous avez un modèle Order
         $stats['revenue_total'] = $totalRevenue;
-        $stats['revenue_today'] = 0; // À calculer selon votre logique
-        $stats['orders_today'] = 0;
+        $stats['revenue_today'] = Subscription::whereDate('created_at', today())
+            ->sum(DB::raw('COALESCE(amount, price, 0)'));
+        $stats['revenue_month'] = Subscription::whereYear('created_at', now()->year)
+            ->whereMonth('created_at', now()->month)
+            ->sum(DB::raw('COALESCE(amount, price, 0)'));
 
-        // Articles récents pour le tableau
         $articles = Article::with('category')
-                           ->latest()
-                           ->paginate(10);
+            ->latest()
+            ->paginate(10);
+
+        $homepageArticles = Article::with('category')
+            ->where('is_published', true)
+            ->latest('published_at')
+            ->take(8)
+            ->get();
+
+        $recentSubscriptions = Subscription::with('user')
+            ->latest()
+            ->take(8)
+            ->get();
+
+        $publishedArticles = Article::published()
+            ->with(['category', 'user'])
+            ->orderBy('created_at', 'desc')
+            ->take(6)
+            ->get();
+
+        $salesData = [];
+        $categoryData = [];
 
         return view('admin.dashboard', compact(
             'usersCount',
@@ -114,7 +123,9 @@ class AdminDashboardController extends Controller
             'categories',
             'chartData',
             'ordersCount',
-            'articles'
+            'articles',
+            'homepageArticles',
+            'recentSubscriptions'
         ));
     }
 
@@ -225,6 +236,15 @@ class AdminDashboardController extends Controller
                 'subscriptions_total' => \App\Models\Subscription::count(),
                 'subscriptions_revenue' => \App\Models\Subscription::where('status', 'active')
                                             ->sum('amount'),
+                'active_subscriptions' => \App\Models\Subscription::where('status', 'active')
+                                            ->where('ends_at', '>', now())->count(),
+                'featured_homepage' => Article::where(function ($query) {
+                    $query->where('is_featured', true)
+                        ->orWhere('featured_on_homepage', true);
+                })->count(),
+                'revenue_month' => \App\Models\Subscription::whereYear('created_at', now()->year)
+                    ->whereMonth('created_at', now()->month)
+                    ->sum(DB::raw('COALESCE(amount, price, 0)')),
             ];
 
             // Données pour graphique articles par mois (12 derniers mois)

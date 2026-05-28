@@ -17,116 +17,208 @@ class AdminDashboardController extends Controller
 {
     public function dashboard(Request $request)
     {
-        $usersCount = User::count();
-        $articlesCount = Article::count();
-        $categoriesCount = Category::count();
-        $categories = Category::all();
-        $users = User::orderBy('created_at', 'desc')->limit(10)->get();
-        $messagesUnread = \App\Models\Message::where('is_read', false)->count();
+        try {
+            // Initialiser les valeurs par défaut
+            $usersCount = 0;
+            $articlesCount = 0;
+            $categoriesCount = 0;
+            $categories = collect();
+            $users = collect();
+            $messagesUnread = 0;
+            $activeSubscriptions = 0;
+            $ordersCount = 0;
+            $ordersToday = 0;
 
-        $activeSubscriptionsQuery = Subscription::where('status', 'active')
-            ->where(function ($query) {
-                $query->whereNull('ends_at')
-                    ->orWhere('ends_at', '>', now());
+            // Compter les utilisateurs
+            if (Schema::hasTable('users')) {
+                $usersCount = User::count();
+                $users = User::orderBy('created_at', 'desc')->limit(10)->get();
+            }
+
+            // Compter les articles
+            if (Schema::hasTable('articles')) {
+                $articlesCount = Article::count();
+            }
+
+            // Compter les catégories
+            if (Schema::hasTable('categories')) {
+                $categoriesCount = Category::count();
+                $categories = Category::all();
+            }
+
+            // Compter les messages non lus
+            if (Schema::hasTable('messages')) {
+                $messagesUnread = \App\Models\Message::where('is_read', false)->count();
+            }
+
+            // Compter les abonnements actifs
+            if (Schema::hasTable('subscriptions')) {
+                $activeSubscriptionsQuery = Subscription::where('status', 'active')
+                    ->where(function ($query) {
+                        $query->whereNull('ends_at')
+                            ->orWhere('ends_at', '>', now());
+                    });
+                $activeSubscriptions = $activeSubscriptionsQuery->count();
+            }
+
+            // Compter les commandes
+            if (Schema::hasTable('orders')) {
+                $ordersCount = DB::table('orders')->count();
+                $ordersToday = DB::table('orders')->whereDate('created_at', today())->count();
+            }
+
+            // Construire les statistiques
+            $stats = [
+                'articles_today' => Schema::hasTable('articles') ? Article::whereDate('created_at', today())->count() : 0,
+                'articles_published' => Schema::hasTable('articles') ? Article::where('is_published', 1)->count() : 0,
+                'articles_draft' => Schema::hasTable('articles') ? Article::where('is_published', 0)->count() : 0,
+                'articles_premium' => Schema::hasTable('articles') ? Article::where('is_premium', 1)->count() : 0,
+                'users_today' => Schema::hasTable('users') ? User::whereDate('created_at', today())->count() : 0,
+                'active_subscriptions' => $activeSubscriptions,
+                'subscriptions_total' => Schema::hasTable('subscriptions') ? Subscription::count() : 0,
+                'featured_homepage' => Schema::hasTable('articles') ? Article::where(function ($query) {
+                    $query->where('is_featured', true)
+                        ->orWhere('featured_on_homepage', true);
+                })->count() : 0,
+                'users_active' => Schema::hasTable('users') ? User::where('status', 'active')->count() : 0,
+                'users_inactive' => Schema::hasTable('users') ? User::where('status', 'inactive')->count() : 0,
+                'users_pending' => Schema::hasTable('users') ? User::whereNull('email_verified_at')->count() : 0,
+                'users_premium' => Schema::hasTable('users') ? User::where('is_premium', true)->count() : 0,
+                'messages_unread' => $messagesUnread,
+                'orders_today' => $ordersToday,
+            ];
+
+            // Données pour le graphique
+            $months = collect(range(11, 0))->map(function ($i) {
+                return now()->subMonths($i);
             });
-        $activeSubscriptions = $activeSubscriptionsQuery->count();
 
-        $ordersCount = Schema::hasTable('orders') ? DB::table('orders')->count() : 0;
-        $ordersToday = Schema::hasTable('orders')
-            ? DB::table('orders')->whereDate('created_at', today())->count()
-            : 0;
+            $chartData = [
+                'labels' => $months->map(fn($m) => $m->format('M Y'))->toArray(),
+                'articles' => [],
+                'revenue' => [],
+            ];
 
-        $stats = [
-            'articles_today' => Article::whereDate('created_at', today())->count(),
-            'articles_published' => Article::where('is_published', 1)->count(),
-            'articles_draft' => Article::where('is_published', 0)->count(),
-            'articles_premium' => Article::where('is_premium', 1)->count(),
-            'users_today' => User::whereDate('created_at', today())->count(),
-            'active_subscriptions' => $activeSubscriptions,
-            'subscriptions_total' => Subscription::count(),
-            'featured_homepage' => Article::where(function ($query) {
-                $query->where('is_featured', true)
-                    ->orWhere('featured_on_homepage', true);
-            })->count(),
-            'users_active' => User::where('status', 'active')->count(),
-            'users_inactive' => User::where('status', 'inactive')->count(),
-            'users_pending' => User::whereNull('email_verified_at')->count(),
-            'users_premium' => User::where('is_premium', true)->count(),
-            'messages_unread' => $messagesUnread,
-            'orders_today' => $ordersToday,
-        ];
+            // Remplir les données d'articles par mois
+            if (Schema::hasTable('articles')) {
+                $chartData['articles'] = $months->map(function ($month) {
+                    return Article::whereYear('created_at', $month->year)
+                        ->whereMonth('created_at', $month->month)
+                        ->count();
+                })->toArray();
+            }
 
-        $months = collect(range(11, 0))->map(function ($i) {
-            return now()->subMonths($i);
-        });
+            // Remplir les données de revenus par mois
+            if (Schema::hasTable('subscriptions')) {
+                $chartData['revenue'] = $months->map(function ($month) {
+                    return Subscription::where('status', 'active')
+                        ->whereYear('created_at', $month->year)
+                        ->whereMonth('created_at', $month->month)
+                        ->sum(DB::raw('COALESCE(amount, price, 0)'));
+                })->toArray();
+            }
 
-        $chartData = [
-            'labels' => $months->map(fn($m) => $m->format('M Y'))->toArray(),
-            'articles' => $months->map(function ($month) {
-                return Article::whereYear('created_at', $month->year)
-                    ->whereMonth('created_at', $month->month)
-                    ->count();
-            })->toArray(),
-            'revenue' => $months->map(function ($month) {
-                return Subscription::where('status', 'active')
-                    ->whereYear('created_at', $month->year)
-                    ->whereMonth('created_at', $month->month)
+            // Revenus totaux
+            $totalRevenue = Schema::hasTable('subscriptions') 
+                ? Subscription::where('status', 'active')->sum(DB::raw('COALESCE(amount, price, 0)'))
+                : 0;
+
+            $subscriptionsCount = $stats['active_subscriptions'];
+            $stats['revenue_total'] = $totalRevenue;
+            
+            if (Schema::hasTable('subscriptions')) {
+                $stats['revenue_today'] = Subscription::whereDate('created_at', today())
                     ->sum(DB::raw('COALESCE(amount, price, 0)'));
-            })->toArray(),
-        ];
+                $stats['revenue_month'] = Subscription::whereYear('created_at', now()->year)
+                    ->whereMonth('created_at', now()->month)
+                    ->sum(DB::raw('COALESCE(amount, price, 0)'));
+            } else {
+                $stats['revenue_today'] = 0;
+                $stats['revenue_month'] = 0;
+            }
 
-        $totalRevenue = Subscription::where('status', 'active')
-            ->sum(DB::raw('COALESCE(amount, price, 0)'));
-        $subscriptionsCount = $stats['active_subscriptions'];
-        $stats['revenue_total'] = $totalRevenue;
-        $stats['revenue_today'] = Subscription::whereDate('created_at', today())
-            ->sum(DB::raw('COALESCE(amount, price, 0)'));
-        $stats['revenue_month'] = Subscription::whereYear('created_at', now()->year)
-            ->whereMonth('created_at', now()->month)
-            ->sum(DB::raw('COALESCE(amount, price, 0)'));
+            // Articles récents
+            $articles = collect();
+            if (Schema::hasTable('articles')) {
+                $articles = Article::with('category')
+                    ->latest()
+                    ->paginate(10);
+            }
 
-        $articles = Article::with('category')
-            ->latest()
-            ->paginate(10);
+            // Articles en homepage
+            $homepageArticles = collect();
+            if (Schema::hasTable('articles')) {
+                $homepageArticles = Article::with('category')
+                    ->where('is_published', true)
+                    ->latest('published_at')
+                    ->take(8)
+                    ->get();
+            }
 
-        $homepageArticles = Article::with('category')
-            ->where('is_published', true)
-            ->latest('published_at')
-            ->take(8)
-            ->get();
+            // Abonnements récents
+            $recentSubscriptions = collect();
+            if (Schema::hasTable('subscriptions')) {
+                $recentSubscriptions = Subscription::with('user')
+                    ->latest()
+                    ->take(8)
+                    ->get();
+            }
 
-        $recentSubscriptions = Subscription::with('user')
-            ->latest()
-            ->take(8)
-            ->get();
+            // Articles publiés
+            $publishedArticles = collect();
+            if (Schema::hasTable('articles')) {
+                $publishedArticles = Article::published()
+                    ->with(['category', 'user'])
+                    ->orderBy('created_at', 'desc')
+                    ->take(6)
+                    ->get();
+            }
 
-        $publishedArticles = Article::published()
-            ->with(['category', 'user'])
-            ->orderBy('created_at', 'desc')
-            ->take(6)
-            ->get();
+            $salesData = [];
+            $categoryData = [];
 
-        $salesData = [];
-        $categoryData = [];
+            return view('admin.dashboard', compact(
+                'usersCount',
+                'articlesCount',
+                'categoriesCount',
+                'publishedArticles',
+                'users',
+                'stats',
+                'salesData',
+                'categoryData',
+                'totalRevenue',
+                'subscriptionsCount',
+                'categories',
+                'chartData',
+                'ordersCount',
+                'articles',
+                'homepageArticles',
+                'recentSubscriptions'
+            ));
 
-        return view('admin.dashboard', compact(
-            'usersCount',
-            'articlesCount',
-            'categoriesCount',
-            'publishedArticles',
-            'users',
-            'stats',
-            'salesData',
-            'categoryData',
-            'totalRevenue',
-            'subscriptionsCount',
-            'categories',
-            'chartData',
-            'ordersCount',
-            'articles',
-            'homepageArticles',
-            'recentSubscriptions'
-        ));
+        } catch (\Exception $e) {
+            Log::error('Erreur Dashboard Admin: ' . $e->getMessage() . ' ' . $e->getFile() . ':' . $e->getLine());
+            
+            // Retourner une vue avec des données vides en cas d'erreur
+            return view('admin.dashboard', [
+                'usersCount' => 0,
+                'articlesCount' => 0,
+                'categoriesCount' => 0,
+                'publishedArticles' => collect(),
+                'users' => collect(),
+                'stats' => [],
+                'salesData' => [],
+                'categoryData' => [],
+                'totalRevenue' => 0,
+                'subscriptionsCount' => 0,
+                'categories' => collect(),
+                'chartData' => ['labels' => [], 'articles' => [], 'revenue' => []],
+                'ordersCount' => 0,
+                'articles' => collect(),
+                'homepageArticles' => collect(),
+                'recentSubscriptions' => collect()
+            ]);
+        }
     }
 
     /**

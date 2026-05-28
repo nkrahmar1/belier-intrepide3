@@ -75,14 +75,18 @@
             <p class="mb-4 text-sm text-gray-500">Dernières transactions enregistrées.</p>
             <div class="space-y-3">
                 @forelse($recentSubscriptions as $subscription)
-                    <div class="rounded-xl border border-gray-100 p-3">
-                        <p class="text-sm font-semibold text-gray-800">{{ ($subscription->user->firstname ?? '') . ' ' . ($subscription->user->lastname ?? '') ?: 'Utilisateur' }}</p>
-                        <p class="text-xs text-gray-500">{{ $subscription->plan_name ?? $subscription->plan ?? 'Plan standard' }}</p>
-                        <div class="mt-1 flex items-center justify-between">
-                            <span class="text-xs text-gray-500">{{ $subscription->created_at?->format('d/m/Y') }}</span>
-                            <span class="text-sm font-semibold text-emerald-600">{{ number_format((float) ($subscription->amount ?? $subscription->price ?? 0), 0, ',', ' ') }} FCFA</span>
+                    @if($subscription && $subscription->user)
+                        <div class="rounded-xl border border-gray-100 p-3">
+                            <p class="text-sm font-semibold text-gray-800">
+                                {{ trim(($subscription->user->firstname ?? '') . ' ' . ($subscription->user->lastname ?? '')) ?: 'Utilisateur' }}
+                            </p>
+                            <p class="text-xs text-gray-500">{{ $subscription->plan_name ?? $subscription->plan ?? 'Plan standard' }}</p>
+                            <div class="mt-1 flex items-center justify-between">
+                                <span class="text-xs text-gray-500">{{ $subscription->created_at?->format('d/m/Y') ?? 'N/A' }}</span>
+                                <span class="text-sm font-semibold text-emerald-600">{{ number_format((float) ($subscription->amount ?? $subscription->price ?? 0), 0, ',', ' ') }} FCFA</span>
+                            </div>
                         </div>
-                    </div>
+                    @endif
                 @empty
                     <p class="text-sm text-gray-500">Aucun abonnement récent.</p>
                 @endforelse

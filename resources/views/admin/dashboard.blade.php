@@ -191,7 +191,7 @@
                 </tbody>
             </table>
         </div>
-        @if($articles->hasPages())
+        @if(method_exists($articles, 'hasPages') && $articles->hasPages())
             <div class="mt-4">{{ $articles->links() }}</div>
         @endif
     </div>

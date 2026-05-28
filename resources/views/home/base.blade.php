@@ -25,11 +25,38 @@
 
         <!-- Styles / Scripts -->
     </head>
-    <body>
+    <body class="home-layout">
+        <style>
+            html, body {
+                width: 100%;
+                max-width: 100%;
+                overflow-x: hidden;
+            }
+
+            body.home-layout {
+                min-height: 100vh;
+                display: flex;
+                flex-direction: column;
+            }
+
+            .home-main {
+                flex: 1 0 auto;
+                width: 100%;
+            }
+
+            .home-main .container {
+                width: 100%;
+                max-width: none;
+                padding-left: clamp(12px, 3vw, 40px);
+                padding-right: clamp(12px, 3vw, 40px);
+            }
+        </style>
 
         @include('navbar.navbar')
 
-        @yield('content')
+        <main class="home-main">
+            @yield('content')
+        </main>
 
         <!-- jQuery -->
         <script src="{{ asset('assets/lib/bootstrap/jquery/jquery.js')}}"></script>
@@ -54,7 +81,8 @@
                 });
             }
         });
-        </script>        @include('footer.footer')
+        </script>
+        @include('footer.footer')
 
         @yield('scripts')
 

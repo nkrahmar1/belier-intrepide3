@@ -27,8 +27,10 @@
     background-color: var(--color-light);
     color: #333;
     line-height: 1.6;
-    padding: 2rem 0;
+    padding: 1rem 0;
     min-height: 100vh;
+    width: 100%;
+    overflow-x: hidden;
     }
 
     /* === NAVBAR TOUJOURS VISIBLE === */
@@ -708,8 +710,11 @@
 
     /* Container principal unifié */
     .home-content .container {
-        max-width: 1200px !important;
-        margin: 0 auto !important;
+        width: 100% !important;
+        max-width: none !important;
+        margin: 0 !important;
+        padding-left: clamp(12px, 3vw, 40px) !important;
+        padding-right: clamp(12px, 3vw, 40px) !important;
     }
 
     /* Bordures subtiles pour toutes les sections */

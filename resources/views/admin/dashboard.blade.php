@@ -129,8 +129,7 @@
                             </td>
                             <td class="py-3 text-right">
                                 <button
-                                    @click="toggleHomepage({{ $article->id }}, {{ ($article->is_featured || $article->featured_on_homepage) ? 'true' : 'false' }})"
-                                    class="rounded-lg px-3 py-1.5 text-xs font-semibold {{ ($article->is_featured || $article->featured_on_homepage) ? 'bg-red-50 text-red-600 hover:bg-red-100' : 'bg-emerald-50 text-emerald-700 hover:bg-emerald-100' }}"
+                                    @click="toggleHomepage({{ $article->id }}, @json(($article->is_featured || $article->featured_on_homepage)))"                                    class="rounded-lg px-3 py-1.5 text-xs font-semibold {{ ($article->is_featured || $article->featured_on_homepage) ? 'bg-red-50 text-red-600 hover:bg-red-100' : 'bg-emerald-50 text-emerald-700 hover:bg-emerald-100' }}"
                                 >
                                     {{ ($article->is_featured || $article->featured_on_homepage) ? 'Retirer accueil' : 'Mettre en accueil' }}
                                 </button>
@@ -178,8 +177,14 @@
                             <td class="py-3 text-right">
                                 <div class="inline-flex items-center gap-2">
                                     <a href="{{ route('admin.articles.edit', ['article' => $article->id]) }}" class="rounded-lg bg-blue-50 px-2.5 py-1.5 text-xs font-medium text-blue-700 hover:bg-blue-100">Modifier</a>
-                                    <button @click="togglePublish({{ $article->id }})" class="rounded-lg bg-amber-50 px-2.5 py-1.5 text-xs font-medium text-amber-700 hover:bg-amber-100">Publier</button>
-                                    <button @click="deleteArticle({{ $article->id }})" class="rounded-lg bg-red-50 px-2.5 py-1.5 text-xs font-medium text-red-700 hover:bg-red-100">Supprimer</button>
+                                        <button @click="togglePublish({{ $article->id }})"
+                                             class="rounded-lg bg-amber-50 px-2.5 py-1.5 text-xs font-medium text-amber-700 hover:bg-amber-100">
+                                                  Publier / Dépublier
+                                        </button>
+                                        <button @click="deleteArticle({{ $article->id }})"
+                                              class="rounded-lg bg-red-50 px-2.5 py-1.5 text-xs font-medium text-red-700 hover:bg-red-100">
+                                                  Supprimer
+                                        </button>
                                 </div>
                             </td>
                         </tr>
@@ -203,33 +208,64 @@
 function dashboardData() {
     return {
         stats: {
-            articles_total: {{ (int) $articlesCount }},
-            articles_today: {{ (int) ($stats['articles_today'] ?? 0) }},
-            articles_published: {{ (int) ($stats['articles_published'] ?? 0) }},
-            articles_draft: {{ (int) ($stats['articles_draft'] ?? 0) }},
-            users_total: {{ (int) $usersCount }},
-            users_today: {{ (int) ($stats['users_today'] ?? 0) }},
-            active_subscriptions: {{ (int) ($stats['active_subscriptions'] ?? 0) }},
-            subscriptions_total: {{ (int) ($stats['subscriptions_total'] ?? 0) }},
-            revenue_total: {{ (float) ($stats['revenue_total'] ?? 0) }},
-            revenue_month: {{ (float) ($stats['revenue_month'] ?? 0) }},
-            featured_homepage: {{ (int) ($stats['featured_homepage'] ?? 0) }},
-            messages_unread: {{ (int) ($stats['messages_unread'] ?? 0) }},
+            articles_total: @json($articlesCount),
+            articles_today: @json($stats['articles_today'] ?? 0),
+            articles_published: @json($stats['articles_published'] ?? 0),
+            articles_draft: @json($stats['articles_draft'] ?? 0),
+            active_subscriptions: @json($stats['active_subscriptions'] ?? 0),
+            subscriptions_total: @json($stats['subscriptions_total'] ?? 0),
+            revenue_total: @json($stats['revenue_total'] ?? 0),
+            revenue_month: @json($stats['revenue_month'] ?? 0),
+            featured_homepage: @json($stats['featured_homepage'] ?? 0),
+            messages_unread: @json($stats['messages_unread'] ?? 0),
         },
+
         chartData: @json($chartData),
         chart: null,
         loading: false,
+
+        csrf: document.querySelector('meta[name="csrf-token"]').content,
 
         init() {
             this.initPerformanceChart();
         },
 
+        // =========================
+        // SAFE FETCH WRAPPER
+        // =========================
+        async request(url, options = {}) {
+            try {
+                const response = await fetch(url, {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': this.csrf
+                    },
+                    ...options
+                });
+
+                if (!response.ok) {
+                    throw new Error("Erreur serveur (" + response.status + ")");
+                }
+
+                return await response.json();
+            } catch (error) {
+                console.error(error);
+                alert(error.message);
+                return null;
+            }
+        },
+
+        // =========================
+        // CHART FIX PROPER LIFECYCLE
+        // =========================
         initPerformanceChart() {
             const ctx = document.getElementById('performanceChart');
             if (!ctx) return;
 
             if (this.chart) {
                 this.chart.destroy();
+                this.chart = null;
             }
 
             this.chart = new Chart(ctx, {
@@ -243,129 +279,107 @@ function dashboardData() {
                             data: this.chartData.articles,
                             borderColor: '#10b981',
                             backgroundColor: 'rgba(16,185,129,.2)',
-                            borderWidth: 2,
                             fill: true,
-                            tension: 0.35,
+                            tension: 0.3,
                         },
                         {
                             label: 'Revenus abonnements',
                             data: this.chartData.revenue,
                             borderColor: '#3b82f6',
-                            backgroundColor: 'rgba(59,130,246,.35)',
-                            borderWidth: 1,
-                            borderRadius: 6,
-                        },
-                    ],
+                            backgroundColor: 'rgba(59,130,246,.3)',
+                        }
+                    ]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    plugins: { legend: { display: true, position: 'top' } },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            grid: { color: 'rgba(0, 0, 0, 0.05)' },
-                        },
-                        x: { grid: { display: false } },
-                    },
-                },
+                    plugins: {
+                        legend: { position: 'top' }
+                    }
+                }
             });
         },
 
+        // =========================
+        // FORMAT CURRENCY
+        // =========================
         formatCurrency(value) {
-            return new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'XOF', maximumFractionDigits: 0 }).format(value || 0);
+            return new Intl.NumberFormat('fr-FR', {
+                style: 'currency',
+                currency: 'XOF',
+                maximumFractionDigits: 0
+            }).format(value || 0);
         },
 
-        refreshStats() {
+        // =========================
+        // REFRESH STATS (NO RELOAD)
+        // =========================
+        async refreshStats() {
             this.loading = true;
-            fetch('{{ route('api.admin.stats') }}')
-                .then((response) => response.json())
-                .then((data) => {
-                    if (!data.success) return;
-                    this.stats = {
-                        ...this.stats,
-                        ...data.stats,
-                        active_subscriptions: data.stats.active_subscriptions ?? data.stats.subscriptions_active ?? 0,
-                        revenue_total: data.stats.subscriptions_revenue ?? data.stats.revenue_total ?? 0,
-                    };
-                    this.chartData = {
-                        labels: (data.charts?.articlesPerMonth || []).map((item) => item.month),
-                        articles: (data.charts?.articlesPerMonth || []).map((item) => item.count),
-                        revenue: (data.charts?.revenuePerMonth || []).map((item) => item.amount),
-                    };
-                    this.initPerformanceChart();
-                })
-                .catch((error) => console.error(error))
-                .finally(() => this.loading = false);
+
+            const data = await this.request("{{ route('api.admin.stats') }}");
+
+            this.loading = false;
+
+            if (!data || !data.success) return;
+
+            this.stats = {
+                ...this.stats,
+                ...data.stats
+            };
+
+            this.chartData = {
+                labels: (data.charts?.articlesPerMonth || []).map(i => i.month),
+                articles: (data.charts?.articlesPerMonth || []).map(i => i.count),
+                revenue: (data.charts?.revenuePerMonth || []).map(i => i.amount),
+            };
+
+            this.initPerformanceChart();
         },
 
-        toggleHomepage(articleId, currentValue) {
-            const nextValue = !currentValue;
-            const endpointTemplate = `{{ route('admin.articles.toggle-homepage', ['article' => '__ID__']) }}`;
-            const endpoint = endpointTemplate.replace('__ID__', articleId);
+        // =========================
+        // HOMEPAGE TOGGLE (FIXED)
+        // =========================
+        async toggleHomepage(articleId, currentValue) {
+            const url = `{{ url('/admin/articles') }}/${articleId}/toggle-homepage`;
 
-            fetch(endpoint, {
+            const data = await this.request(url, {
                 method: 'PATCH',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-                    'Accept': 'application/json',
-                },
-                body: JSON.stringify({ featured: nextValue }),
-            })
-            .then((response) => response.json())
-            .then((data) => {
-                if (!data.success) {
-                    alert(data.message || 'Impossible de mettre a jour la homepage.');
-                    return;
-                }
-                window.location.reload();
-            })
-            .catch(() => alert('Erreur reseau pendant la mise a jour homepage.'));
-        },
-
-        togglePublish(articleId) {
-            fetch(`/admin/articles/${articleId}/toggle-publish`, {
-                method: 'POST',
-                headers: {
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-                    'Accept': 'application/json',
-                },
-            })
-            .then((response) => response.json())
-            .then((data) => {
-                if (!data.success) {
-                    alert(data.message || 'Erreur de publication.');
-                    return;
-                }
-                window.location.reload();
-            })
-            .catch(() => alert('Erreur reseau pendant la publication.'));
-        },
-
-        deleteArticle(articleId) {
-            if (!confirm('Êtes-vous sûr de vouloir supprimer cet article ?')) return;
-
-            fetch(`/admin/articles/${articleId}`, {
-                method: 'DELETE',
-                headers: {
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-                    'Accept': 'application/json',
-                },
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    window.location.reload();
-                } else {
-                    alert('Erreur lors de la suppression');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('Une erreur est survenue');
+                body: JSON.stringify({ featured: !currentValue })
             });
+
+            if (data?.success) {
+                window.location.reload(); // tu peux remplacer plus tard par update DOM
+            }
         },
+
+        // =========================
+        // PUBLISH TOGGLE
+        // =========================
+        async togglePublish(articleId) {
+            const data = await this.request(`/admin/articles/${articleId}/toggle-publish`, {
+                method: 'POST'
+            });
+
+            if (data?.success) {
+                window.location.reload();
+            }
+        },
+
+        // =========================
+        // DELETE ARTICLE
+        // =========================
+        async deleteArticle(articleId) {
+            if (!confirm("Confirmer suppression ?")) return;
+
+            const data = await this.request(`/admin/articles/${articleId}`, {
+                method: 'DELETE'
+            });
+
+            if (data?.success) {
+                window.location.reload();
+            }
+        }
     };
 }
 </script>

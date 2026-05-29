@@ -9,7 +9,7 @@
     padding: 0;
     overflow: hidden;
 ">
-    <img src="{{ asset('image/pdci.jpg') }}" alt="PDCI-RDA" style="
+    <img src="{{ asset('image/pdci3.jpg') }}" alt="PDCI-RDA" style="
         width: 100vw;
         height: 400px;
         object-fit: cover;

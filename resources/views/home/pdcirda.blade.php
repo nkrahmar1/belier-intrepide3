@@ -4,6 +4,6 @@
 
 @section('content')
 
-    <p1>PDCI-RDA</p1>
-
+    <h1>PDCI-RDA</h1>
+    <img src="{{ asset('images/pdci.jpg') }}" alt="PDCI-RDA" style="width: 300px;">
 @endsection

@@ -1,497 +1,440 @@
 @extends('layouts.admin')
-@section('title', 'Dashboard Administrateur')
 
-@push('styles')
-<style>
-    [x-cloak] { display: none !important; }
-    .metric-card { transition: all .2s ease; }
-    .metric-card:hover { transform: translateY(-2px); box-shadow: 0 10px 24px rgba(0,0,0,.08); }
-</style>
-@endpush
+@section('title', 'Dashboard')
 
 @section('content')
-<div x-data="dashboardData()" x-init="init()" class="space-y-6">
-    <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-            <h1 class="text-2xl font-semibold text-gray-800 dark:text-white/90">Dashboard Admin Pro</h1>
-            <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                Suivi des performances, abonnements et publications de la page d'accueil.
-            </p>
-        </div>
-        <div class="flex items-center gap-2">
-            <button @click="openQuickCreate()" class="inline-flex items-center gap-2 rounded-lg bg-brand-500 px-4 py-2 text-sm font-medium text-white hover:bg-brand-600">
-                + Nouvel article
-            </button>
-            <a href="{{ route('admin.articles.create') }}" class="inline-flex items-center gap-2 rounded-lg border border-transparent bg-white px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">
-                Formulaire complet
-            </a>
-            <button @click="refreshStats()" :disabled="loading" class="inline-flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-60">
-                <span x-text="loading ? 'Actualisation...' : 'Actualiser'"></span>
-            </button>
-        </div>
-    </div>
-
-    <!-- Quick Create Modal -->
-    <div x-show="quickCreateOpen" x-cloak class="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-        <div @click.away="closeQuickCreate()" class="w-full max-w-2xl rounded-xl bg-white p-6 shadow-lg">
-            <div class="flex items-center justify-between">
-                <h3 class="text-lg font-semibold">Créer un article rapidement</h3>
-                <button @click="closeQuickCreate()" class="text-gray-500 hover:text-gray-800">✕</button>
+<div x-data="dashboardData()" x-init="init()" x-cloak>
+    <!-- Stats Cards -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 32px;">
+        <div class="glass-card" style="padding: 20px;">
+            <div style="font-size: 12px; font-weight: 600; text-transform: uppercase; color: #94a3b8; margin-bottom: 8px;">Total Articles</div>
+            <div style="font-size: 28px; font-weight: 700; color: #f1f5f9; margin-bottom: 6px;" x-text="stats.articles_total || '0'"></div>
+            <div style="font-size: 12px; color: #22c55e;">
+                <span x-text="stats.articles_published || '0'"></span> publiés
             </div>
-            <form @submit.prevent="submitQuickCreate($event)" class="mt-4 space-y-3">
-                <div>
-                    <label class="text-sm text-gray-600">Titre</label>
-                    <input name="titre" required class="w-full rounded-md border px-3 py-2" />
-                </div>
-                <div>
-                    <label class="text-sm text-gray-600">Contenu</label>
-                    <textarea name="contenu" required class="w-full rounded-md border px-3 py-2 h-28"></textarea>
-                </div>
-                <div>
-                    <label class="text-sm text-gray-600">Catégorie</label>
-                    <select name="category_id" class="w-full rounded-md border px-3 py-2">
-                        @if(isset($categories) && $categories->count())
-                            @foreach($categories as $cat)
-                                <option value="{{ $cat->id }}">{{ $cat->nom }}</option>
-                            @endforeach
-                        @else
-                            <option value="">Aucune catégorie</option>
-                        @endif
-                    </select>
-                </div>
-                <div class="flex items-center justify-end gap-2">
-                    <button type="button" @click="closeQuickCreate()" class="rounded-lg border px-4 py-2 text-sm">Annuler</button>
-                    <button type="submit" :disabled="loading" class="rounded-lg bg-brand-500 px-4 py-2 text-sm text-white">Créer</button>
-                </div>
-            </form>
+        </div>
+
+        <div class="glass-card" style="padding: 20px;">
+            <div style="font-size: 12px; font-weight: 600; text-transform: uppercase; color: #94a3b8; margin-bottom: 8px;">Abonnements Actifs</div>
+            <div style="font-size: 28px; font-weight: 700; color: #f1f5f9; margin-bottom: 6px;" x-text="stats.active_subscriptions || '0'"></div>
+            <div style="font-size: 12px; color: #22c55e;"><span x-text="stats.revenue_total || '$0'"></span> revenus</div>
+        </div>
+
+        <div class="glass-card" style="padding: 20px;">
+            <div style="font-size: 12px; font-weight: 600; text-transform: uppercase; color: #94a3b8; margin-bottom: 8px;">À la Une</div>
+            <div style="font-size: 28px; font-weight: 700; color: #f1f5f9; margin-bottom: 6px;" x-text="stats.featured_homepage || '0'"></div>
+            <div style="font-size: 12px; color: #22c55e;">Articles en vedette</div>
+        </div>
+
+        <div class="glass-card" style="padding: 20px;">
+            <div style="font-size: 12px; font-weight: 600; text-transform: uppercase; color: #94a3b8; margin-bottom: 8px;">Messages</div>
+            <div style="font-size: 28px; font-weight: 700; color: #f1f5f9; margin-bottom: 6px;" x-text="stats.messages_unread || '0'"></div>
+            <div style="font-size: 12px; color: #fb923c;">Non lus</div>
         </div>
     </div>
 
-    <!-- Toasts -->
-    <div id="dashboard-toasts" class="fixed bottom-6 right-6 z-50 space-y-2"></div>
-
-    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-6">
-        <div class="metric-card glass-card rounded-2xl p-4">
-            <p class="text-xs uppercase text-gray-500">Articles</p>
-            <p class="mt-2 text-2xl font-bold text-gray-900" x-text="stats.articles_total"></p>
-            <p class="mt-1 text-xs text-green-600">+<span x-text="stats.articles_today"></span> aujourd'hui</p>
-        </div>
-        <div class="metric-card glass-card rounded-2xl p-4">
-            <p class="text-xs uppercase text-gray-500">Publié</p>
-            <p class="mt-2 text-2xl font-bold text-gray-900" x-text="stats.articles_published"></p>
-            <p class="mt-1 text-xs text-gray-500"><span x-text="stats.articles_draft"></span> brouillons</p>
-        </div>
-        <div class="metric-card glass-card rounded-2xl p-4">
-            <p class="text-xs uppercase text-gray-500">Abonnements actifs</p>
-            <p class="mt-2 text-2xl font-bold text-gray-900" x-text="stats.active_subscriptions"></p>
-            <p class="mt-1 text-xs text-gray-500">Total: <span x-text="stats.subscriptions_total"></span></p>
-        </div>
-        <div class="metric-card glass-card rounded-2xl p-4">
-            <p class="text-xs uppercase text-gray-500">Revenu abonnement</p>
-            <p class="mt-2 text-2xl font-bold text-gray-900" x-text="formatCurrency(stats.revenue_total)"></p>
-            <p class="mt-1 text-xs text-gray-500">Mois: <span x-text="formatCurrency(stats.revenue_month)"></span></p>
-        </div>
-        <div class="metric-card glass-card rounded-2xl p-4">
-            <p class="text-xs uppercase text-gray-500">Articles homepage</p>
-            <p class="mt-2 text-2xl font-bold text-gray-900" x-text="stats.featured_homepage"></p>
-            <p class="mt-1 text-xs text-gray-500">Mise en avant active</p>
-        </div>
-        <div class="metric-card glass-card rounded-2xl p-4">
-            <p class="text-xs uppercase text-gray-500">Messages non lus</p>
-            <p class="mt-2 text-2xl font-bold text-gray-900" x-text="stats.messages_unread"></p>
-            <p class="mt-1 text-xs text-gray-500">Surveillance support</p>
-        </div>
+    <!-- Action Bar -->
+    <div style="display: flex; gap: 12px; margin-bottom: 32px;">
+        <button @click="openQuickCreate()" class="btn btn-primary">+ Nouvel Article</button>
+        <button @click="refreshStats()" class="btn btn-secondary">Rafraîchir</button>
     </div>
 
-    <div class="grid grid-cols-1 gap-6 xl:grid-cols-3">
-        <div class="glass-card rounded-2xl p-5 xl:col-span-2">
-            <h3 class="text-lg font-semibold card-title">Évolution des contenus et revenus</h3>
-            <p class="mb-4 text-sm text-gray-400">Basé sur les 12 derniers mois.</p>
-            <div class="h-[340px]">
+    <!-- Main Grid -->
+    <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 20px; margin-bottom: 32px;">
+        <!-- Performance Chart -->
+        <div class="glass-card" style="padding: 20px;">
+            <h3 style="font-size: 14px; font-weight: 600; color: #f1f5f9; margin-bottom: 12px;">Tendance Articles</h3>
+            <div style="position: relative; height: 300px;">
                 <canvas id="performanceChart"></canvas>
             </div>
         </div>
 
-        <div class="glass-card rounded-2xl p-5">
-            <h3 class="text-lg font-semibold card-title">Derniers abonnements</h3>
-            <p class="mb-4 text-sm text-gray-400">Dernières transactions enregistrées.</p>
-            <div class="space-y-3">
-                @forelse($recentSubscriptions as $subscription)
-                    @if($subscription && $subscription->user)
-                        <div class="rounded-xl border border-gray-100 p-3">
-                            <p class="text-sm font-semibold text-gray-800">
-                                {{ trim(($subscription->user->firstname ?? '') . ' ' . ($subscription->user->lastname ?? '')) ?: 'Utilisateur' }}
-                            </p>
-                            <p class="text-xs text-gray-500">{{ $subscription->plan_name ?? $subscription->plan ?? 'Plan standard' }}</p>
-                            <div class="mt-1 flex items-center justify-between">
-                                <span class="text-xs text-gray-500">{{ $subscription->created_at?->format('d/m/Y') ?? 'N/A' }}</span>
-                                <span class="text-sm font-semibold text-emerald-600">{{ number_format((float) ($subscription->amount ?? $subscription->price ?? 0), 0, ',', ' ') }} FCFA</span>
-                            </div>
-                        </div>
-                    @endif
-                @empty
-                    <p class="text-sm text-gray-500">Aucun abonnement récent.</p>
-                @endforelse
+        <!-- Stats Distribution -->
+        <div class="glass-card" style="padding: 20px;">
+            <h3 style="font-size: 14px; font-weight: 600; color: #f1f5f9; margin-bottom: 12px;">Distribution</h3>
+            <div style="position: relative; height: 300px;">
+                <canvas id="distributionChart"></canvas>
             </div>
         </div>
     </div>
 
-    <div class="glass-card rounded-2xl p-5">
-        <div class="mb-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-            <div>
-                <h3 class="text-lg font-semibold card-title">Publication homepage</h3>
-                <p class="text-sm text-gray-400">Active/désactive les articles visibles sur la page d'accueil.</p>
-            </div>
-        </div>
-        <div class="overflow-x-auto">
-            <table class="min-w-full text-sm">
+    <!-- Recent Articles -->
+    <div class="glass-card" style="padding: 20px; margin-bottom: 32px;">
+        <h3 style="font-size: 14px; font-weight: 600; color: #f1f5f9; margin-bottom: 12px;">Articles Récents</h3>
+        <div style="overflow-x: auto;">
+            <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
                 <thead>
-                    <tr class="border-b border-gray-100 text-left text-xs uppercase text-gray-500">
-                        <th class="py-3">Article</th>
-                        <th class="py-3">Catégorie</th>
-                        <th class="py-3">Publication</th>
-                        <th class="py-3">Homepage</th>
-                        <th class="py-3 text-right">Action</th>
+                    <tr style="border-bottom: 1px solid rgba(148,163,184,0.1);">
+                        <th style="text-align: left; padding: 12px; color: #94a3b8; font-weight: 600; text-transform: uppercase; font-size: 11px;">Titre</th>
+                        <th style="text-align: left; padding: 12px; color: #94a3b8; font-weight: 600; text-transform: uppercase; font-size: 11px;">Catégorie</th>
+                        <th style="text-align: left; padding: 12px; color: #94a3b8; font-weight: 600; text-transform: uppercase; font-size: 11px;">Statut</th>
+                        <th style="text-align: center; padding: 12px; color: #94a3b8; font-weight: 600; text-transform: uppercase; font-size: 11px;">Actions</th>
                     </tr>
                 </thead>
-                <tbody>
-                    @forelse($homepageArticles as $article)
-                        <tr class="border-b border-gray-100" data-article-id="{{ $article->id }}">
-                            <td class="py-3 font-medium text-gray-800">{{ \Illuminate\Support\Str::limit($article->titre, 60) }}</td>
-                            <td class="py-3 text-gray-500">{{ $article->category->nom ?? 'Sans catégorie' }}</td>
-                            <td class="py-3">
-                                <span class="rounded-full px-2 py-1 text-xs {{ $article->is_published ? 'bg-emerald-100 text-emerald-700' : 'bg-gray-100 text-gray-600' }}">
-                                    {{ $article->is_published ? 'Publié' : 'Brouillon' }}
+                <tbody x-ref="articlesBody">
+                    <template x-for="article in recentArticles" :key="article.id">
+                        <tr style="border-bottom: 1px solid rgba(148,163,184,0.05); transition: all 0.2s;" @mouseenter="$el.style.background='rgba(6,182,212,0.05)'" @mouseleave="$el.style.background='transparent'">
+                            <td style="padding: 12px; color: #cbd5e1;"><strong x-text="article.titre.substring(0, 30) + (article.titre.length > 30 ? '...' : '')"></strong></td>
+                            <td style="padding: 12px; color: #cbd5e1;" x-text="article.category?.name || 'N/A'"></td>
+                            <td style="padding: 12px;">
+                                <span :class="article.is_published ? 'badge-success' : 'badge-warning'" style="display: inline-block; padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: 600;">
+                                    <span x-show="article.is_published">Publié</span>
+                                    <span x-show="!article.is_published">Brouillon</span>
                                 </span>
                             </td>
-                            <td class="py-3">
-                                <span class="rounded-full px-2 py-1 text-xs {{ ($article->is_featured || $article->featured_on_homepage) ? 'bg-brand-100 text-brand-700' : 'bg-gray-100 text-gray-600' }}">
-                                    {{ ($article->is_featured || $article->featured_on_homepage) ? 'Visible accueil' : 'Non affiché' }}
-                                </span>
-                            </td>
-                            <td class="py-3 text-right">
-                                <button
-                                    data-article-id="{{ $article->id }}"
-                                    @click="toggleHomepage({{ $article->id }}, @json(($article->is_featured || $article->featured_on_homepage)))"
-                                    class="rounded-lg px-3 py-1.5 text-xs font-semibold {{ ($article->is_featured || $article->featured_on_homepage) ? 'bg-red-50 text-red-600 hover:bg-red-100' : 'bg-emerald-50 text-emerald-700 hover:bg-emerald-100' }}"
-                                >
-                                    {{ ($article->is_featured || $article->featured_on_homepage) ? 'Retirer accueil' : 'Mettre en accueil' }}
+                            <td style="padding: 12px; text-align: center;">
+                                <button @click="togglePublish(article.id, article.is_published)" style="background: rgba(6,182,212,0.1); color: #06b6d4; border: none; padding: 6px 8px; border-radius: 4px; font-size: 11px; cursor: pointer; transition: all 0.2s;" @mouseover="$el.style.background='rgba(6,182,212,0.2)'" @mouseout="$el.style.background='rgba(6,182,212,0.1)'">
+                                    <span x-show="!article.is_published">Publier</span>
+                                    <span x-show="article.is_published">Dépublier</span>
+                                </button>
+                                <button @click="toggleHomepage(article.id, article.is_featured)" style="background: rgba(251,146,60,0.1); color: #fb923c; border: none; padding: 6px 8px; border-radius: 4px; font-size: 11px; cursor: pointer; margin-left: 6px; transition: all 0.2s;" @mouseover="$el.style.background='rgba(251,146,60,0.2)'" @mouseout="$el.style.background='rgba(251,146,60,0.1)'">
+                                    <span x-show="!article.is_featured">En Vedette</span>
+                                    <span x-show="article.is_featured">Retirer</span>
+                                </button>
+                                <button @click="deleteArticle(article.id)" style="background: rgba(239,68,68,0.1); color: #ef4444; border: none; padding: 6px 8px; border-radius: 4px; font-size: 11px; cursor: pointer; margin-left: 6px; transition: all 0.2s;" @mouseover="$el.style.background='rgba(239,68,68,0.2)'" @mouseout="$el.style.background='rgba(239,68,68,0.1)'">
+                                    Supprimer
                                 </button>
                             </td>
                         </tr>
-                    @empty
-                        <tr>
-                            <td colspan="5" class="py-6 text-center text-sm text-gray-500">Aucun article publié disponible.</td>
-                        </tr>
-                    @endforelse
+                    </template>
                 </tbody>
             </table>
         </div>
     </div>
 
-    <div class="glass-card rounded-2xl p-5">
-        <div class="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <h3 class="text-lg font-semibold card-title">Articles récents</h3>
-            <a href="{{ route('admin.articles.index') }}" class="rounded-lg border border-gray-300 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
-                Voir tous les articles
-            </a>
-        </div>
-        <div class="overflow-x-auto">
-            <table class="min-w-full text-sm">
+    <!-- Subscriptions Table -->
+    <div class="glass-card" style="padding: 20px;">
+        <h3 style="font-size: 14px; font-weight: 600; color: #f1f5f9; margin-bottom: 12px;">Abonnements Récents</h3>
+        <div style="overflow-x: auto;">
+            <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
                 <thead>
-                    <tr class="border-b border-gray-100 text-left text-xs uppercase text-gray-500">
-                        <th class="py-3">Titre</th>
-                        <th class="py-3">Catégorie</th>
-                        <th class="py-3">Date</th>
-                        <th class="py-3">Statut</th>
-                        <th class="py-3 text-right">Actions</th>
+                    <tr style="border-bottom: 1px solid rgba(148,163,184,0.1);">
+                        <th style="text-align: left; padding: 12px; color: #94a3b8; font-weight: 600; text-transform: uppercase; font-size: 11px;">Client</th>
+                        <th style="text-align: left; padding: 12px; color: #94a3b8; font-weight: 600; text-transform: uppercase; font-size: 11px;">Plan</th>
+                        <th style="text-align: left; padding: 12px; color: #94a3b8; font-weight: 600; text-transform: uppercase; font-size: 11px;">Montant</th>
+                        <th style="text-align: left; padding: 12px; color: #94a3b8; font-weight: 600; text-transform: uppercase; font-size: 11px;">Statut</th>
                     </tr>
                 </thead>
                 <tbody>
-                    @forelse($articles as $article)
-                        <tr class="border-b border-gray-100" data-article-id="{{ $article->id }}">
-                            <td class="py-3 font-medium text-gray-800">{{ \Illuminate\Support\Str::limit($article->titre, 60) }}</td>
-                            <td class="py-3 text-gray-500">{{ $article->category->nom ?? 'Sans catégorie' }}</td>
-                            <td class="py-3 text-gray-500">{{ $article->created_at->format('d/m/Y') }}</td>
-                            <td class="py-3">
-                                <span class="rounded-full px-2 py-1 text-xs {{ $article->is_published ? 'bg-emerald-100 text-emerald-700' : 'bg-gray-100 text-gray-600' }}">
-                                    {{ $article->is_published ? 'Publié' : 'Brouillon' }}
-                                </span>
-                            </td>
-                            <td class="py-3 text-right">
-                                <div class="inline-flex items-center gap-2">
-                                    <a href="{{ route('admin.articles.edit', ['article' => $article->id]) }}" class="rounded-lg bg-blue-50 px-2.5 py-1.5 text-xs font-medium text-blue-700 hover:bg-blue-100">Modifier</a>
-                                        <button data-article-id="{{ $article->id }}" @click="togglePublish({{ $article->id }})"
-                                             class="rounded-lg bg-amber-50 px-2.5 py-1.5 text-xs font-medium text-amber-700 hover:bg-amber-100">
-                                                  Publier / Dépublier
-                                        </button>
-                                        <button data-article-id="{{ $article->id }}" @click="deleteArticle({{ $article->id }})"
-                                              class="rounded-lg bg-red-50 px-2.5 py-1.5 text-xs font-medium text-red-700 hover:bg-red-100">
-                                                  Supprimer
-                                        </button>
-                                </div>
+                    <template x-for="sub in subscriptions" :key="sub.id">
+                        <tr style="border-bottom: 1px solid rgba(148,163,184,0.05);">
+                            <td style="padding: 12px; color: #cbd5e1;" x-text="sub.user?.name || 'N/A'"></td>
+                            <td style="padding: 12px; color: #cbd5e1;" x-text="sub.plan_name || 'N/A'"></td>
+                            <td style="padding: 12px; color: #cbd5e1;" x-text="'$' + (sub.amount || '0')"></td>
+                            <td style="padding: 12px;">
+                                <span style="display: inline-block; padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; background: rgba(34,197,94,0.1); color: #22c55e;">Actif</span>
                             </td>
                         </tr>
-                    @empty
-                        <tr>
-                            <td colspan="5" class="py-6 text-center text-sm text-gray-500">Aucun article trouvé.</td>
-                        </tr>
-                    @endforelse
+                    </template>
                 </tbody>
             </table>
         </div>
-        @if(method_exists($articles, 'hasPages') && $articles->hasPages())
-            <div class="mt-4">{{ $articles->links() }}</div>
-        @endif
+    </div>
+
+    <!-- Quick Create Modal -->
+    <div class="modal-overlay" :class="{ 'active': quickCreateOpen }" @click="closeQuickCreate()">
+        <div class="modal" @click.stop>
+            <div class="modal-header">
+                <h2>Ajouter un Nouvel Article</h2>
+                <button @click="closeQuickCreate()" class="modal-close">&times;</button>
+            </div>
+            <form @submit="submitQuickCreate" style="display: contents;">
+                <div class="modal-body">
+                    @csrf
+                    <div class="form-group">
+                        <label for="titre">Titre *</label>
+                        <input type="text" id="titre" name="titre" required placeholder="Titre de l'article">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="category_id">Catégorie *</label>
+                        <select id="category_id" name="category_id" required>
+                            <option value="">-- Sélectionner une catégorie --</option>
+                            <template x-for="cat in categories" :key="cat.id">
+                                <option :value="cat.id" x-text="cat.name"></option>
+                            </template>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="contenu">Contenu *</label>
+                        <textarea id="contenu" name="contenu" required placeholder="Contenu de l'article" style="resize: vertical; min-height: 100px;"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="extrait">Extrait</label>
+                        <textarea id="extrait" name="extrait" placeholder="Extrait (résumé court)" style="resize: vertical; min-height: 60px;"></textarea>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                        <div class="form-group">
+                            <label>
+                                <input type="checkbox" name="is_premium" value="1" style="margin-right: 6px;">
+                                Contenu Premium
+                            </label>
+                        </div>
+                        <div class="form-group">
+                            <label>
+                                <input type="checkbox" name="is_published" value="1" style="margin-right: 6px;">
+                                Publier immédiatement
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" @click="closeQuickCreate()" class="btn btn-secondary">Annuler</button>
+                    <button type="submit" class="btn btn-primary">Créer l'Article</button>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
-@endsection
 
-@push('scripts')
+<style>
+    [x-cloak] { display: none !important; }
+</style>
+
 <script>
-function dashboardData() {
-    return {
-        quickCreateOpen: false,
-        stats: {
-            articles_total: @json($articlesCount),
-            articles_today: @json($stats['articles_today'] ?? 0),
-            articles_published: @json($stats['articles_published'] ?? 0),
-            articles_draft: @json($stats['articles_draft'] ?? 0),
-            active_subscriptions: @json($stats['active_subscriptions'] ?? 0),
-            subscriptions_total: @json($stats['subscriptions_total'] ?? 0),
-            revenue_total: @json($stats['revenue_total'] ?? 0),
-            revenue_month: @json($stats['revenue_month'] ?? 0),
-            featured_homepage: @json($stats['featured_homepage'] ?? 0),
-            messages_unread: @json($stats['messages_unread'] ?? 0),
-        },
+    function dashboardData() {
+        return {
+            quickCreateOpen: false,
+            stats: {
+                articles_total: 0,
+                articles_published: 0,
+                active_subscriptions: 0,
+                revenue_total: 0,
+                featured_homepage: 0,
+                messages_unread: 0
+            },
+            recentArticles: [],
+            subscriptions: [],
+            categories: [],
+            performanceChart: null,
+            distributionChart: null,
 
-        chartData: @json($chartData),
-        chart: null,
-        loading: false,
-
-        csrf: document.querySelector('meta[name="csrf-token"]').content,
-
-        init() {
-            this.initPerformanceChart();
-        },
-
-        showToast(message, type = 'info') {
-            const id = 'toast-' + Date.now();
-            const container = document.getElementById('dashboard-toasts');
-            if (!container) return;
-            const el = document.createElement('div');
-            el.id = id;
-            el.className = 'rounded-md px-4 py-2 text-sm shadow';
-            el.style.minWidth = '200px';
-            el.innerText = message;
-            if (type === 'success') el.style.backgroundColor = '#ecfdf5';
-            if (type === 'error') el.style.backgroundColor = '#fff1f2';
-            container.appendChild(el);
-            setTimeout(() => { el.remove(); }, 4500);
-        },
-
-        openQuickCreate() { this.quickCreateOpen = true; },
-        closeQuickCreate() { this.quickCreateOpen = false; },
-
-        async submitQuickCreate(e) {
-            this.loading = true;
-            const form = e.target;
-            const data = {};
-            new FormData(form).forEach((v,k) => data[k] = v);
-
-            const url = `{{ route('admin.articles.quick-create') }}`;
-            const res = await this.request(url, { method: 'POST', body: JSON.stringify(data) });
-            this.loading = false;
-
-            if (res?.success) {
-                this.showToast('Article créé', 'success');
-                this.closeQuickCreate();
+            init() {
+                this.loadCategories();
                 this.refreshStats();
-            } else if (res?.errors) {
-                this.showToast('Erreurs: ' + JSON.stringify(res.errors), 'error');
-            } else {
-                this.showToast('Erreur création article', 'error');
-            }
-        },
+            },
 
-        // =========================
-        // SAFE FETCH WRAPPER
-        // =========================
-        async request(url, options = {}) {
-            try {
-                const response = await fetch(url, {
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json',
-                        'X-CSRF-TOKEN': this.csrf
-                    },
-                    ...options
-                });
-
-                if (!response.ok) {
-                    const text = await response.text().catch(() => null);
-                    throw new Error(response.status + ' ' + (text || response.statusText));
+            async loadCategories() {
+                try {
+                    const response = await fetch('/api/categories');
+                    this.categories = await response.json();
+                } catch (e) {
+                    console.error('Failed to load categories:', e);
                 }
+            },
 
-                return await response.json();
-            } catch (error) {
-                console.error(error);
-                this.showToast(error.message || 'Erreur réseau', 'error');
-                return null;
-            }
-        },
-
-        // =========================
-        // CHART FIX PROPER LIFECYCLE
-        // =========================
-        initPerformanceChart() {
-            const ctx = document.getElementById('performanceChart');
-            if (!ctx) return;
-
-            if (this.chart) {
-                this.chart.destroy();
-                this.chart = null;
-            }
-
-            this.chart = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: this.chartData.labels || [],
-                    datasets: [
-                        {
-                            label: 'Articles publiés',
-                            data: this.chartData.articles || [],
-                            borderColor: '#10b981',
-                            backgroundColor: 'rgba(16,185,129,0.12)',
-                            fill: true,
-                            tension: 0.35,
-                        },
-                        {
-                            label: 'Revenus abonnements',
-                            data: this.chartData.revenue || [],
-                            borderColor: '#3b82f6',
-                            backgroundColor: 'rgba(59,130,246,0.12)',
-                            fill: true,
-                        }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { position: 'top' } },
-                    interaction: { mode: 'index', intersect: false },
-                    scales: { y: { beginAtZero: true } }
-                }
-            });
-        },
-
-        // =========================
-        // FORMAT CURRENCY
-        // =========================
-        formatCurrency(value) {
-            return new Intl.NumberFormat('fr-FR', {
-                style: 'currency',
-                currency: 'XOF',
-                maximumFractionDigits: 0
-            }).format(value || 0);
-        },
-
-        // =========================
-        // REFRESH STATS (NO RELOAD)
-        // =========================
-        async refreshStats() {
-            this.loading = true;
-
-            const data = await this.request("{{ route('api.admin.stats') }}");
-
-            this.loading = false;
-
-            if (!data || !data.success) return;
-
-            this.stats = { ...this.stats, ...data.stats };
-
-            this.chartData = {
-                labels: (data.charts?.articlesPerMonth || []).map(i => i.month),
-                articles: (data.charts?.articlesPerMonth || []).map(i => i.count),
-                revenue: (data.charts?.revenuePerMonth || []).map(i => i.amount),
-            };
-
-            this.initPerformanceChart();
-        },
-
-        // =========================
-        // HOMEPAGE TOGGLE (DOM UPDATE)
-        // =========================
-        async toggleHomepage(articleId, currentValue) {
-            const url = `{{ url('/admin/articles') }}/${articleId}/toggle-homepage`;
-
-            const data = await this.request(url, {
-                method: 'PATCH',
-                body: JSON.stringify({ featured: !currentValue })
-            });
-
-            if (data?.success) {
-                // update stats and badges
-                this.stats.featured_homepage = (this.stats.featured_homepage || 0) + (data.is_featured ? 1 : -1);
-                this.refreshStats();
-                // update rows in DOM
-                document.querySelectorAll(`[data-article-id="${articleId}"]`).forEach(row => {
-                    const badge = row.querySelectorAll('td')[3]?.querySelector('span');
-                    if (badge) badge.textContent = data.is_featured ? 'Visible accueil' : 'Non affiché';
-                    const btn = row.querySelector('[data-article-id]');
-                    if (btn) btn.textContent = data.is_featured ? 'Retirer accueil' : 'Mettre en accueil';
-                });
-
-                this.showToast(data.message || 'Mise à jour réussie', 'success');
-            }
-        },
-
-        // =========================
-        // PUBLISH TOGGLE (DOM UPDATE)
-        // =========================
-        async togglePublish(articleId) {
-            const data = await this.request(`/admin/articles/${articleId}/toggle-publish`, {
-                method: 'POST'
-            });
-
-            if (data?.success) {
-                // Update status badges in all rows for this article
-                document.querySelectorAll(`[data-article-id="${articleId}"]`).forEach(row => {
-                    const cells = row.querySelectorAll('td');
-                    // Try to find the status cell which contains 'Publié' or 'Brouillon'
-                    cells.forEach(cell => {
-                        const span = cell.querySelector('span');
-                        if (!span) return;
-                        if (span.textContent.includes('Publié') || span.textContent.includes('Brouillon')) {
-                            span.textContent = data.is_published ? 'Publié' : 'Brouillon';
-                            span.className = data.is_published ? 'rounded-full px-2 py-1 text-xs bg-emerald-100 text-emerald-700' : 'rounded-full px-2 py-1 text-xs bg-gray-100 text-gray-600';
-                        }
+            async refreshStats() {
+                try {
+                    const response = await fetch('/api/admin/stats', {
+                        headers: { 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content }
                     });
+                    const data = await response.json();
+                    this.stats = data.stats || {};
+                    this.recentArticles = data.articles || [];
+                    this.subscriptions = data.subscriptions || [];
+                    
+                    this.$nextTick(() => {
+                        this.initPerformanceChart(data.chartData);
+                        this.initDistributionChart();
+                    });
+                } catch (e) {
+                    this.showToast('Erreur lors du chargement des statistiques', 'error');
+                }
+            },
+
+            openQuickCreate() {
+                this.quickCreateOpen = true;
+            },
+
+            closeQuickCreate() {
+                this.quickCreateOpen = false;
+                document.querySelectorAll('.modal-body input, .modal-body textarea').forEach(el => el.value = '');
+                document.querySelectorAll('.modal-body input[type="checkbox"]').forEach(el => el.checked = false);
+            },
+
+            async submitQuickCreate(e) {
+                e.preventDefault();
+                const form = e.target.closest('form') || e.target;
+                const formData = new FormData(form);
+                
+                try {
+                    const response = await fetch('/admin/articles/quick-create', {
+                        method: 'POST',
+                        headers: { 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content },
+                        body: formData
+                    });
+                    
+                    if (response.ok) {
+                        this.showToast('Article créé avec succès!', 'success');
+                        this.closeQuickCreate();
+                        this.refreshStats();
+                    } else {
+                        const error = await response.json();
+                        this.showToast(error.message || 'Erreur lors de la création', 'error');
+                    }
+                } catch (e) {
+                    this.showToast('Erreur réseau', 'error');
+                }
+            },
+
+            async togglePublish(articleId, currentValue) {
+                try {
+                    const response = await fetch(`/admin/articles/${articleId}/toggle-publish`, {
+                        method: 'POST',
+                        headers: { 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content }
+                    });
+                    
+                    if (response.ok) {
+                        const article = this.recentArticles.find(a => a.id === articleId);
+                        if (article) {
+                            article.is_published = !article.is_published;
+                            if (article.is_published) {
+                                article.published_at = new Date().toISOString();
+                            }
+                            this.showToast(article.is_published ? 'Article publié' : 'Article dépublié', 'success');
+                        }
+                        this.refreshStats();
+                    }
+                } catch (e) {
+                    this.showToast('Erreur lors de la mise à jour', 'error');
+                }
+            },
+
+            async toggleHomepage(articleId, currentValue) {
+                try {
+                    const response = await fetch(`/admin/articles/${articleId}/toggle-homepage`, {
+                        method: 'PATCH',
+                        headers: { 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content }
+                    });
+                    
+                    if (response.ok) {
+                        const article = this.recentArticles.find(a => a.id === articleId);
+                        if (article) {
+                            article.is_featured = !article.is_featured;
+                            this.showToast(article.is_featured ? 'Ajouté à la vedette' : 'Retiré de la vedette', 'success');
+                        }
+                        this.refreshStats();
+                    }
+                } catch (e) {
+                    this.showToast('Erreur lors de la mise à jour', 'error');
+                }
+            },
+
+            async deleteArticle(articleId) {
+                if (!confirm('Êtes-vous sûr de vouloir supprimer cet article?')) return;
+                
+                try {
+                    const response = await fetch(`/admin/articles/${articleId}/delete`, {
+                        method: 'DELETE',
+                        headers: { 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content }
+                    });
+                    
+                    if (response.ok) {
+                        this.showToast('Article supprimé', 'success');
+                        this.recentArticles = this.recentArticles.filter(a => a.id !== articleId);
+                        this.refreshStats();
+                    }
+                } catch (e) {
+                    this.showToast('Erreur lors de la suppression', 'error');
+                }
+            },
+
+            initPerformanceChart(chartData) {
+                const ctx = document.getElementById('performanceChart');
+                if (!ctx) return;
+                
+                if (this.performanceChart) {
+                    this.performanceChart.destroy();
+                }
+
+                const data = chartData?.articlesPerMonth || {};
+                this.performanceChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: Object.keys(data),
+                        datasets: [{
+                            label: 'Articles',
+                            data: Object.values(data),
+                            borderColor: '#06b6d4',
+                            backgroundColor: 'rgba(6, 182, 212, 0.1)',
+                            borderWidth: 2,
+                            tension: 0.4,
+                            pointBackgroundColor: '#06b6d4',
+                            pointBorderWidth: 0,
+                            fill: true
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                grid: { color: 'rgba(148, 163, 184, 0.1)' },
+                                ticks: { color: '#94a3b8' }
+                            },
+                            x: {
+                                grid: { display: false },
+                                ticks: { color: '#94a3b8' }
+                            }
+                        }
+                    }
                 });
+            },
 
-                this.refreshStats();
-                this.showToast(data.message || 'Statut modifié', 'success');
+            initDistributionChart() {
+                const ctx = document.getElementById('distributionChart');
+                if (!ctx) return;
+                
+                if (this.distributionChart) {
+                    this.distributionChart.destroy();
+                }
+
+                this.distributionChart = new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Publiés', 'Brouillons', 'À la une'],
+                        datasets: [{
+                            data: [
+                                this.stats.articles_published,
+                                this.stats.articles_total - this.stats.articles_published,
+                                this.stats.featured_homepage
+                            ],
+                            backgroundColor: [
+                                '#22c55e',
+                                '#fb923c',
+                                '#06b6d4'
+                            ]
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                                labels: { color: '#cbd5e1' }
+                            }
+                        }
+                    }
+                });
+            },
+
+            showToast(message, type = 'info') {
+                const container = document.getElementById('dashboard-toasts');
+                const toast = document.createElement('div');
+                toast.className = `toast ${type}`;
+                toast.textContent = message;
+                container.appendChild(toast);
+                setTimeout(() => toast.remove(), 4500);
             }
-        },
-
-        // =========================
-        // DELETE ARTICLE (DOM UPDATE)
-        // =========================
-        async deleteArticle(articleId) {
-            if (!confirm("Confirmer suppression ?")) return;
-
-            const data = await this.request(`/admin/articles/${articleId}`, {
-                method: 'DELETE'
-            });
-
-            if (data?.success) {
-                document.querySelectorAll(`[data-article-id="${articleId}"]`).forEach(row => row.remove());
-                this.stats.articles_total = Math.max(0, (this.stats.articles_total || 0) - 1);
-                this.refreshStats();
-                this.showToast(data.message || 'Article supprimé', 'success');
-            }
-        }
-    };
-}
+        };
+    }
 </script>
-@endpush
+@endsection

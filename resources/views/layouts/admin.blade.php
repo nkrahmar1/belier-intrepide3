@@ -10,6 +10,13 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link href="{{ asset('css/tailwind.css') }}" rel="stylesheet">
+    @php
+        $adminName = Auth::check() ? Auth::user()->name : 'Administrateur';
+        $notificationCount = 0;
+        if (Schema::hasTable('messages')) {
+            $notificationCount = \App\Models\Message::where('is_read', false)->count();
+        }
+    @endphp
     <script src="{{ asset('assets/lib/bootstrap/jquery/jquery.js') }}"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -206,6 +213,70 @@
         }
         .toast.success { border-left: 3px solid #22c55e; }
         .toast.error { border-left: 3px solid #ef4444; }
+
+        body.light {
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            color: #0f172a;
+        }
+
+        body.light .sidebar {
+            background: linear-gradient(180deg, #f8fafc 0%, #e2e8f0 100%);
+            border-color: rgba(15,23,42,0.08);
+        }
+
+        body.light .glass-card {
+            background: rgba(255,255,255,0.85);
+            border-color: rgba(148,163,184,0.3);
+            color: #0f172a;
+            box-shadow: 0 8px 32px rgba(15,23,42,0.15);
+        }
+
+        body.light .nav-item {
+            color: #0f172a;
+        }
+
+        body.light .nav-item:hover,
+        body.light .nav-item.active {
+            background: rgba(6,182,212,0.08);
+            color: #0f172a;
+        }
+
+        body.light .header {
+            background: rgba(255,255,255,0.92);
+            border-color: rgba(148,163,184,0.2);
+        }
+
+        body.light .header-icon-btn {
+            background: rgba(255,255,255,0.85);
+            color: #0f172a;
+            border-color: rgba(148,163,184,0.2);
+        }
+
+        body.light .search-box input {
+            background: rgba(255,255,255,0.95);
+            color: #0f172a;
+            border-color: rgba(148,163,184,0.3);
+        }
+
+        body.light .content {
+            color: #0f172a;
+        }
+
+        body.light .modal {
+            background: rgba(255,255,255,0.96);
+            color: #0f172a;
+        }
+
+        body.light .toast {
+            background: rgba(255,255,255,0.96);
+            color: #0f172a;
+            border-color: rgba(148,163,184,0.2);
+        }
+
+        body.light .badge {
+            color: #0f172a;
+        }
+
         @keyframes slideIn {
             from { opacity: 0; transform: translateX(100%); }
             to { opacity: 1; transform: translateX(0); }
@@ -376,15 +447,25 @@
                     <input type="text" placeholder="Rechercher...">
                 </div>
             </div>
-            <div class="header-right">
-                <button class="header-icon-btn">
-                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+            <div class="header-right" style="position: relative;">
+                <button class="header-icon-btn" @click="toggleTheme()" title="Changer le thème">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M6.343 6.343l-.707-.707M12 5a7 7 0 100 14 7 7 0 000-14z"/></svg>
                 </button>
-                <div class="user-menu">
+                <button class="header-icon-btn" @click="window.location.href='{{ route('admin.modal.messages') }}'" title="Notifications">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+                    @if($notificationCount > 0)
+                        <span style="position: absolute; top: 4px; right: 4px; width: 16px; height: 16px; border-radius: 999px; display: flex; align-items: center; justify-content: center; font-size: 10px; background: #ef4444; color: white;">{{ $notificationCount }}</span>
+                    @endif
+                </button>
+                <div class="user-menu" style="gap: 12px;">
                     <div class="user-avatar"></div>
+                    <div style="display:flex; flex-direction:column; align-items:flex-start;">
+                        <span style="font-size:12px; color:#94a3b8;">Bonjour</span>
+                        <span style="font-weight:700; color:#f8fafc;">{{ $adminName }}</span>
+                    </div>
                     <form method="POST" action="{{ route('app_logout') }}" style="display:inline;">
                         @csrf
-                        <button type="submit" class="header-icon-btn">
+                        <button type="submit" class="header-icon-btn" title="Se déconnecter">
                             <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
                         </button>
                     </form>
@@ -400,11 +481,26 @@
         function adminApp() {
             return {
                 sidebarOpen: localStorage.getItem('sidebarOpen') !== 'false',
+                theme: localStorage.getItem('dashboardTheme') || 'dark',
+
                 init() {
                     const saved = localStorage.getItem('sidebarOpen');
                     if (saved !== null) this.sidebarOpen = saved === 'true';
+                    this.applyTheme();
                     this.$watch('sidebarOpen', (val) => localStorage.setItem('sidebarOpen', val));
                 },
+
+                applyTheme() {
+                    document.body.classList.toggle('light', this.theme === 'light');
+                    document.body.classList.toggle('dark', this.theme !== 'light');
+                },
+
+                toggleTheme() {
+                    this.theme = this.theme === 'dark' ? 'light' : 'dark';
+                    localStorage.setItem('dashboardTheme', this.theme);
+                    this.applyTheme();
+                },
+
                 showToast(message, type = 'info') {
                     const container = document.getElementById('dashboard-toasts');
                     const toast = document.createElement('div');

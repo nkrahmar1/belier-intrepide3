@@ -4,6 +4,18 @@
 
 @section('content')
 <div x-data="dashboardData()" x-init="init()" x-cloak>
+    <div class="glass-card" style="padding: 24px; margin-bottom: 28px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px;">
+        <div>
+            <div style="font-size: 14px; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px;">Bienvenue sur votre dashboard</div>
+            <div style="font-size: 28px; font-weight: 700; color: #f1f5f9;">Bonjour, {{ Auth::user()->name ?? 'Administrateur' }}</div>
+            <div style="font-size: 13px; color: #cbd5e1; margin-top: 8px; max-width: 520px; line-height: 1.6;">Tous les contrôles sont connectés aux données. Publiez des articles, gérez les statuts et suivez les abonnements directement depuis cet espace.</div>
+        </div>
+        <div style="display: flex; gap: 12px; flex-wrap: wrap; align-items: center;">
+            <span class="badge badge-info" style="background: rgba(6,182,212,0.1); color: #06b6d4;">Notifications activées</span>
+            <span class="badge badge-success" style="background: rgba(34,197,94,0.12); color: #22c55e;">Thème sélectionnable</span>
+        </div>
+    </div>
+
     <!-- Stats Cards -->
     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 32px;">
         <div class="glass-card" style="padding: 20px;">
@@ -17,7 +29,7 @@
         <div class="glass-card" style="padding: 20px;">
             <div style="font-size: 12px; font-weight: 600; text-transform: uppercase; color: #94a3b8; margin-bottom: 8px;">Abonnements Actifs</div>
             <div style="font-size: 28px; font-weight: 700; color: #f1f5f9; margin-bottom: 6px;" x-text="stats.active_subscriptions || '0'"></div>
-            <div style="font-size: 12px; color: #22c55e;"><span x-text="stats.revenue_total || '$0'"></span> revenus</div>
+            <div style="font-size: 12px; color: #22c55e;"><span x-text="formatCurrency(stats.subscriptions_revenue || 0)"></span> revenus</div>
         </div>
 
         <div class="glass-card" style="padding: 20px;">
@@ -67,6 +79,7 @@
                     <tr style="border-bottom: 1px solid rgba(148,163,184,0.1);">
                         <th style="text-align: left; padding: 12px; color: #94a3b8; font-weight: 600; text-transform: uppercase; font-size: 11px;">Titre</th>
                         <th style="text-align: left; padding: 12px; color: #94a3b8; font-weight: 600; text-transform: uppercase; font-size: 11px;">Catégorie</th>
+                        <th style="text-align: left; padding: 12px; color: #94a3b8; font-weight: 600; text-transform: uppercase; font-size: 11px;">Auteur</th>
                         <th style="text-align: left; padding: 12px; color: #94a3b8; font-weight: 600; text-transform: uppercase; font-size: 11px;">Statut</th>
                         <th style="text-align: center; padding: 12px; color: #94a3b8; font-weight: 600; text-transform: uppercase; font-size: 11px;">Actions</th>
                     </tr>
@@ -76,6 +89,7 @@
                         <tr style="border-bottom: 1px solid rgba(148,163,184,0.05); transition: all 0.2s;" @mouseenter="$el.style.background='rgba(6,182,212,0.05)'" @mouseleave="$el.style.background='transparent'">
                             <td style="padding: 12px; color: #cbd5e1;"><strong x-text="article.titre.substring(0, 30) + (article.titre.length > 30 ? '...' : '')"></strong></td>
                             <td style="padding: 12px; color: #cbd5e1;" x-text="article.category?.name || 'N/A'"></td>
+                            <td style="padding: 12px; color: #cbd5e1;" x-text="article.user?.name || 'Admin'"></td>
                             <td style="padding: 12px;">
                                 <span :class="article.is_published ? 'badge-success' : 'badge-warning'" style="display: inline-block; padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: 600;">
                                     <span x-show="article.is_published">Publié</span>
@@ -202,28 +216,23 @@
                 articles_total: 0,
                 articles_published: 0,
                 active_subscriptions: 0,
-                revenue_total: 0,
+                subscriptions_revenue: 0,
                 featured_homepage: 0,
                 messages_unread: 0
             },
             recentArticles: [],
             subscriptions: [],
-            categories: [],
+            categories: @json($categories->map->only(['id','name'])->toArray()),
             performanceChart: null,
             distributionChart: null,
 
             init() {
-                this.loadCategories();
                 this.refreshStats();
             },
 
             async loadCategories() {
-                try {
-                    const response = await fetch('/api/categories');
-                    this.categories = await response.json();
-                } catch (e) {
-                    console.error('Failed to load categories:', e);
-                }
+                // Categories are preloaded from the server into the page
+                return;
             },
 
             async refreshStats() {
@@ -233,11 +242,21 @@
                     });
                     const data = await response.json();
                     this.stats = data.stats || {};
-                    this.recentArticles = data.articles || [];
-                    this.subscriptions = data.subscriptions || [];
-                    
+
+                    const articlesResponse = await fetch('/api/admin/articles?per_page=8', {
+                        headers: { 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content }
+                    });
+                    const articlesData = await articlesResponse.json();
+                    this.recentArticles = articlesData.articles?.data || [];
+
+                    const subsResponse = await fetch('/api/admin/subscriptions?per_page=8', {
+                        headers: { 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content }
+                    });
+                    const subscriptionsData = await subsResponse.json();
+                    this.subscriptions = subscriptionsData.subscriptions?.data || [];
+
                     this.$nextTick(() => {
-                        this.initPerformanceChart(data.chartData);
+                        this.initPerformanceChart(data.charts);
                         this.initDistributionChart();
                     });
                 } catch (e) {
@@ -327,7 +346,7 @@
                 if (!confirm('Êtes-vous sûr de vouloir supprimer cet article?')) return;
                 
                 try {
-                    const response = await fetch(`/admin/articles/${articleId}/delete`, {
+const response = await fetch(`/admin/articles/${articleId}`, {
                         method: 'DELETE',
                         headers: { 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content }
                     });
@@ -350,14 +369,16 @@
                     this.performanceChart.destroy();
                 }
 
-                const data = chartData?.articlesPerMonth || {};
+                const data = chartData?.articlesPerMonth || [];
+                const labels = data.map(item => item.month || item.label || '');
+                const values = data.map(item => item.count || item.value || 0);
                 this.performanceChart = new Chart(ctx, {
                     type: 'line',
                     data: {
-                        labels: Object.keys(data),
+                        labels: labels,
                         datasets: [{
                             label: 'Articles',
-                            data: Object.values(data),
+                            data: values,
                             borderColor: '#06b6d4',
                             backgroundColor: 'rgba(6, 182, 212, 0.1)',
                             borderWidth: 2,
@@ -433,6 +454,14 @@
                 toast.textContent = message;
                 container.appendChild(toast);
                 setTimeout(() => toast.remove(), 4500);
+            },
+
+            formatCurrency(value) {
+                return new Intl.NumberFormat('fr-FR', {
+                    style: 'currency',
+                    currency: 'EUR',
+                    maximumFractionDigits: 0
+                }).format(value);
             }
         };
     }

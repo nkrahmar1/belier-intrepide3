@@ -23,39 +23,45 @@
     @endif
 
     <!-- Table -->
-    <div class="card shadow-sm border-0">
+    <div class="card shadow-sm border-0 admin-users-card">
+        <div class="card-header bg-slate-950/90 border-bottom border-slate-700 d-flex flex-column flex-md-row justify-content-between align-items-start gap-3 py-4 px-4">
+            <div>
+                <h2 class="fw-bold text-white mb-1"><i class="fas fa-users me-2"></i>Gestion des utilisateurs</h2>
+                <p class="text-slate-400 mb-0">Affichez la liste des utilisateurs de manière claire, ordonnée et facile à gérer.</p>
+            </div>
+            <a href="{{ route('admin.dashboard') }}" class="btn btn-outline-light shadow-sm">
+                <i class="fas fa-arrow-left me-1"></i> Retour
+            </a>
+        </div>
         <div class="card-body p-0">
             <div class="table-responsive">
-                <table class="table table-hover table-striped align-middle mb-0">
-                    <thead class="table-light text-center">
+                <table class="table table-hover table-striped align-middle mb-0 admin-users-table">
+                    <thead class="text-white text-uppercase" style="font-size:12px; letter-spacing:0.05em;">
                         <tr>
-                            <th class="text-start ps-4">Nom</th>
-                            <th>Email</th>
-                            <th>Statut</th>
-                            <th class="text-center">Actions</th>
+                            <th class="text-start ps-4" style="min-width: 240px;">Nom</th>
+                            <th style="min-width: 240px;">Email</th>
+                            <th style="width: 130px;">Statut</th>
+                            <th class="text-center" style="width: 170px;">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
                         @forelse($users as $user)
                             <tr>
-                                <td class="ps-4 fw-semibold text-dark">{{ $user->name }}</td>
-                                <td class="text-muted">{{ $user->email }}</td>
+                                <td class="ps-4 fw-semibold text-white">{{ $user->name }}</td>
+                                <td class="text-slate-300">{{ $user->email }}</td>
                                 <td>
-                                    <span class="badge rounded-pill bg-{{ $user->status === 'actif' ? 'success' : 'secondary' }}">
+                                    <span class="badge rounded-pill {{ $user->status === 'actif' ? 'bg-success text-white' : 'bg-secondary text-white' }}">
                                         {{ ucfirst($user->status) }}
                                     </span>
                                 </td>
                                 <td class="text-center">
-                                    <div class="d-flex justify-content-center gap-2">
-                                        <!-- Voir -->
+                                    <div class="d-flex justify-content-center gap-2 flex-wrap">
                                         <a href="{{ route('admin.users.show', $user) }}" class="btn btn-sm btn-outline-info shadow-sm" data-bs-toggle="tooltip" title="Voir détails">
                                             <i class="fas fa-eye"></i>
                                         </a>
-                                        <!-- Modifier -->
                                         <a href="{{ route('admin.users.edit', $user) }}" class="btn btn-sm btn-outline-warning shadow-sm" data-bs-toggle="tooltip" title="Modifier">
                                             <i class="fas fa-edit"></i>
                                         </a>
-                                        <!-- Supprimer -->
                                         <form action="{{ route('admin.users.destroy', $user) }}" method="POST" onsubmit="return confirm('Confirmer la suppression ?')" class="d-inline">
                                             @csrf
                                             @method('DELETE')
@@ -68,7 +74,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="4" class="text-center text-muted py-4">Aucun utilisateur trouvé.</td>
+                                <td colspan="4" class="text-center text-slate-400 py-4">Aucun utilisateur trouvé.</td>
                             </tr>
                         @endforelse
                     </tbody>
@@ -97,5 +103,40 @@
     .btn:hover {
         transform: scale(1.03);
         transition: all 0.2s ease-in-out;
+    }
+
+    .admin-users-card {
+        background: rgba(15, 23, 42, 0.92);
+        border: 1px solid rgba(148, 163, 184, 0.12);
+        border-radius: 18px;
+        overflow: hidden;
+    }
+
+    .admin-users-card .card-header {
+        background: rgba(15, 23, 42, 0.98);
+    }
+
+    .admin-users-table thead th {
+        background: rgba(30, 41, 59, 0.98) !important;
+        border-bottom: 1px solid rgba(148, 163, 184, 0.2) !important;
+        color: #cbd5e1 !important;
+    }
+
+    .admin-users-table tbody tr {
+        border-bottom: 1px solid rgba(148, 163, 184, 0.08);
+    }
+
+    .admin-users-table tbody tr:hover {
+        background: rgba(255, 255, 255, 0.03);
+    }
+
+    .admin-users-table tbody td {
+        color: #e2e8f0;
+        vertical-align: middle;
+        padding: 14px 16px;
+    }
+
+    .admin-users-table .badge {
+        min-width: 88px;
     }
 </style>

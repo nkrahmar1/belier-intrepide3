@@ -153,52 +153,57 @@
                 <button @click="closeQuickCreate()" class="modal-close">&times;</button>
             </div>
             <form @submit="submitQuickCreate" style="display: contents;">
-                <div class="modal-body">
+                <div class="modal-body" style="display:grid; gap:20px;">
                     @csrf
-                    <div class="form-group">
-                        <label for="titre">Titre *</label>
-                        <input type="text" id="titre" name="titre" required placeholder="Titre de l'article">
-                    </div>
-
-                    <div class="form-group">
-                        <label for="category_id">Catégorie *</label>
-                        <select id="category_id" name="category_id" required>
-                            <option value="">-- Sélectionner une catégorie --</option>
-                            <option value="1">Sports</option>
-                            <option value="2">Politiques</option>
-                            <option value="3">Afriques</option>
-                            <option value="4">Culture et Média</option>
-                            <option value="5">Économique</option>
-                            <option value="6">Société</option>
-                            <template x-for="cat in categories" :key="cat.id">
-                                <option :value="cat.id" x-text="cat.name"></option>
-                            </template>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="contenu">Contenu *</label>
-                        <textarea id="contenu" name="contenu" required placeholder="Contenu de l'article" style="resize: vertical; min-height: 100px;"></textarea>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="extrait">Extrait</label>
-                        <textarea id="extrait" name="extrait" placeholder="Extrait (résumé court)" style="resize: vertical; min-height: 60px;"></textarea>
-                    </div>
-
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                    <div class="grid gap-6 lg:grid-cols-2">
                         <div class="form-group">
-                            <label>
-                                <input type="checkbox" name="is_premium" value="1" style="margin-right: 6px;">
-                                Contenu Premium
-                            </label>
+                            <label for="titre">Titre de l'article *</label>
+                            <input type="text" id="titre" name="titre" required placeholder="Titre de l'article" style="width:100%; padding:12px 14px; border-radius:12px; border:1px solid rgba(148,163,184,0.2); background:rgba(255,255,255,0.08); color:#edf2f7;">
                         </div>
                         <div class="form-group">
-                            <label>
-                                <input type="checkbox" name="is_published" value="1" style="margin-right: 6px;">
-                                Publier immédiatement
-                            </label>
+                            <label for="category_id">Catégorie *</label>
+                            <select id="category_id" name="category_id" required style="width:100%; padding:12px 14px; border-radius:12px; border:1px solid rgba(148,163,184,0.2); background:rgba(255,255,255,0.08); color:#edf2f7;">
+                                <option value="">Sélectionnez une catégorie</option>
+                                <template x-for="cat in categories" :key="cat.id">
+                                    <option :value="cat.id" x-text="cat.name"></option>
+                                </template>
+                            </select>
+                            <p style="margin-top:8px; color:#94a3b8; font-size:13px;">Choisissez la catégorie correspondante pour votre article.</p>
                         </div>
+                    </div>
+
+                    <div class="grid gap-6 lg:grid-cols-2">
+                        <div class="form-group">
+                            <label for="extrait">Extrait</label>
+                            <textarea id="extrait" name="extrait" placeholder="Extrait ou résumé court" style="width:100%; min-height:130px; padding:12px 14px; border-radius:12px; border:1px solid rgba(148,163,184,0.2); background:rgba(255,255,255,0.08); color:#edf2f7;"></textarea>
+                        </div>
+                        <div class="form-group" style="display:flex; flex-direction:column; gap:10px;">
+                            <label for="contenu">Contenu en rédaction *</label>
+                            <textarea id="contenu" name="contenu" required placeholder="Rédigez votre article ici..." style="width:100%; min-height:240px; padding:14px 16px; border-radius:16px; border:1px solid rgba(148,163,184,0.2); background:rgba(255,255,255,0.08); color:#edf2f7; line-height:1.7;"></textarea>
+                            <p style="color:#94a3b8; font-size:13px;">Utilisez ce champ pour rédiger votre article en mode brouillon avant publication.</p>
+                        </div>
+                    </div>
+
+                    <div class="grid gap-6 lg:grid-cols-2">
+                        <div class="form-group">
+                            <label for="image">Image de l'article</label>
+                            <input type="file" id="image" name="image" accept="image/jpeg,image/png,image/jpg,image/gif,image/webp" style="width:100%; padding:12px 14px; border-radius:12px; border:1px solid rgba(148,163,184,0.2); background:rgba(255,255,255,0.08); color:#edf2f7;">
+                        </div>
+                        <div class="form-group">
+                            <label for="document">Document à télécharger</label>
+                            <input type="file" id="document" name="document" accept=".pdf,.doc,.docx,.txt,.xls,.xlsx,.ppt,.pptx" style="width:100%; padding:12px 14px; border-radius:12px; border:1px solid rgba(148,163,184,0.2); background:rgba(255,255,255,0.08); color:#edf2f7;">
+                        </div>
+                    </div>
+
+                    <div style="display:grid; gap:10px; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));">
+                        <label class="inline-flex items-center gap-3" style="padding:12px 14px; background:rgba(255,255,255,0.05); border:1px solid rgba(148,163,184,0.15); border-radius:12px;">
+                            <input type="checkbox" id="is_premium" name="is_premium" value="1" style="width:18px; height:18px;">
+                            <span style="color:#edf2f7;">Article Premium</span>
+                        </label>
+                        <label class="inline-flex items-center gap-3" style="padding:12px 14px; background:rgba(255,255,255,0.05); border:1px solid rgba(148,163,184,0.15); border-radius:12px;">
+                            <input type="checkbox" id="is_published" name="is_published" value="1" style="width:18px; height:18px;">
+                            <span style="color:#edf2f7;">Publier immédiatement</span>
+                        </label>
                     </div>
                 </div>
                 <div class="modal-footer">

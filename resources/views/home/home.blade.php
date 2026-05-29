@@ -1456,7 +1456,7 @@
 <div class="container">
     <div class="video-container">
         <iframe
-            src="{{ asset('video/18Eme bureau.mp4') }}"
+            src="https://www.youtube.com/watch?v=svMwJBv8CBo"
             title="Vidéo de présentation - Le Bélier Intrépide"
             frameborder="0"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"

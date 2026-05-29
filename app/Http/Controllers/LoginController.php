@@ -73,11 +73,13 @@ class LoginController extends Controller
 
             if ($user->is_admin) {
                 return redirect()->intended(route('admin.dashboard'))
-                    ->with('status', 'Connexion réussie (admin) !');
+                    ->with('status', 'Connexion réussie (admin) !')
+                    ->with('welcome_message', 'Vous êtes connecté en tant qu\'administrateur. Un email de confirmation a été envoyé à ' . $user->email . '.');
             }
 
             return redirect()->intended(route('home'))
-                ->with('status', 'Connexion réussie !');
+                ->with('status', 'Connexion réussie !')
+                ->with('welcome_message', 'Vous êtes connecté(e). Un email de confirmation a été envoyé à ' . $user->email . '.');
         }
 
         // Échec

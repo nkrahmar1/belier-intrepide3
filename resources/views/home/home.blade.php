@@ -1271,7 +1271,7 @@
                         @if(Auth::user()->is_admin)
                             <a href="{{ route('admin.articles.index') }}" class="btn btn-sm" style="background: #667eea; color: white; font-size: 0.8rem; padding: 5px 10px;">Mes Articles</a>
                         @else
-                            <a href="{{ route('articles.index') }}" class="btn btn-sm" style="background: #667eea; color: white; font-size: 0.8rem; padding: 5px 10px;">Mes Articles</a>
+                            <a href="{{ route('articles.mine') }}" class="btn btn-sm" style="background: #667eea; color: white; font-size: 0.8rem; padding: 5px 10px;">Mes Articles</a>
                         @endif
                     @else
                         <a href="{{ route('articles.index') }}" class="btn btn-sm" style="background: #667eea; color: white; font-size: 0.8rem; padding: 5px 10px;">Mes Articles</a>

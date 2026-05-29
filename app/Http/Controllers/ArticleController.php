@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
 
 class ArticleController extends Controller
 {
@@ -69,7 +70,7 @@ class ArticleController extends Controller
                 ['path' => request()->url(), 'query' => request()->query()]
             );
             
-            return view('articles.index', ['articles' => $paginatedArticles]);
+            return view('articles.index', ['articles' => $paginatedArticles, 'listingTitle' => '📰 Nos Articles']);
         } catch (\Exception $e) {
             Log::error('Erreur ArticleController@index: ' . $e->getMessage());
             
@@ -78,8 +79,66 @@ class ArticleController extends Controller
                 ->limit(12)
                 ->get();
             
-            return view('articles.index', ['articles' => $articles]);
+            return view('articles.index', ['articles' => $articles, 'listingTitle' => '📰 Nos Articles']);
         }
+    }
+
+    public function mine()
+    {
+        if (!Auth::check()) {
+            return redirect()->route('login');
+        }
+
+        $articles = \App\Models\Article::where('user_id', Auth::id())
+            ->with(['category:id,nom', 'user:id,firstname,lastname'])
+            ->latest('created_at')
+            ->get();
+
+        $articles->transform(function ($article) {
+            $article->titre_limit = strlen($article->titre) > 60 
+                ? substr($article->titre, 0, 57) . '...' 
+                : $article->titre;
+
+            if ($article->extrait) {
+                $article->extrait_limit = strlen($article->extrait) > 120 
+                    ? substr($article->extrait, 0, 117) . '...' 
+                    : $article->extrait;
+            } else {
+                $content_stripped = strip_tags($article->contenu ?? '');
+                $article->extrait_limit = strlen($content_stripped) > 120 
+                    ? substr($content_stripped, 0, 117) . '...' 
+                    : ($content_stripped ?: 'Aucun extrait disponible');
+            }
+
+            $article->date_formatted = $article->published_at 
+                ? $article->published_at->format('d/m/Y') 
+                : $article->created_at->format('d/m/Y');
+
+            $article->category_nom = $article->category ? $article->category->nom : 'Non classé';
+
+            unset($article->contenu);
+            return $article;
+        });
+
+        $page = request()->get('page', 1);
+        $perPage = 12;
+        $offset = ($page - 1) * $perPage;
+
+        $items = $articles->slice($offset, $perPage);
+        $total = $articles->count();
+
+        $paginatedArticles = new \Illuminate\Pagination\LengthAwarePaginator(
+            $items,
+            $total,
+            $perPage,
+            $page,
+            ['path' => request()->url(), 'query' => request()->query()]
+        );
+
+        return view('articles.index', [
+            'articles' => $paginatedArticles,
+            'listingTitle' => '📰 Mes Articles',
+        ]);
     }
 
     public function show($id)

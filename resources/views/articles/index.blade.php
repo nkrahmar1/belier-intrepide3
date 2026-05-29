@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Storage;
     <!-- Header avec statistiques responsive -->
     <div class="row mb-3 mb-md-4">
         <div class="col-12 col-md-8 text-center text-md-start mb-3 mb-md-0">
-            <h1 class="fw-bold text-dark" style="font-size: clamp(1.8rem, 5vw, 3rem);">📰 Nos Articles</h1>
+            <h1 class="fw-bold text-dark" style="font-size: clamp(1.8rem, 5vw, 3rem);">{{ $listingTitle ?? '📰 Nos Articles' }}</h1>
             <p class="text-muted" style="font-size: clamp(1rem, 2.5vw, 1.2rem);">Découvrez nos dernières publications et analyses</p>
         </div>
         <div class="col-12 col-md-4">

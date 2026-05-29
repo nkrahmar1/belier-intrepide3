@@ -4,6 +4,17 @@
 
 @section('content')
 
-    <h1>PDCI-RDA</h1>
-    <img src="{{ asset('image/pdci.jpg') }}" alt="PDCI-RDA" style="width: 300px;">
+<div style="
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+">
+    <img src="{{ asset('image/pdci.jpg') }}" alt="PDCI-RDA" style="
+        width: 100vw;
+        height: 100vh;
+        object-fit: cover;
+        display: block;
+    ">
+</div>
+
 @endsection

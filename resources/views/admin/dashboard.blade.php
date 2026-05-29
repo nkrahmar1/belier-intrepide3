@@ -71,32 +71,32 @@
     <div id="dashboard-toasts" class="fixed bottom-6 right-6 z-50 space-y-2"></div>
 
     <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-6">
-        <div class="metric-card rounded-2xl border border-gray-200 bg-white p-4">
+        <div class="metric-card glass-card rounded-2xl p-4">
             <p class="text-xs uppercase text-gray-500">Articles</p>
             <p class="mt-2 text-2xl font-bold text-gray-900" x-text="stats.articles_total"></p>
             <p class="mt-1 text-xs text-green-600">+<span x-text="stats.articles_today"></span> aujourd'hui</p>
         </div>
-        <div class="metric-card rounded-2xl border border-gray-200 bg-white p-4">
+        <div class="metric-card glass-card rounded-2xl p-4">
             <p class="text-xs uppercase text-gray-500">Publié</p>
             <p class="mt-2 text-2xl font-bold text-gray-900" x-text="stats.articles_published"></p>
             <p class="mt-1 text-xs text-gray-500"><span x-text="stats.articles_draft"></span> brouillons</p>
         </div>
-        <div class="metric-card rounded-2xl border border-gray-200 bg-white p-4">
+        <div class="metric-card glass-card rounded-2xl p-4">
             <p class="text-xs uppercase text-gray-500">Abonnements actifs</p>
             <p class="mt-2 text-2xl font-bold text-gray-900" x-text="stats.active_subscriptions"></p>
             <p class="mt-1 text-xs text-gray-500">Total: <span x-text="stats.subscriptions_total"></span></p>
         </div>
-        <div class="metric-card rounded-2xl border border-gray-200 bg-white p-4">
+        <div class="metric-card glass-card rounded-2xl p-4">
             <p class="text-xs uppercase text-gray-500">Revenu abonnement</p>
             <p class="mt-2 text-2xl font-bold text-gray-900" x-text="formatCurrency(stats.revenue_total)"></p>
             <p class="mt-1 text-xs text-gray-500">Mois: <span x-text="formatCurrency(stats.revenue_month)"></span></p>
         </div>
-        <div class="metric-card rounded-2xl border border-gray-200 bg-white p-4">
+        <div class="metric-card glass-card rounded-2xl p-4">
             <p class="text-xs uppercase text-gray-500">Articles homepage</p>
             <p class="mt-2 text-2xl font-bold text-gray-900" x-text="stats.featured_homepage"></p>
             <p class="mt-1 text-xs text-gray-500">Mise en avant active</p>
         </div>
-        <div class="metric-card rounded-2xl border border-gray-200 bg-white p-4">
+        <div class="metric-card glass-card rounded-2xl p-4">
             <p class="text-xs uppercase text-gray-500">Messages non lus</p>
             <p class="mt-2 text-2xl font-bold text-gray-900" x-text="stats.messages_unread"></p>
             <p class="mt-1 text-xs text-gray-500">Surveillance support</p>
@@ -104,17 +104,17 @@
     </div>
 
     <div class="grid grid-cols-1 gap-6 xl:grid-cols-3">
-        <div class="rounded-2xl border border-gray-200 bg-white p-5 xl:col-span-2">
-            <h3 class="text-lg font-semibold text-gray-900">Évolution des contenus et revenus</h3>
-            <p class="mb-4 text-sm text-gray-500">Basé sur les 12 derniers mois.</p>
+        <div class="glass-card rounded-2xl p-5 xl:col-span-2">
+            <h3 class="text-lg font-semibold card-title">Évolution des contenus et revenus</h3>
+            <p class="mb-4 text-sm text-gray-400">Basé sur les 12 derniers mois.</p>
             <div class="h-[340px]">
                 <canvas id="performanceChart"></canvas>
             </div>
         </div>
 
-        <div class="rounded-2xl border border-gray-200 bg-white p-5">
-            <h3 class="text-lg font-semibold text-gray-900">Derniers abonnements</h3>
-            <p class="mb-4 text-sm text-gray-500">Dernières transactions enregistrées.</p>
+        <div class="glass-card rounded-2xl p-5">
+            <h3 class="text-lg font-semibold card-title">Derniers abonnements</h3>
+            <p class="mb-4 text-sm text-gray-400">Dernières transactions enregistrées.</p>
             <div class="space-y-3">
                 @forelse($recentSubscriptions as $subscription)
                     @if($subscription && $subscription->user)
@@ -136,11 +136,11 @@
         </div>
     </div>
 
-    <div class="rounded-2xl border border-gray-200 bg-white p-5">
+    <div class="glass-card rounded-2xl p-5">
         <div class="mb-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
             <div>
-                <h3 class="text-lg font-semibold text-gray-900">Publication homepage</h3>
-                <p class="text-sm text-gray-500">Active/désactive les articles visibles sur la page d'accueil.</p>
+                <h3 class="text-lg font-semibold card-title">Publication homepage</h3>
+                <p class="text-sm text-gray-400">Active/désactive les articles visibles sur la page d'accueil.</p>
             </div>
         </div>
         <div class="overflow-x-auto">
@@ -189,9 +189,9 @@
         </div>
     </div>
 
-    <div class="rounded-2xl border border-gray-200 bg-white p-5">
+    <div class="glass-card rounded-2xl p-5">
         <div class="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <h3 class="text-lg font-semibold text-gray-900">Articles récents</h3>
+            <h3 class="text-lg font-semibold card-title">Articles récents</h3>
             <a href="{{ route('admin.articles.index') }}" class="rounded-lg border border-gray-300 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
                 Voir tous les articles
             </a>

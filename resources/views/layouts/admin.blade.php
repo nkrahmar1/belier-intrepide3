@@ -105,6 +105,32 @@
             overflow-y: auto;
         }
 
+        /* Dark glass theme */
+        body.bg-dark-pattern {
+            background: radial-gradient(ellipse at top left, rgba(20,40,30,0.6), rgba(10,20,25,0.9)), linear-gradient(180deg, #0b1220 0%, #071018 100%);
+            color: #e6eef2;
+        }
+
+        .glass-card {
+            background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+            border: 1px solid rgba(255,255,255,0.04);
+            box-shadow: 0 6px 20px rgba(2,6,23,0.6);
+            backdrop-filter: blur(6px) saturate(120%);
+            color: #e6eef2;
+        }
+
+        /* Sidebar darken overrides */
+        aside { background: linear-gradient(180deg,#06121a 0%, #07141a 100%); }
+        aside a.menu-item { color: #cbd5e1; }
+        .menu-item-icon-inactive svg { color: #94a3b8; }
+        .menu-item-icon-active svg { color: #7ee3a1; }
+        .menu-item-text { color: #cbd5e1; }
+
+        header { background: linear-gradient(90deg, rgba(8,12,16,0.6), rgba(6,10,14,0.6)); border-bottom: 1px solid rgba(255,255,255,0.03); }
+
+        /* Card accent titles */
+        .card-title { color: #cbd5e1; font-weight: 600; }
+
         /* Menu item styles */
         .menu-item {
             @apply flex items-center gap-3 px-4 py-3 rounded-lg text-gray-700 dark:text-gray-300 transition-all duration-200;
@@ -255,7 +281,7 @@
 
     @stack('styles')
 </head>
-<body class="min-h-screen bg-gray-50 dark:bg-gray-900">
+<body class="min-h-screen bg-dark-pattern dark">
     <div class="min-h-screen xl:flex">
         <!-- Sidebar -->
         <aside

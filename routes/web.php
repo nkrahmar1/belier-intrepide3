@@ -315,6 +315,8 @@ Route::post('/newsletter/subscribe', [NewsletterController::class, 'subscribe'])
 // Articles (publiques)
 // --------------------
 Route::get('/articles', [ArticleController::class, 'index'])->name('articles.index');
+Route::get('/articles/create', [ArticleController::class, 'create'])->name('articles.create')->middleware('auth');
+Route::post('/articles', [ArticleController::class, 'store'])->name('articles.store')->middleware('auth');
 Route::get('/mes-articles', [ArticleController::class, 'mine'])->name('articles.mine')->middleware('auth');
 Route::get('/articles/{id}', [ArticleController::class, 'show'])->name('articles.show');
 

@@ -1457,7 +1457,7 @@
     <div class="video-container">
         <video 
             controls 
-            style="width: 100%; height: 450px; object-fit: cover;">
+            style="width: 100%; height: 100vh; object-fit: cover;">
             <source src="{{ asset('video/18Eme bureau.mp4') }}" type="video/mp4">
             Votre navigateur ne supporte pas la lecture vidéo.
         </video>

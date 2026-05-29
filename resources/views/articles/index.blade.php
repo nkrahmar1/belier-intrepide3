@@ -165,8 +165,20 @@ use Illuminate\Support\Facades\Storage;
             <div class="col-12">
                 <div class="text-center py-5">
                     <i class="fas fa-newspaper fa-5x text-muted mb-3"></i>
-                    <h3 class="text-muted">Aucun article disponible</h3>
-                    <p class="text-muted">Les articles publiés apparaîtront ici prochainement.</p>
+                    <h3 class="text-muted">
+                        @if(request()->routeIs('articles.mine'))
+                            Vous n'avez encore publié aucun article.
+                        @else
+                            Aucun article disponible
+                        @endif
+                    </h3>
+                    <p class="text-muted">
+                        @if(request()->routeIs('articles.mine'))
+                            Commencez par publier votre premier article depuis votre espace personnel.
+                        @else
+                            Les articles publiés apparaîtront ici prochainement.
+                        @endif
+                    </p>
                     @auth
                         @if(auth()->user()->is_admin)
                             <a href="{{ route('admin.articles.create') }}" class="btn btn-primary">

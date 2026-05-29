@@ -1455,14 +1455,12 @@
 <!-- Section vidéo de présentation -->
 <div class="container">
     <div class="video-container">
-        <iframe
-            src="https://www.youtube.com/embed/svMwJBv8CBo"
-            title="Vidéo PDCI-RDA"
-            frameborder="0"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-            allowfullscreen
-            style="width: 100%; height: 450px;">
-        </iframe>
+        <video 
+            controls 
+            style="width: 100%; height: 450px; object-fit: cover;">
+            <source src="{{ asset('video/18Eme bureau.mp4') }}" type="video/mp4">
+            Votre navigateur ne supporte pas la lecture vidéo.
+        </video>
     </div>
 </div>
 

@@ -1,4 +1,4 @@
-<div class="flex flex-col gap-6">
+﻿<div class="flex flex-col gap-6">
     <div class="flex flex-col md:flex-row justify-between items-start gap-4">
         <div class="space-y-2">
             <h1 class="text-3xl font-semibold text-slate-100">
@@ -394,7 +394,6 @@
             documentName.textContent = file.name;
             documentSize.textContent = formatFileSize(file.size);
             documentType.textContent = file.type || 'Fichier';
-
             const extension = file.name.split('.').pop().toLowerCase();
             documentIcon.className = 'fas fa-file-' + (['pdf', 'doc', 'docx'].includes(extension) ? extension : 'alt');
             previewContainer.classList.remove('hidden');

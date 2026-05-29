@@ -1456,7 +1456,7 @@
 <div class="container">
     <div class="video-container">
         <iframe
-            src="https://www.youtube.com/embed/dQw4w9WgXcQ"
+            src="https://www.youtube.com/watch?v=_Rx23Okz_1E"
             title="Vidéo de présentation - Le Bélier Intrépide"
             frameborder="0"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"

@@ -19,6 +19,34 @@
     @endphp
     <script src="{{ asset('assets/lib/bootstrap/jquery/jquery.js') }}"></script>
     <style>
+        /* Theme variables (default = green) */
+        :root {
+            --accent: #06b6d4;
+            --accent-gradient-from: #06b6d4;
+            --accent-gradient-to: #0891b2;
+            --accent-weak: rgba(6,182,212,0.1);
+            --accent-strong: rgba(6,182,212,0.9);
+            --text-on-accent: #ffffff;
+        }
+
+        [data-theme="blue"] {
+            --accent: #3b82f6;
+            --accent-gradient-from: #3b82f6;
+            --accent-gradient-to: #6366f1;
+            --accent-weak: rgba(59,130,246,0.1);
+            --accent-strong: rgba(59,130,246,0.9);
+            --text-on-accent: #ffffff;
+        }
+
+        [data-theme="orange"] {
+            --accent: #f97316;
+            --accent-gradient-from: #fb923c;
+            --accent-gradient-to: #f97316;
+            --accent-weak: rgba(249,115,22,0.1);
+            --accent-strong: rgba(249,115,22,0.9);
+            --text-on-accent: #ffffff;
+        }
+
         * { margin: 0; padding: 0; box-sizing: border-box; }
         html, body { height: 100%; }
         body {
@@ -53,7 +81,7 @@
         .sidebar .logo {
             font-size: 18px;
             font-weight: 700;
-            color: #06b6d4;
+            color: var(--accent);
             margin-bottom: 32px;
             display: flex;
             align-items: center;
@@ -93,13 +121,13 @@
             font-weight: 500;
         }
         .nav-item:hover {
-            background: rgba(6,182,212,0.1);
-            color: #06b6d4;
+            background: var(--accent-weak);
+            color: var(--accent);
         }
         .nav-item.active {
-            background: rgba(6,182,212,0.15);
-            color: #06b6d4;
-            border-left: 3px solid #06b6d4;
+            background: var(--accent-weak);
+            color: var(--accent);
+            border-left: 3px solid var(--accent);
         }
         .nav-item svg {
             width: 18px;
@@ -167,8 +195,8 @@
             transition: all 0.2s;
         }
         .header-icon-btn:hover {
-            background: rgba(6,182,212,0.1);
-            color: #06b6d4;
+            background: var(--accent-weak);
+            color: var(--accent);
         }
         .user-menu {
             display: flex;
@@ -179,7 +207,7 @@
             width: 36px;
             height: 36px;
             border-radius: 8px;
-            background: linear-gradient(135deg, #06b6d4, #0891b2);
+            background: linear-gradient(135deg, var(--accent-gradient-from), var(--accent-gradient-to));
         }
         .content {
             flex: 1;
@@ -348,8 +376,8 @@
         .form-group textarea:focus,
         .form-group select:focus {
             outline: none;
-            border-color: #06b6d4;
-            background: rgba(6,182,212,0.05);
+            border-color: var(--accent);
+            background: rgba(0,0,0,0.03);
         }
         .modal-footer {
             display: flex;
@@ -368,12 +396,12 @@
             transition: all 0.2s;
         }
         .btn-primary {
-            background: linear-gradient(135deg, #06b6d4, #0891b2);
-            color: #f1f5f9;
+            background: linear-gradient(135deg, var(--accent-gradient-from), var(--accent-gradient-to));
+            color: var(--text-on-accent);
         }
         .btn-primary:hover {
             transform: translateY(-1px);
-            box-shadow: 0 6px 20px rgba(6,182,212,0.3);
+            box-shadow: 0 6px 20px var(--accent-weak);
         }
         .btn-secondary {
             background: rgba(30,41,59,0.4);
@@ -390,6 +418,24 @@
             .search-box { max-width: 100%; }
         }
     </style>
+    <script>
+        (function(){
+            try {
+                var theme = localStorage.getItem('appTheme') || 'green';
+                document.documentElement.setAttribute('data-theme', theme);
+                if (localStorage.getItem('darkMode') === 'true') {
+                    document.documentElement.classList.add('dark');
+                } else {
+                    document.documentElement.classList.remove('dark');
+                }
+                var accents = { green: '#06b6d4', blue: '#3b82f6', orange: '#f97316' };
+                var meta = document.querySelector('meta[name="theme-color"]');
+                if (meta) meta.setAttribute('content', accents[theme] || accents.green);
+            } catch (e) {
+                console.warn('Theme init error', e);
+            }
+        })();
+    </script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     @stack('styles')

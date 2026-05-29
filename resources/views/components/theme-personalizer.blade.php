@@ -7,7 +7,7 @@
 
     <div x-data="themeManager()" class="space-y-6">
         <!-- Theme Selection -->
-        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <!-- Green Theme (Default) -->
             <button 
                 @click="setTheme('green')" 
@@ -26,26 +26,6 @@
             >
                 <div class="w-12 h-12 bg-gradient-to-br from-blue-400 to-blue-600 rounded-lg mx-auto mb-2"></div>
                 <p class="text-sm font-medium text-gray-700 dark:text-gray-300">Bleu</p>
-            </button>
-
-            <!-- Purple Theme -->
-            <button 
-                @click="setTheme('purple')" 
-                :class="currentTheme === 'purple' ? 'ring-2 ring-offset-2 ring-purple-500' : ''"
-                class="p-4 rounded-lg border-2 border-gray-200 dark:border-gray-700 hover:border-purple-500 transition-all text-center"
-            >
-                <div class="w-12 h-12 bg-gradient-to-br from-purple-400 to-purple-600 rounded-lg mx-auto mb-2"></div>
-                <p class="text-sm font-medium text-gray-700 dark:text-gray-300">Violet</p>
-            </button>
-
-            <!-- Red Theme -->
-            <button 
-                @click="setTheme('red')" 
-                :class="currentTheme === 'red' ? 'ring-2 ring-offset-2 ring-red-500' : ''"
-                class="p-4 rounded-lg border-2 border-gray-200 dark:border-gray-700 hover:border-red-500 transition-all text-center"
-            >
-                <div class="w-12 h-12 bg-gradient-to-br from-red-400 to-red-600 rounded-lg mx-auto mb-2"></div>
-                <p class="text-sm font-medium text-gray-700 dark:text-gray-300">Rouge</p>
             </button>
 
             <!-- Orange Theme -->
@@ -115,12 +95,12 @@
             <h4 class="text-md font-semibold text-gray-900 dark:text-white mb-4">Aperçu</h4>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div class="p-4 rounded-lg" :class="getThemeClass('bg')">
-                    <p class="text-white font-semibold">Exemple de Gradient</p>
-                    <p class="text-white text-sm opacity-80">Texte secondaire</p>
+                    <p class="text-white font-semibold">Exemple de gradient</p>
+                    <p class="text-white text-sm opacity-80">Texte bien lisible sur fond coloré</p>
                 </div>
                 <div class="p-4 rounded-lg border-2" :class="getThemeClass('border')">
-                    <p class="font-semibold" :class="getThemeClass('text')">Exemple de Bordure</p>
-                    <p class="text-sm opacity-70">Avec accent de couleur</p>
+                    <p class="font-semibold text-gray-900 dark:text-white">Exemple de bordure</p>
+                    <p class="text-sm text-gray-600 dark:text-gray-300">Avec accent de couleur et texte visible</p>
                 </div>
             </div>
         </div>
@@ -178,11 +158,9 @@ function themeManager() {
 
         getThemeClass(type) {
             const themeClasses = {
-                green: { bg: 'bg-gradient-to-r from-green-500 to-green-600', text: 'text-green-600', border: 'border-green-500' },
-                blue: { bg: 'bg-gradient-to-r from-blue-500 to-blue-600', text: 'text-blue-600', border: 'border-blue-500' },
-                purple: { bg: 'bg-gradient-to-r from-purple-500 to-purple-600', text: 'text-purple-600', border: 'border-purple-500' },
-                red: { bg: 'bg-gradient-to-r from-red-500 to-red-600', text: 'text-red-600', border: 'border-red-500' },
-                orange: { bg: 'bg-gradient-to-r from-orange-500 to-orange-600', text: 'text-orange-600', border: 'border-orange-500' }
+                green: { bg: 'bg-gradient-to-r from-green-500 to-green-600', text: 'text-white', border: 'border-green-500' },
+                blue: { bg: 'bg-gradient-to-r from-blue-500 to-blue-600', text: 'text-white', border: 'border-blue-500' },
+                orange: { bg: 'bg-gradient-to-r from-orange-500 to-orange-600', text: 'text-white', border: 'border-orange-500' }
             };
             return themeClasses[this.currentTheme][type];
         },

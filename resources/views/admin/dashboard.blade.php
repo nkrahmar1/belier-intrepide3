@@ -11,7 +11,7 @@
             <div style="font-size: 13px; color: #cbd5e1; margin-top: 8px; max-width: 520px; line-height: 1.6;">Tous les contrôles sont connectés aux données. Publiez des articles, gérez les statuts et suivez les abonnements directement depuis cet espace.</div>
         </div>
         <div style="display: flex; gap: 12px; flex-wrap: wrap; align-items: center;">
-            <span class="badge badge-info" style="background: rgba(6,182,212,0.1); color: #06b6d4;">Notifications activées</span>
+            <span class="badge badge-info" style="background: var(--accent-weak); color: var(--accent);">Notifications activées</span>
             <span class="badge badge-success" style="background: rgba(34,197,94,0.12); color: #22c55e;">Thème sélectionnable</span>
         </div>
     </div>
@@ -86,7 +86,7 @@
                 </thead>
                 <tbody x-ref="articlesBody">
                     <template x-for="article in recentArticles" :key="article.id">
-                        <tr style="border-bottom: 1px solid rgba(148,163,184,0.05); transition: all 0.2s;" @mouseenter="$el.style.background='rgba(6,182,212,0.05)'" @mouseleave="$el.style.background='transparent'">
+                        <tr style="border-bottom: 1px solid rgba(148,163,184,0.05); transition: all 0.2s;" @mouseenter="$el.style.background='var(--accent-weak)'" @mouseleave="$el.style.background='transparent'">
                             <td style="padding: 12px; color: #cbd5e1;"><strong x-text="article.titre.substring(0, 30) + (article.titre.length > 30 ? '...' : '')"></strong></td>
                             <td style="padding: 12px; color: #cbd5e1;" x-text="article.category?.name || 'N/A'"></td>
                             <td style="padding: 12px; color: #cbd5e1;" x-text="article.user?.name || 'Admin'"></td>
@@ -97,7 +97,7 @@
                                 </span>
                             </td>
                             <td style="padding: 12px; text-align: center;">
-                                <button @click="togglePublish(article.id, article.is_published)" style="background: rgba(6,182,212,0.1); color: #06b6d4; border: none; padding: 6px 8px; border-radius: 4px; font-size: 11px; cursor: pointer; transition: all 0.2s;" @mouseover="$el.style.background='rgba(6,182,212,0.2)'" @mouseout="$el.style.background='rgba(6,182,212,0.1)'">
+                                <button @click="togglePublish(article.id, article.is_published)" style="background: var(--accent-weak); color: var(--accent); border: none; padding: 6px 8px; border-radius: 4px; font-size: 11px; cursor: pointer; transition: all 0.2s;" @mouseover="$el.style.background='var(--accent-strong)'" @mouseout="$el.style.background='var(--accent-weak)'">
                                     <span x-show="!article.is_published">Publier</span>
                                     <span x-show="article.is_published">Dépublier</span>
                                 </button>

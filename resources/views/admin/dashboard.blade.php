@@ -19,14 +19,56 @@
             </p>
         </div>
         <div class="flex items-center gap-2">
-            <a href="{{ route('admin.articles.create') }}" class="inline-flex items-center gap-2 rounded-lg bg-brand-500 px-4 py-2 text-sm font-medium text-white hover:bg-brand-600">
-                Nouvel article
+            <button @click="openQuickCreate()" class="inline-flex items-center gap-2 rounded-lg bg-brand-500 px-4 py-2 text-sm font-medium text-white hover:bg-brand-600">
+                + Nouvel article
+            </button>
+            <a href="{{ route('admin.articles.create') }}" class="inline-flex items-center gap-2 rounded-lg border border-transparent bg-white px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">
+                Formulaire complet
             </a>
             <button @click="refreshStats()" :disabled="loading" class="inline-flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-60">
                 <span x-text="loading ? 'Actualisation...' : 'Actualiser'"></span>
             </button>
         </div>
     </div>
+
+    <!-- Quick Create Modal -->
+    <div x-show="quickCreateOpen" x-cloak class="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+        <div @click.away="closeQuickCreate()" class="w-full max-w-2xl rounded-xl bg-white p-6 shadow-lg">
+            <div class="flex items-center justify-between">
+                <h3 class="text-lg font-semibold">Créer un article rapidement</h3>
+                <button @click="closeQuickCreate()" class="text-gray-500 hover:text-gray-800">✕</button>
+            </div>
+            <form @submit.prevent="submitQuickCreate($event)" class="mt-4 space-y-3">
+                <div>
+                    <label class="text-sm text-gray-600">Titre</label>
+                    <input name="titre" required class="w-full rounded-md border px-3 py-2" />
+                </div>
+                <div>
+                    <label class="text-sm text-gray-600">Contenu</label>
+                    <textarea name="contenu" required class="w-full rounded-md border px-3 py-2 h-28"></textarea>
+                </div>
+                <div>
+                    <label class="text-sm text-gray-600">Catégorie</label>
+                    <select name="category_id" class="w-full rounded-md border px-3 py-2">
+                        @if(isset($categories) && $categories->count())
+                            @foreach($categories as $cat)
+                                <option value="{{ $cat->id }}">{{ $cat->nom }}</option>
+                            @endforeach
+                        @else
+                            <option value="">Aucune catégorie</option>
+                        @endif
+                    </select>
+                </div>
+                <div class="flex items-center justify-end gap-2">
+                    <button type="button" @click="closeQuickCreate()" class="rounded-lg border px-4 py-2 text-sm">Annuler</button>
+                    <button type="submit" :disabled="loading" class="rounded-lg bg-brand-500 px-4 py-2 text-sm text-white">Créer</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Toasts -->
+    <div id="dashboard-toasts" class="fixed bottom-6 right-6 z-50 space-y-2"></div>
 
     <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-6">
         <div class="metric-card rounded-2xl border border-gray-200 bg-white p-4">
@@ -114,7 +156,7 @@
                 </thead>
                 <tbody>
                     @forelse($homepageArticles as $article)
-                        <tr class="border-b border-gray-100">
+                        <tr class="border-b border-gray-100" data-article-id="{{ $article->id }}">
                             <td class="py-3 font-medium text-gray-800">{{ \Illuminate\Support\Str::limit($article->titre, 60) }}</td>
                             <td class="py-3 text-gray-500">{{ $article->category->nom ?? 'Sans catégorie' }}</td>
                             <td class="py-3">
@@ -129,7 +171,9 @@
                             </td>
                             <td class="py-3 text-right">
                                 <button
-                                    @click="toggleHomepage({{ $article->id }}, @json(($article->is_featured || $article->featured_on_homepage)))"                                    class="rounded-lg px-3 py-1.5 text-xs font-semibold {{ ($article->is_featured || $article->featured_on_homepage) ? 'bg-red-50 text-red-600 hover:bg-red-100' : 'bg-emerald-50 text-emerald-700 hover:bg-emerald-100' }}"
+                                    data-article-id="{{ $article->id }}"
+                                    @click="toggleHomepage({{ $article->id }}, @json(($article->is_featured || $article->featured_on_homepage)))"
+                                    class="rounded-lg px-3 py-1.5 text-xs font-semibold {{ ($article->is_featured || $article->featured_on_homepage) ? 'bg-red-50 text-red-600 hover:bg-red-100' : 'bg-emerald-50 text-emerald-700 hover:bg-emerald-100' }}"
                                 >
                                     {{ ($article->is_featured || $article->featured_on_homepage) ? 'Retirer accueil' : 'Mettre en accueil' }}
                                 </button>
@@ -165,7 +209,7 @@
                 </thead>
                 <tbody>
                     @forelse($articles as $article)
-                        <tr class="border-b border-gray-100">
+                        <tr class="border-b border-gray-100" data-article-id="{{ $article->id }}">
                             <td class="py-3 font-medium text-gray-800">{{ \Illuminate\Support\Str::limit($article->titre, 60) }}</td>
                             <td class="py-3 text-gray-500">{{ $article->category->nom ?? 'Sans catégorie' }}</td>
                             <td class="py-3 text-gray-500">{{ $article->created_at->format('d/m/Y') }}</td>
@@ -177,11 +221,11 @@
                             <td class="py-3 text-right">
                                 <div class="inline-flex items-center gap-2">
                                     <a href="{{ route('admin.articles.edit', ['article' => $article->id]) }}" class="rounded-lg bg-blue-50 px-2.5 py-1.5 text-xs font-medium text-blue-700 hover:bg-blue-100">Modifier</a>
-                                        <button @click="togglePublish({{ $article->id }})"
+                                        <button data-article-id="{{ $article->id }}" @click="togglePublish({{ $article->id }})"
                                              class="rounded-lg bg-amber-50 px-2.5 py-1.5 text-xs font-medium text-amber-700 hover:bg-amber-100">
                                                   Publier / Dépublier
                                         </button>
-                                        <button @click="deleteArticle({{ $article->id }})"
+                                        <button data-article-id="{{ $article->id }}" @click="deleteArticle({{ $article->id }})"
                                               class="rounded-lg bg-red-50 px-2.5 py-1.5 text-xs font-medium text-red-700 hover:bg-red-100">
                                                   Supprimer
                                         </button>
@@ -207,6 +251,7 @@
 <script>
 function dashboardData() {
     return {
+        quickCreateOpen: false,
         stats: {
             articles_total: @json($articlesCount),
             articles_today: @json($stats['articles_today'] ?? 0),
@@ -230,6 +275,45 @@ function dashboardData() {
             this.initPerformanceChart();
         },
 
+        showToast(message, type = 'info') {
+            const id = 'toast-' + Date.now();
+            const container = document.getElementById('dashboard-toasts');
+            if (!container) return;
+            const el = document.createElement('div');
+            el.id = id;
+            el.className = 'rounded-md px-4 py-2 text-sm shadow';
+            el.style.minWidth = '200px';
+            el.innerText = message;
+            if (type === 'success') el.style.backgroundColor = '#ecfdf5';
+            if (type === 'error') el.style.backgroundColor = '#fff1f2';
+            container.appendChild(el);
+            setTimeout(() => { el.remove(); }, 4500);
+        },
+
+        openQuickCreate() { this.quickCreateOpen = true; },
+        closeQuickCreate() { this.quickCreateOpen = false; },
+
+        async submitQuickCreate(e) {
+            this.loading = true;
+            const form = e.target;
+            const data = {};
+            new FormData(form).forEach((v,k) => data[k] = v);
+
+            const url = `{{ route('admin.articles.quick-create') }}`;
+            const res = await this.request(url, { method: 'POST', body: JSON.stringify(data) });
+            this.loading = false;
+
+            if (res?.success) {
+                this.showToast('Article créé', 'success');
+                this.closeQuickCreate();
+                this.refreshStats();
+            } else if (res?.errors) {
+                this.showToast('Erreurs: ' + JSON.stringify(res.errors), 'error');
+            } else {
+                this.showToast('Erreur création article', 'error');
+            }
+        },
+
         // =========================
         // SAFE FETCH WRAPPER
         // =========================
@@ -245,13 +329,14 @@ function dashboardData() {
                 });
 
                 if (!response.ok) {
-                    throw new Error("Erreur serveur (" + response.status + ")");
+                    const text = await response.text().catch(() => null);
+                    throw new Error(response.status + ' ' + (text || response.statusText));
                 }
 
                 return await response.json();
             } catch (error) {
                 console.error(error);
-                alert(error.message);
+                this.showToast(error.message || 'Erreur réseau', 'error');
                 return null;
             }
         },
@@ -269,33 +354,33 @@ function dashboardData() {
             }
 
             this.chart = new Chart(ctx, {
-                type: 'bar',
+                type: 'line',
                 data: {
-                    labels: this.chartData.labels,
+                    labels: this.chartData.labels || [],
                     datasets: [
                         {
-                            type: 'line',
                             label: 'Articles publiés',
-                            data: this.chartData.articles,
+                            data: this.chartData.articles || [],
                             borderColor: '#10b981',
-                            backgroundColor: 'rgba(16,185,129,.2)',
+                            backgroundColor: 'rgba(16,185,129,0.12)',
                             fill: true,
-                            tension: 0.3,
+                            tension: 0.35,
                         },
                         {
                             label: 'Revenus abonnements',
-                            data: this.chartData.revenue,
+                            data: this.chartData.revenue || [],
                             borderColor: '#3b82f6',
-                            backgroundColor: 'rgba(59,130,246,.3)',
+                            backgroundColor: 'rgba(59,130,246,0.12)',
+                            fill: true,
                         }
                     ]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    plugins: {
-                        legend: { position: 'top' }
-                    }
+                    plugins: { legend: { position: 'top' } },
+                    interaction: { mode: 'index', intersect: false },
+                    scales: { y: { beginAtZero: true } }
                 }
             });
         },
@@ -323,10 +408,7 @@ function dashboardData() {
 
             if (!data || !data.success) return;
 
-            this.stats = {
-                ...this.stats,
-                ...data.stats
-            };
+            this.stats = { ...this.stats, ...data.stats };
 
             this.chartData = {
                 labels: (data.charts?.articlesPerMonth || []).map(i => i.month),
@@ -338,7 +420,7 @@ function dashboardData() {
         },
 
         // =========================
-        // HOMEPAGE TOGGLE (FIXED)
+        // HOMEPAGE TOGGLE (DOM UPDATE)
         // =========================
         async toggleHomepage(articleId, currentValue) {
             const url = `{{ url('/admin/articles') }}/${articleId}/toggle-homepage`;
@@ -349,12 +431,23 @@ function dashboardData() {
             });
 
             if (data?.success) {
-                window.location.reload(); // tu peux remplacer plus tard par update DOM
+                // update stats and badges
+                this.stats.featured_homepage = (this.stats.featured_homepage || 0) + (data.is_featured ? 1 : -1);
+                this.refreshStats();
+                // update rows in DOM
+                document.querySelectorAll(`[data-article-id="${articleId}"]`).forEach(row => {
+                    const badge = row.querySelectorAll('td')[3]?.querySelector('span');
+                    if (badge) badge.textContent = data.is_featured ? 'Visible accueil' : 'Non affiché';
+                    const btn = row.querySelector('[data-article-id]');
+                    if (btn) btn.textContent = data.is_featured ? 'Retirer accueil' : 'Mettre en accueil';
+                });
+
+                this.showToast(data.message || 'Mise à jour réussie', 'success');
             }
         },
 
         // =========================
-        // PUBLISH TOGGLE
+        // PUBLISH TOGGLE (DOM UPDATE)
         // =========================
         async togglePublish(articleId) {
             const data = await this.request(`/admin/articles/${articleId}/toggle-publish`, {
@@ -362,12 +455,27 @@ function dashboardData() {
             });
 
             if (data?.success) {
-                window.location.reload();
+                // Update status badges in all rows for this article
+                document.querySelectorAll(`[data-article-id="${articleId}"]`).forEach(row => {
+                    const cells = row.querySelectorAll('td');
+                    // Try to find the status cell which contains 'Publié' or 'Brouillon'
+                    cells.forEach(cell => {
+                        const span = cell.querySelector('span');
+                        if (!span) return;
+                        if (span.textContent.includes('Publié') || span.textContent.includes('Brouillon')) {
+                            span.textContent = data.is_published ? 'Publié' : 'Brouillon';
+                            span.className = data.is_published ? 'rounded-full px-2 py-1 text-xs bg-emerald-100 text-emerald-700' : 'rounded-full px-2 py-1 text-xs bg-gray-100 text-gray-600';
+                        }
+                    });
+                });
+
+                this.refreshStats();
+                this.showToast(data.message || 'Statut modifié', 'success');
             }
         },
 
         // =========================
-        // DELETE ARTICLE
+        // DELETE ARTICLE (DOM UPDATE)
         // =========================
         async deleteArticle(articleId) {
             if (!confirm("Confirmer suppression ?")) return;
@@ -377,7 +485,10 @@ function dashboardData() {
             });
 
             if (data?.success) {
-                window.location.reload();
+                document.querySelectorAll(`[data-article-id="${articleId}"]`).forEach(row => row.remove());
+                this.stats.articles_total = Math.max(0, (this.stats.articles_total || 0) - 1);
+                this.refreshStats();
+                this.showToast(data.message || 'Article supprimé', 'success');
             }
         }
     };

@@ -260,14 +260,9 @@
         <!-- Sidebar -->
         <aside
             :class="[
-                'fixed mt-16 flex flex-col lg:mt-0 top-0 px-5 left-0 bg-white dark:bg-gray-900 dark:border-gray-800 text-gray-900 h-screen transition-all duration-300 ease-in-out z-[99999] border-r border-gray-200',
-                {
-                    'lg:w-[290px]': sidebarExpanded || sidebarHovered,
-                    'lg:w-[90px]': !sidebarExpanded && !sidebarHovered,
-                    'translate-x-0 w-[290px]': mobileSidebarOpen,
-                    '-translate-x-full': !mobileSidebarOpen,
-                    'lg:translate-x-0': true,
-                },
+                'fixed left-0 top-0 bottom-0 z-[99999] flex flex-col px-4 py-6 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 transition-all duration-300',
+                (sidebarExpanded || sidebarHovered || mobileSidebarOpen) ? 'w-[260px]' : 'w-[88px]',
+                mobileSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
             ]"
             @mouseenter="!sidebarExpanded && (sidebarHovered = true)"
             @mouseleave="sidebarHovered = false"
@@ -566,7 +561,7 @@
         <!-- Main Content -->
         <div
             class="flex flex-col flex-1 min-h-screen w-full transition-all duration-300 ease-in-out"
-            :class="[sidebarExpanded || sidebarHovered ? 'lg:ml-[290px]' : 'lg:ml-[90px]']"
+            :class="[sidebarExpanded || sidebarHovered ? 'lg:ml-[260px]' : 'lg:ml-[88px]']"
         >
             <!-- Header -->
             <header class="sticky top-0 left-0 right-0 flex w-full bg-white border-gray-200 z-[9999] dark:border-gray-800 dark:bg-gray-900 lg:border-b">

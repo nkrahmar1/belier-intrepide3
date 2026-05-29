@@ -1456,11 +1456,12 @@
 <div class="container">
     <div class="video-container">
         <iframe
-            src="https://www.youtube.com/watch?v=svMwJBv8CBo"
-            title="Vidéo de présentation - Le Bélier Intrépide"
+            src="https://www.youtube.com/embed/svMwJBv8CBo"
+            title="Vidéo PDCI-RDA"
             frameborder="0"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-            allowfullscreen>
+            allowfullscreen
+            style="width: 100%; height: 450px;">
         </iframe>
     </div>
 </div>

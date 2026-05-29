@@ -164,6 +164,12 @@
                         <label for="category_id">Catégorie *</label>
                         <select id="category_id" name="category_id" required>
                             <option value="">-- Sélectionner une catégorie --</option>
+                            <option value="1">Sports</option>
+                            <option value="2">Politiques</option>
+                            <option value="3">Afriques</option>
+                            <option value="4">Culture et Média</option>
+                            <option value="5">Économique</option>
+                            <option value="6">Société</option>
                             <template x-for="cat in categories" :key="cat.id">
                                 <option :value="cat.id" x-text="cat.name"></option>
                             </template>

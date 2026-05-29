@@ -10,8 +10,8 @@
     overflow: hidden;
 ">
     <img src="{{ asset('image/pdci.jpg') }}" alt="PDCI-RDA" style="
-        width: 100px;
-        height: 100px;
+        width: 100vw;
+        height: 400px;
         object-fit: cover;
         display: block;
     ">

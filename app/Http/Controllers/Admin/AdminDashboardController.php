@@ -444,11 +444,17 @@ class AdminDashboardController extends Controller
             $article->published_at = $article->is_published ? now() : null;
             $article->save();
 
-            return response()->json([
-                'success' => true,
-                'message' => $article->is_published ? 'Article publié' : 'Article mis en brouillon',
-                'is_published' => $article->is_published
-            ]);
+            $message = $article->is_published ? 'Article publié' : 'Article mis en brouillon';
+
+            if (request()->ajax()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => $message,
+                    'is_published' => $article->is_published
+                ]);
+            }
+
+            return redirect()->back()->with('success', $message);
 
         } catch (\Exception $e) {
             Log::error('Erreur toggle publish: ' . $e->getMessage());

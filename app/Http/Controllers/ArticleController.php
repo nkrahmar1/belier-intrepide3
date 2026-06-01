@@ -239,8 +239,9 @@ class ArticleController extends Controller
         $category = \App\Models\Category::where('slug', $category)->firstOrFail();
 
         $articles = \App\Models\Article::where('category_id', $category->id)
-                ->latest()
-                ->paginate(12);
+            ->published()
+            ->latest()
+            ->paginate(12);
 
         return view('articles.category', compact('articles', 'category'));
     }

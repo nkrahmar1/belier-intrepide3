@@ -22,15 +22,17 @@ class AdminArticleController extends Controller
 
     public function togglePublish(Article $article)
     {
+        $newStatus = !$article->is_published;
+
         $article->update([
-            'is_published' => !$article->is_published,
-            'published_at' => !$article->is_published ? null : now()
+            'is_published' => $newStatus,
+            'published_at' => $newStatus ? now() : null
         ]);
 
         return response()->json([
             'success' => true,
-            'message' => $article->is_published ? 'Article publié' : 'Article dépublié',
-            'is_published' => $article->is_published
+            'message' => $newStatus ? 'Article publié' : 'Article dépublié',
+            'is_published' => $newStatus
         ]);
     }
 

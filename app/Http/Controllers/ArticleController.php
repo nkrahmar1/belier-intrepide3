@@ -249,7 +249,7 @@ class ArticleController extends Controller
     public function economie()
     {
         $articles = \App\Models\Article::whereHas('category', function($query) {
-            $query->where('name', 'ÉCONOMIE');
+            $query->where('nom', 'ÉCONOMIE');
         })->latest()->paginate(12);
 
         return view('articles.economie', compact('articles'));
@@ -258,7 +258,7 @@ class ArticleController extends Controller
     public function sport()
     {
         $articles = \App\Models\Article::whereHas('category', function($query) {
-            $query->where('name', 'SPORT');
+            $query->where('nom', 'SPORT');
         })->latest()->paginate(12);
 
         return view('articles.sport', compact('articles'));
@@ -267,7 +267,7 @@ class ArticleController extends Controller
     public function politique()
     {
         $articles = \App\Models\Article::whereHas('category', function($query) {
-            $query->where('name', 'POLITIQUE');
+            $query->where('nom', 'POLITIQUE');
         })->latest()->paginate(12);
 
         return view('articles.politique', compact('articles'));

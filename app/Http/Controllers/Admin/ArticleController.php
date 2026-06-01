@@ -361,19 +361,29 @@ class ArticleController extends Controller
 
             Log::info("Article {$article->id} - Statut publication basculé: " . ($newStatus ? 'publié' : 'dépublié'));
 
-            return response()->json([
-                'success' => true,
-                'message' => $newStatus ? 'Article publié avec succès' : 'Article dépublié',
-                'is_published' => $newStatus,
-                'published_at' => $article->published_at ? $article->published_at->format('d/m/Y H:i') : null
-            ]);
+            $message = $newStatus ? 'Article publié avec succès' : 'Article dépublié';
+
+            if (request()->ajax() || request()->wantsJson()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => $message,
+                    'is_published' => $newStatus,
+                    'published_at' => $article->published_at ? $article->published_at->format('d/m/Y H:i') : null
+                ]);
+            }
+
+            return redirect()->back()->with('success', $message);
         } catch (\Exception $e) {
             Log::error("Erreur lors du basculement de publication: " . $e->getMessage());
 
-            return response()->json([
-                'success' => false,
-                'message' => 'Erreur lors de la mise à jour du statut'
-            ], 500);
+            if (request()->ajax() || request()->wantsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Erreur lors de la mise à jour du statut'
+                ], 500);
+            }
+
+            return redirect()->back()->with('error', 'Erreur lors de la mise à jour du statut');
         }
     }
 

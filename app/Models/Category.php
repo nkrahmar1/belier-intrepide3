@@ -15,6 +15,8 @@ class Category extends Model
 
     protected $fillable = ['nom', 'description', 'slug'];
 
+    protected $appends = ['name'];
+
     protected $casts = [
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
@@ -33,6 +35,12 @@ class Category extends Model
     public function products()
     {
         return $this->hasMany(Product::class, 'category_id');
+    }
+
+    // Compatibilité front-end : certains templates utilisent $category->name
+    public function getNameAttribute()
+    {
+        return $this->attributes['nom'] ?? null;
     }
 
     // Scope pour les articles publiés de cette catégorie

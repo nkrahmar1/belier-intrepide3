@@ -119,4 +119,11 @@ class AdminArticleController extends Controller
         
         return Storage::download($article->document_path, $originalName);
     }
+
+    return view('admin.articles.form', [
+    'categories'       => Category::where('actif', 1)->get(),
+    'users'            => User::orderBy('name')->get(),
+    'categoryArticles' => Category::with('articles')->where('actif', 1)->get(),
+    'article'          => $article ?? null,
+]);
 }

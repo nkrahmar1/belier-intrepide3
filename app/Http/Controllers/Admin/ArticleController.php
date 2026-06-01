@@ -110,9 +110,15 @@ class ArticleController extends Controller
         $validated['views_count'] = 0;
         $validated['downloads_count'] = 0;
 
-        // Si publié, mettre la date de publication
+        // ===== GESTION PUBLICATION =====
+        // Si publié: SET published_at = NOW()
+        // Si pas publié: SET published_at = NULL
         if ($validated['is_published']) {
             $validated['published_at'] = now();
+            Log::info("Article à créer avec publication: is_published=1, published_at=" . now());
+        } else {
+            $validated['published_at'] = null;
+            Log::info("Article à créer en brouillon: is_published=0");
         }
 
         $totalStorageBytes = 0;
@@ -255,11 +261,21 @@ class ArticleController extends Controller
         $validated['unit_price'] = isset($validated['unit_price']) ? $validated['unit_price'] : $article->unit_price;
         $validated['free_download_limit'] = isset($validated['free_download_limit']) ? $validated['free_download_limit'] : $article->free_download_limit;
 
-        // Gestion de la publication
+        // ===== GESTION PUBLICATION (UPDATE) =====
+        // Si transition de dépublié → publié: set published_at
+        // Si reste dépublié: set published_at = NULL
         if ($validated['is_published'] && !$article->is_published) {
+            // Passage de brouillon à publié
             $validated['published_at'] = now();
+            Log::info("Article {$article->id} passe à PUBLIÉ: published_at=" . now());
+        } elseif ($validated['is_published'] && $article->is_published && !$article->published_at) {
+            // Était publié mais published_at est NULL: corriger
+            $validated['published_at'] = now();
+            Log::warning("Article {$article->id} était sans published_at: correction appliquée");
         } elseif (!$validated['is_published']) {
+            // Dépublication
             $validated['published_at'] = null;
+            Log::info("Article {$article->id} est DÉPUBLIÉ");
         }
 
         $totalStorageBytes = $article->storage_size ?? 0;

@@ -1,0 +1,39 @@
+; Configuration PHP recommandée pour Bélier Intrepide
+; À placer dans /etc/php/8.2/fpm/conf.d/ ou /etc/php/8.2/apache2/conf.d/
+; Ou utiliser php.ini du répertoire PHP-FPM
+
+; === LIMITES D'UPLOAD ===
+upload_max_filesize = 50M          ; Max taille fichier
+post_max_size = 50M                 ; Max taille POST
+memory_limit = 256M                 ; Mémoire PHP
+max_execution_time = 300            ; Timeout en secondes (5 min)
+default_socket_timeout = 60
+
+; === SÉCURITÉ ===
+expose_php = Off
+disable_functions = exec,passthru,shell_exec,system,proc_open,popen,curl_exec,curl_multi_exec,parse_ini_file,show_source
+allow_url_fopen = Off
+allow_url_include = Off
+
+; === SESSIONS ===
+session.gc_maxlifetime = 86400      ; 24 heures
+session.cookie_secure = On           ; HTTPS only (si en prod)
+session.cookie_httponly = On         ; JS-inaccessible
+session.cookie_samesite = Lax
+
+; === DATABASE ===
+default_charset = "UTF-8"
+pdo_mysql.default_socket = /var/run/mysqld/mysqld.sock
+
+; === LOGGING ===
+error_reporting = E_ALL
+display_errors = Off
+log_errors = On
+error_log = /var/log/php-errors.log
+
+; === PERFORMANCE ===
+opcache.enable = 1
+opcache.memory_consumption = 128
+opcache.max_accelerated_files = 10000
+opcache.validate_timestamps = 1
+opcache.revalidate_freq = 0

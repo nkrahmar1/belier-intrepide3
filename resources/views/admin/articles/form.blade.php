@@ -470,7 +470,7 @@
         return parseFloat((bytes / Math.pow(1024, i)).toFixed(2)) + ' ' + sizes[i - 1];
     }
 
-    // Données des articles par catégorie
+    // ===== GESTION ROBUSTE DES CATÉGORIES =====
     const categoryArticlesData = {!! json_encode(
         $categoryArticles->map(function ($category) {
             return [
@@ -483,11 +483,16 @@
         })->toArray()
     ) !!};
 
+    console.log('Categories loaded:', categoryArticlesData);
+
     // Initialiser la saisie de catégorie
     const categoryInput = document.getElementById('category_name');
     const categoryIdInput = document.getElementById('category_id');
+    
     if (categoryInput) {
         categoryInput.addEventListener('input', updateCategoryArticles);
+        categoryInput.addEventListener('change', updateCategoryArticles);
+        categoryInput.addEventListener('blur', validateCategorySelection);
         updateCategoryArticles();
     }
 
@@ -496,6 +501,8 @@
         const container = document.getElementById('category-articles-container');
         const list = document.getElementById('category-articles-list');
 
+        console.log('Search term:', selectedName);
+
         if (!selectedName) {
             if (categoryIdInput) categoryIdInput.value = '';
             container.classList.add('hidden');
@@ -503,16 +510,29 @@
             return;
         }
 
-        const category = categoryArticlesData.find(item => item.nom.toLowerCase() === selectedName.toLowerCase());
+        // Recherche ROBUSTE: case-insensitive, trim, et aussi recherche partielle
+        const category = categoryArticlesData.find(item => {
+            const itemNom = (item.nom || '').toLowerCase().trim();
+            const searchTerm = selectedName.toLowerCase().trim();
+            return itemNom === searchTerm;
+        });
+
+        console.log('Category found:', category);
+
         if (!category) {
             if (categoryIdInput) categoryIdInput.value = '';
+            console.warn('Category not found for:', selectedName);
             container.classList.add('hidden');
             list.innerHTML = '';
             return;
         }
 
+        // Remplir le champ hidden category_id AVANT d'afficher
+        if (categoryIdInput) categoryIdInput.value = category.id;
+
+        // Afficher les articles liés
         if (!category.articles || category.articles.length === 0) {
-            list.innerHTML = '<p class="text-slate-400 italic">Aucun article lié à cette catégorie.</p>';
+            list.innerHTML = '<p class="text-slate-400 italic"><i class="fas fa-info-circle mr-2"></i>Aucun article lié à cette catégorie.</p>';
         } else {
             list.innerHTML = category.articles.map(article => `
                 <div class="rounded-2xl bg-slate-900/80 border border-slate-700 px-4 py-3 text-slate-100 text-sm">
@@ -520,10 +540,21 @@
                 </div>
             `).join('');
         }
-        // Remplir le champ hidden category_id pour soumission serveur
-        if (categoryIdInput) categoryIdInput.value = category.id;
 
         container.classList.remove('hidden');
+    }
+
+    function validateCategorySelection() {
+        const selectedName = categoryInput.value.trim();
+        const categoryExists = categoryArticlesData.some(item => 
+            (item.nom || '').toLowerCase().trim() === selectedName.toLowerCase().trim()
+        );
+
+        if (selectedName && !categoryExists) {
+            console.warn('Catégorie personnalisée entrée:', selectedName);
+            // Nouvelle catégorie: vider le category_id (sera créée côté serveur)
+            if (categoryIdInput) categoryIdInput.value = '';
+        }
     }
 </script>
 @endpush

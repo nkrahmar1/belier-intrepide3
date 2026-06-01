@@ -78,6 +78,7 @@
                            placeholder="Tapez une catégorie ou choisissez dans la liste"
                            autocomplete="off"
                            required>
+                    <input type="hidden" id="category_id" name="category_id" value="{{ old('category_id', $article->category_id ?? '') }}">
                     <datalist id="category_list">
                         @foreach($categories as $category)
                             <option value="{{ $category->nom ?? $category->name ?? 'Catégorie sans nom' }}"></option>
@@ -484,6 +485,7 @@
 
     // Initialiser la saisie de catégorie
     const categoryInput = document.getElementById('category_name');
+    const categoryIdInput = document.getElementById('category_id');
     if (categoryInput) {
         categoryInput.addEventListener('input', updateCategoryArticles);
         updateCategoryArticles();
@@ -495,6 +497,7 @@
         const list = document.getElementById('category-articles-list');
 
         if (!selectedName) {
+            if (categoryIdInput) categoryIdInput.value = '';
             container.classList.add('hidden');
             list.innerHTML = '';
             return;
@@ -502,6 +505,7 @@
 
         const category = categoryArticlesData.find(item => item.nom.toLowerCase() === selectedName.toLowerCase());
         if (!category) {
+            if (categoryIdInput) categoryIdInput.value = '';
             container.classList.add('hidden');
             list.innerHTML = '';
             return;
@@ -516,6 +520,8 @@
                 </div>
             `).join('');
         }
+        // Remplir le champ hidden category_id pour soumission serveur
+        if (categoryIdInput) categoryIdInput.value = category.id;
 
         container.classList.remove('hidden');
     }

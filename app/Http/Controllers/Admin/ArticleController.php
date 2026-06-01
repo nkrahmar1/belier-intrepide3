@@ -33,7 +33,7 @@ class ArticleController extends Controller
     public function create()
     {
         $categories = Category::all();
-        $categoryArticles = Category::with('articles:id,titre,category_id')->get()->keyBy('id');
+        $categoryArticles = Category::with('articles:id,titre,category_id')->get();
 
         return view('admin.articles.create', compact('categories', 'categoryArticles'));
     }
@@ -44,7 +44,8 @@ class ArticleController extends Controller
             'titre' => 'required|string|max:255|min:3',
             'contenu' => 'required|string|min:10',
             'extrait' => 'nullable|string|max:500',
-            'category_name' => 'required|string|max:100',
+            'category_name' => 'required_without:category_id|string|max:100',
+            'category_id' => 'nullable|integer|exists:categories,id',
             'is_premium' => 'nullable|boolean',
             'is_published' => 'nullable|boolean',
             'is_featured' => 'nullable|boolean',
@@ -70,15 +71,29 @@ class ArticleController extends Controller
             'free_download_limit.integer' => 'Le nombre de téléchargements gratuits doit être un entier.',
         ]);
 
-        $validated['category_name'] = trim($validated['category_name']);
-        $normalizedCategoryName = ucwords(Str::lower($validated['category_name']));
-        $category = Category::whereRaw('LOWER(nom) = ?', [Str::lower($normalizedCategoryName)])->first();
+        // Prioritiser category_id si fourni (rempli par le formulaire via JS)
+        if ($request->filled('category_id')) {
+            $catId = intval($request->input('category_id'));
+            $category = Category::find($catId);
+            // Si l'id fourni est invalide, fallback sur le nom
+            if (!$category) {
+                $validated['category_name'] = trim($validated['category_name']);
+                $normalizedCategoryName = ucwords(Str::lower($validated['category_name']));
+                $category = Category::whereRaw('LOWER(nom) = ?', [Str::lower($normalizedCategoryName)])->first();
+            }
+        } else {
+            $validated['category_name'] = trim($validated['category_name']);
+            $normalizedCategoryName = ucwords(Str::lower($validated['category_name']));
+            $category = Category::whereRaw('LOWER(nom) = ?', [Str::lower($normalizedCategoryName)])->first();
+        }
+
         if (!$category) {
             $category = Category::create([
                 'nom' => $normalizedCategoryName,
                 'slug' => Str::slug($normalizedCategoryName),
             ]);
         }
+
         $validated['category_id'] = $category->id;
         unset($validated['category_name']);
 
@@ -165,7 +180,7 @@ class ArticleController extends Controller
     public function edit(Article $article)
     {
         $categories = Category::all();
-        $categoryArticles = Category::with('articles:id,titre,category_id')->get()->keyBy('id');
+        $categoryArticles = Category::with('articles:id,titre,category_id')->get();
 
         return view('admin.articles.edit', compact('article', 'categories', 'categoryArticles'));
     }
@@ -176,7 +191,8 @@ class ArticleController extends Controller
             'titre' => 'required|string|max:255|min:3',
             'contenu' => 'required|string|min:10',
             'extrait' => 'nullable|string|max:500',
-            'category_name' => 'required|string|max:100',
+            'category_name' => 'required_without:category_id|string|max:100',
+            'category_id' => 'nullable|integer|exists:categories,id',
             'is_premium' => 'boolean',
             'is_published' => 'boolean',
             'is_featured' => 'nullable|boolean',
@@ -202,15 +218,28 @@ class ArticleController extends Controller
             'free_download_limit.integer' => 'Le nombre de téléchargements gratuits doit être un entier.',
         ]);
 
-        $validated['category_name'] = trim($validated['category_name']);
-        $normalizedCategoryName = ucwords(Str::lower($validated['category_name']));
-        $category = Category::whereRaw('LOWER(nom) = ?', [Str::lower($normalizedCategoryName)])->first();
+        // Prioritiser category_id si fourni (rempli par le formulaire via JS)
+        if ($request->filled('category_id')) {
+            $catId = intval($request->input('category_id'));
+            $category = Category::find($catId);
+            if (!$category) {
+                $validated['category_name'] = trim($validated['category_name']);
+                $normalizedCategoryName = ucwords(Str::lower($validated['category_name']));
+                $category = Category::whereRaw('LOWER(nom) = ?', [Str::lower($normalizedCategoryName)])->first();
+            }
+        } else {
+            $validated['category_name'] = trim($validated['category_name']);
+            $normalizedCategoryName = ucwords(Str::lower($validated['category_name']));
+            $category = Category::whereRaw('LOWER(nom) = ?', [Str::lower($normalizedCategoryName)])->first();
+        }
+
         if (!$category) {
             $category = Category::create([
                 'nom' => $normalizedCategoryName,
                 'slug' => Str::slug($normalizedCategoryName),
             ]);
         }
+
         $validated['category_id'] = $category->id;
         unset($validated['category_name']);
 

@@ -418,15 +418,17 @@
         return parseFloat((bytes / Math.pow(1024, i)).toFixed(2)) + ' ' + sizes[i - 1];
     }
 
-    const categoryArticlesData = @json($categories->map(function ($category) {
-        return [
-            'id' => $category->id,
-            'nom' => $category->nom ?? $category->name ?? 'Catégorie sans nom',
-            'articles' => $category->articles->map(function ($article) {
-                return ['id' => $article->id, 'titre' => $article->titre];
-            })->values(),
-        ];
-    }));
+    const categoryArticlesData = {!! json_encode(
+        $categoryArticles->map(function ($category) {
+            return [
+                'id' => $category->id,
+                'nom' => $category->nom ?? $category->name ?? 'Catégorie sans nom',
+                'articles' => $category->articles->map(function ($article) {
+                    return ['id' => $article->id, 'titre' => $article->titre];
+                })->values()->toArray(),
+            ];
+        })->toArray()
+    ) !!};
 
     const categorySelect = document.getElementById('category_id');
     if (categorySelect) {

@@ -32,11 +32,10 @@ class ArticleController extends Controller
 
     public function create()
     {
-        $categories = Category::with(['articles' => function ($query) {
-            $query->select('id', 'titre', 'category_id');
-        }])->get();
+        $categories = Category::all();
+        $categoryArticles = Category::with('articles:id,titre,category_id')->get()->keyBy('id');
 
-        return view('admin.articles.create', compact('categories'));
+        return view('admin.articles.create', compact('categories', 'categoryArticles'));
     }
 
     public function store(Request $request)
@@ -153,11 +152,10 @@ class ArticleController extends Controller
 
     public function edit(Article $article)
     {
-        $categories = Category::with(['articles' => function ($query) {
-            $query->select('id', 'titre', 'category_id');
-        }])->get();
+        $categories = Category::all();
+        $categoryArticles = Category::with('articles:id,titre,category_id')->get()->keyBy('id');
 
-        return view('admin.articles.edit', compact('article', 'categories'));
+        return view('admin.articles.edit', compact('article', 'categories', 'categoryArticles'));
     }
 
     public function update(Request $request, Article $article)

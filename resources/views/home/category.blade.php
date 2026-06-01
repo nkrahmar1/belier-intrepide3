@@ -250,7 +250,7 @@ body {
 
                             <div>
                                 <h5 class="card-title fw-semibold text-dark">{{ $article->titre }}</h5>
-                                <p class="card-subtitle text-muted mb-2">Catégorie : {{ $article->category->name }}</p>
+                                <p class="card-subtitle text-muted mb-2">Catégorie : {{ $article->category->nom }}</p>
 
                                 {{-- Texte avec bouton Lire plus --}}
                                 <p class="card-text text-secondary" style="line-height: 1.6;">

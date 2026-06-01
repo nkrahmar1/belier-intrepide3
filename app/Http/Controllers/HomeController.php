@@ -7,6 +7,7 @@ use App\Models\Category;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 
 class HomeController extends Controller
 {
@@ -137,11 +138,22 @@ class HomeController extends Controller
             $articles = Article::whereHas('category', function($query) {
                 $query->whereIn('nom', ['Society', 'Political']);
             })->published()->latest()->get();
+
+            return view('home.category', compact('articles', 'categorie'));
+        }
+
+        $category = Category::whereRaw('LOWER(nom) = ?', [strtolower($categorie)])
+            ->orWhere('slug', Str::slug($categorie))
+            ->first();
+
+        if (!$category) {
+            $articles = collect();
         } else {
-            // Pour les autres catégories, filtrer par le nom exact
-            $articles = Article::whereHas('category', function($query) use ($categorie) {
-                $query->where('nom', $categorie);
-            })->published()->latest()->get();
+            $articles = Article::where('category_id', $category->id)
+                ->published()
+                ->latest()
+                ->get();
+            $categorie = $category->nom;
         }
 
         return view('home.category', compact('articles', 'categorie'));

@@ -248,34 +248,44 @@ class ArticleController extends Controller
 
     public function economie()
     {
-        $articles = \App\Models\Article::whereHas('category', function($query) {
-            $query->where('nom', 'ÉCONOMIE');
-        })->latest()->paginate(12);
+        $articles = \App\Models\Article::published()
+            ->whereHas('category', function($query) {
+                $query->where('nom', 'ÉCONOMIE');
+            })
+            ->latest()
+            ->paginate(12);
 
         return view('articles.economie', compact('articles'));
     }
 
     public function sport()
     {
-        $articles = \App\Models\Article::whereHas('category', function($query) {
-            $query->where('nom', 'SPORT');
-        })->latest()->paginate(12);
+        $articles = \App\Models\Article::published()
+            ->whereHas('category', function($query) {
+                $query->where('nom', 'SPORT');
+            })
+            ->latest()
+            ->paginate(12);
 
         return view('articles.sport', compact('articles'));
     }
 
     public function politique()
     {
-        $articles = \App\Models\Article::whereHas('category', function($query) {
-            $query->where('nom', 'POLITIQUE');
-        })->latest()->paginate(12);
+        $articles = \App\Models\Article::published()
+            ->whereHas('category', function($query) {
+                $query->where('nom', 'POLITIQUE');
+            })
+            ->latest()
+            ->paginate(12);
 
         return view('articles.politique', compact('articles'));
     }
 
     public function populaires()
     {
-        $articles = \App\Models\Article::orderBy('views_count', 'desc')
+        $articles = \App\Models\Article::published()
+            ->orderBy('views_count', 'desc')
             ->take(10)
             ->get();
 

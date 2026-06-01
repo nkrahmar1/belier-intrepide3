@@ -175,7 +175,7 @@
                             <td class="px-4 py-4 text-slate-300">{{ $article->created_at ? $article->created_at->format('d/m/Y') : 'N/A' }}</td>
                             <td class="px-4 py-4">
                                 <div class="flex flex-wrap gap-2">
-                                    <form action="{{ route('admin.articles.toggle-publish', ['id' => $article->id]) }}" method="POST">
+                                    <form action="{{ route('admin.articles.toggle-publish', ['article' => $article->id]) }}" method="POST">
                                         @csrf
                                         <button type="submit"
                                                 class="btn btn-secondary btn-sm inline-flex items-center gap-2"

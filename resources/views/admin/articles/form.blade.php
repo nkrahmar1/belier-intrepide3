@@ -63,17 +63,27 @@
                             class="w-full rounded-2xl border border-slate-700 bg-slate-950/80 px-4 py-3 text-slate-100 focus:border-cyan-400 focus:ring-2 focus:ring-cyan-300/20"
                             required>
                         <option value="">Sélectionnez une catégorie</option>
-                        @foreach($categories as $category)
+                        @forelse($categories as $category)
                             <option value="{{ $category->id }}"
                                 {{ old('category_id', $article->category_id ?? '') == $category->id ? 'selected' : '' }}>
-                                {{ $category->nom ?? $category->name }}
+                                {{ $category->nom ?? $category->name ?? 'Catégorie sans nom' }}
                             </option>
-                        @endforeach
+                        @empty
+                            <option value="" disabled>Aucune catégorie disponible</option>
+                        @endforelse
                     </select>
                     @error('category_id')
                         <div class="mt-2 text-sm text-rose-400">{{ $message }}</div>
                     @enderror
                     <p class="mt-2 text-sm text-slate-500">Choisissez la catégorie qui correspond le mieux à cet article.</p>
+
+                    <div id="category-articles-container" class="mt-4 hidden rounded-3xl border border-slate-700 bg-slate-950/90 p-4">
+                        <div class="flex items-center gap-2 text-slate-100 mb-3">
+                            <i class="fas fa-link text-cyan-300"></i>
+                            <h3 class="text-sm font-semibold">Articles associés à la catégorie</h3>
+                        </div>
+                        <div id="category-articles-list" class="space-y-2 text-slate-300"></div>
+                    </div>
                 </div>
             </div>
 
@@ -325,22 +335,7 @@
 </div>
 
 @push('scripts')
-<script src="https://cdn.tiny.cloud/1/no-api-key/tinymce/5/tinymce.min.js"></script>
 <script>
-    tinymce.init({
-        selector: '#contenu',
-        height: 500,
-        plugins: [
-            'advlist autolink lists link image charmap print preview anchor',
-            'searchreplace visualblocks code fullscreen',
-            'insertdatetime media table paste code help wordcount'
-        ],
-        toolbar: 'undo redo | formatselect | bold italic backcolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | removeformat | help',
-        content_style: 'body { font-family:Inter, sans-serif; font-size:14px; color:#e2e8f0; background:#0f172a; }',
-        skin: 'oxide-dark',
-        content_css: 'dark'
-    });
-
     function previewImage(input) {
         const file = input.files[0];
         const previewContainer = document.getElementById('image-preview-container');
@@ -421,6 +416,53 @@
         const sizes = ['KB', 'MB', 'GB'];
         const i = Math.floor(Math.log(bytes) / Math.log(1024));
         return parseFloat((bytes / Math.pow(1024, i)).toFixed(2)) + ' ' + sizes[i - 1];
+    }
+
+    const categoryArticlesData = @json($categories->map(function ($category) {
+        return [
+            'id' => $category->id,
+            'nom' => $category->nom ?? $category->name ?? 'Catégorie sans nom',
+            'articles' => $category->articles->map(function ($article) {
+                return ['id' => $article->id, 'titre' => $article->titre];
+            })->values(),
+        ];
+    }));
+
+    const categorySelect = document.getElementById('category_id');
+    if (categorySelect) {
+        categorySelect.addEventListener('change', updateCategoryArticles);
+        updateCategoryArticles();
+    }
+
+    function updateCategoryArticles() {
+        const selectedId = parseInt(categorySelect.value, 10);
+        const container = document.getElementById('category-articles-container');
+        const list = document.getElementById('category-articles-list');
+
+        if (!selectedId) {
+            container.classList.add('hidden');
+            list.innerHTML = '';
+            return;
+        }
+
+        const category = categoryArticlesData.find(item => item.id === selectedId);
+        if (!category) {
+            container.classList.add('hidden');
+            list.innerHTML = '';
+            return;
+        }
+
+        if (!category.articles || category.articles.length === 0) {
+            list.innerHTML = '<p class="text-slate-400">Aucun article lié à cette catégorie.</p>';
+        } else {
+            list.innerHTML = category.articles.map(article => `
+                <div class="rounded-2xl bg-slate-900/80 border border-slate-700 px-4 py-3 text-slate-100">
+                    ${article.titre}
+                </div>
+            `).join('');
+        }
+
+        container.classList.remove('hidden');
     }
 </script>
 @endpush

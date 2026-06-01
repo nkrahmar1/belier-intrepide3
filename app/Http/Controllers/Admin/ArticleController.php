@@ -32,7 +32,10 @@ class ArticleController extends Controller
 
     public function create()
     {
-        $categories = Category::all();
+        $categories = Category::with(['articles' => function ($query) {
+            $query->select('id', 'titre', 'category_id');
+        }])->get();
+
         return view('admin.articles.create', compact('categories'));
     }
 
@@ -150,7 +153,10 @@ class ArticleController extends Controller
 
     public function edit(Article $article)
     {
-        $categories = Category::all();
+        $categories = Category::with(['articles' => function ($query) {
+            $query->select('id', 'titre', 'category_id');
+        }])->get();
+
         return view('admin.articles.edit', compact('article', 'categories'));
     }
 

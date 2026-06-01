@@ -9,6 +9,9 @@ if (!headers_sent()) {
 ini_set('max_execution_time', 300); // 5 minutes
 ini_set('memory_limit', '512M');
 ini_set('max_input_vars', 3000);
+ini_set('post_max_size', '50M');
+ini_set('upload_max_filesize', '50M');
+ini_set('max_input_time', 300);
 
 // Supprimer les avertissements OpenSSL
 ini_set('openssl.cafile', '');

@@ -52,8 +52,8 @@ class ArticleController extends Controller
             'content_quality' => 'nullable|integer|min:0|max:100',
             'unit_price' => 'nullable|numeric|min:0',
             'free_download_limit' => 'nullable|integer|min:0',
-            'document' => 'nullable|file|mimes:pdf,doc,docx,txt,xls,xlsx,ppt,pptx|max:10240', // 10MB max
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048', // 2MB max
+            'document' => 'nullable|file|mimes:pdf,doc,docx,txt,xls,xlsx,ppt,pptx|max:51200', // 50MB max
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:10240', // 10MB max
         ], [
             'titre.required' => 'Le titre est obligatoire.',
             'titre.min' => 'Le titre doit contenir au moins 3 caractères.',
@@ -184,8 +184,8 @@ class ArticleController extends Controller
             'content_quality' => 'nullable|integer|min:0|max:100',
             'unit_price' => 'nullable|numeric|min:0',
             'free_download_limit' => 'nullable|integer|min:0',
-            'document' => 'nullable|file|mimes:pdf,doc,docx,txt,xls,xlsx,ppt,pptx|max:10240',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+            'document' => 'nullable|file|mimes:pdf,doc,docx,txt,xls,xlsx,ppt,pptx|max:51200',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:10240',
         ], [
             'titre.required' => 'Le titre est obligatoire.',
             'titre.min' => 'Le titre doit contenir au moins 3 caractères.',
@@ -524,7 +524,7 @@ class ArticleController extends Controller
     {
         try {
             $request->validate([
-                'image' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:2048'
+                'image' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:10240'
             ]);
 
             if ($request->hasFile('image')) {

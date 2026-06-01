@@ -140,7 +140,7 @@
                     <label for="user_id" class="block text-sm font-semibold text-slate-200 mb-2">
                         Auteur <span class="text-rose-500">*</span>
                     </label>
-                    <select id="user_id"
+                    <!--<select id="user_id"
                             name="user_id"
                             class="w-full rounded-2xl border border-slate-700 bg-slate-950/80 px-4 py-3 text-slate-100 focus:border-cyan-400 focus:ring-2 focus:ring-cyan-300/20"
                             required>
@@ -151,7 +151,8 @@
                                 {{ $user->name }}
                             </option>
                         @endforeach
-                    </select>
+                    </select>--->
+                    <input type="text">
                     @error('user_id')
                         <div class="mt-2 text-sm text-rose-400">{{ $message }}</div>
                     @enderror

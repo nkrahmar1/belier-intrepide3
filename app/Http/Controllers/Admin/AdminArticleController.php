@@ -22,17 +22,15 @@ class AdminArticleController extends Controller
 
     public function togglePublish(Article $article)
     {
-        $newStatus = !$article->is_published;
-
         $article->update([
-            'is_published' => $newStatus,
-            'published_at' => $newStatus ? now() : null
+            'is_published' => !$article->is_published,
+            'published_at' => !$article->is_published ? null : now()
         ]);
 
         return response()->json([
             'success' => true,
-            'message' => $newStatus ? 'Article publié' : 'Article dépublié',
-            'is_published' => $newStatus
+            'message' => $article->is_published ? 'Article publié' : 'Article dépublié',
+            'is_published' => $article->is_published
         ]);
     }
 
@@ -119,11 +117,4 @@ class AdminArticleController extends Controller
         
         return Storage::download($article->document_path, $originalName);
     }
-
-    return view('admin.articles.form', [
-    'categories'       => Category::where('actif', 1)->get(),
-    'users'            => User::orderBy('name')->get(),
-    'categoryArticles' => Category::with('articles')->where('actif', 1)->get(),
-    'article'          => $article ?? null,
-]);
 }

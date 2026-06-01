@@ -44,7 +44,7 @@ class ArticleController extends Controller
             'titre' => 'required|string|max:255|min:3',
             'contenu' => 'required|string|min:10',
             'extrait' => 'nullable|string|max:500',
-            'category_id' => 'required|exists:categories,id',
+            'category_name' => 'required|string|max:100',
             'is_premium' => 'nullable|boolean',
             'is_published' => 'nullable|boolean',
             'is_featured' => 'nullable|boolean',
@@ -59,8 +59,8 @@ class ArticleController extends Controller
             'titre.min' => 'Le titre doit contenir au moins 3 caractères.',
             'contenu.required' => 'Le contenu est obligatoire.',
             'contenu.min' => 'Le contenu doit contenir au moins 10 caractères.',
-            'category_id.required' => 'La catégorie est obligatoire.',
-            'category_id.exists' => 'La catégorie sélectionnée n\'existe pas.',
+            'category_name.required' => 'La catégorie est obligatoire.',
+            'category_name.max' => 'Le nom de catégorie doit contenir au maximum 100 caractères.',
             'image.image' => 'Le fichier doit être une image.',
             'image.max' => 'L\'image ne doit pas dépasser 2MB.',
             'document.mimes' => 'Le document doit être un fichier PDF, DOC, DOCX, TXT, XLS, XLSX, PPT ou PPTX.',
@@ -69,6 +69,18 @@ class ArticleController extends Controller
             'unit_price.numeric' => 'Le prix unitaire doit être un nombre valide.',
             'free_download_limit.integer' => 'Le nombre de téléchargements gratuits doit être un entier.',
         ]);
+
+        $validated['category_name'] = trim($validated['category_name']);
+        $normalizedCategoryName = ucwords(Str::lower($validated['category_name']));
+        $category = Category::whereRaw('LOWER(nom) = ?', [Str::lower($normalizedCategoryName)])->first();
+        if (!$category) {
+            $category = Category::create([
+                'nom' => $normalizedCategoryName,
+                'slug' => Str::slug($normalizedCategoryName),
+            ]);
+        }
+        $validated['category_id'] = $category->id;
+        unset($validated['category_name']);
 
         // Sécurisation et valeurs par défaut
         $validated['user_id'] = Auth::id();
@@ -164,7 +176,7 @@ class ArticleController extends Controller
             'titre' => 'required|string|max:255|min:3',
             'contenu' => 'required|string|min:10',
             'extrait' => 'nullable|string|max:500',
-            'category_id' => 'required|exists:categories,id',
+            'category_name' => 'required|string|max:100',
             'is_premium' => 'boolean',
             'is_published' => 'boolean',
             'is_featured' => 'nullable|boolean',
@@ -179,7 +191,8 @@ class ArticleController extends Controller
             'titre.min' => 'Le titre doit contenir au moins 3 caractères.',
             'contenu.required' => 'Le contenu est obligatoire.',
             'contenu.min' => 'Le contenu doit contenir au moins 10 caractères.',
-            'category_id.required' => 'La catégorie est obligatoire.',
+            'category_name.required' => 'La catégorie est obligatoire.',
+            'category_name.max' => 'Le nom de catégorie doit contenir au maximum 100 caractères.',
             'image.image' => 'Le fichier doit être une image.',
             'image.max' => 'L\'image ne doit pas dépasser 2MB.',
             'document.mimes' => 'Le document doit être un fichier PDF, DOC, DOCX, TXT, XLS, XLSX, PPT ou PPTX.',
@@ -188,6 +201,18 @@ class ArticleController extends Controller
             'unit_price.numeric' => 'Le prix unitaire doit être un nombre valide.',
             'free_download_limit.integer' => 'Le nombre de téléchargements gratuits doit être un entier.',
         ]);
+
+        $validated['category_name'] = trim($validated['category_name']);
+        $normalizedCategoryName = ucwords(Str::lower($validated['category_name']));
+        $category = Category::whereRaw('LOWER(nom) = ?', [Str::lower($normalizedCategoryName)])->first();
+        if (!$category) {
+            $category = Category::create([
+                'nom' => $normalizedCategoryName,
+                'slug' => Str::slug($normalizedCategoryName),
+            ]);
+        }
+        $validated['category_id'] = $category->id;
+        unset($validated['category_name']);
 
         // Mise à jour du slug si le titre a changé
         if ($validated['titre'] !== $article->titre) {

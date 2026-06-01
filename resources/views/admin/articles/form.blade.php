@@ -57,8 +57,8 @@
                 </div>
 
                 <div>
-                    <label for="category_id" class="block text-sm font-semibold text-slate-200 mb-2">Catégorie <span class="text-rose-500">*</span></label>
-                    
+                    <label for="category_name" class="block text-sm font-semibold text-slate-200 mb-2">Catégorie <span class="text-rose-500">*</span></label>
+
                     {{-- Débogage: Affiche le nombre de catégories --}}
                     @if(empty($categories) || count($categories) === 0)
                         <div class="rounded-2xl border border-rose-500/50 bg-rose-900/20 p-3 mb-3">
@@ -69,30 +69,25 @@
                             <p class="text-emerald-300 text-sm"><i class="fas fa-check-circle mr-2"></i> {{ count($categories) }} catégorie(s) disponible(s)</p>
                         </div>
                     @endif
-                    
-                    <select id="category_id"
-                            name="category_id"
-                            class="w-full rounded-2xl border-2 border-cyan-500/50 bg-slate-900/95 px-4 py-3 text-slate-100 font-medium focus:border-cyan-400 focus:ring-2 focus:ring-cyan-300/30 transition-all duration-200 appearance-none cursor-pointer hover:border-cyan-400"
-                            style="background-image: url('data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"%2322d3ee\" stroke-width=\"2\"><polyline points=\"6 9 12 15 18 9\"></polyline></svg>'); background-repeat: no-repeat; background-position: right 0.75rem center; background-size: 1.5em; padding-right: 2.5rem;"
-                            required>
-                        <option value="" style="background-color: #0f172a; color: #cbd5e1;">-- Sélectionnez une catégorie --</option>
-                        
-                        @forelse($categories as $category)
-                            <option value="{{ $category->id }}"
-                                style="background-color: #0f172a; color: #e2e8f0;"
-                                {{ old('category_id', $article->category_id ?? '') == $category->id ? 'selected' : '' }}>
-                                {{ $category->nom ?? $category->name ?? 'Catégorie sans nom' }} (ID: {{ $category->id }})
-                            </option>
-                        @empty
-                            <option value="" disabled style="background-color: #0f172a; color: #64748b;">
-                                ⚠️ Aucune catégorie disponible
-                            </option>
-                        @endforelse
-                    </select>
-                    @error('category_id')
+
+                    <input list="category_list"
+                           id="category_name"
+                           name="category_name"
+                           value="{{ old('category_name', $article->category->nom ?? $article->category->name ?? '') }}"
+                           class="w-full rounded-2xl border-2 border-cyan-500/50 bg-slate-900/95 px-4 py-3 text-slate-100 font-medium focus:border-cyan-400 focus:ring-2 focus:ring-cyan-300/30 transition-all duration-200"
+                           placeholder="Tapez une catégorie ou choisissez dans la liste"
+                           autocomplete="off"
+                           required>
+                    <datalist id="category_list">
+                        @foreach($categories as $category)
+                            <option value="{{ $category->nom ?? $category->name ?? 'Catégorie sans nom' }}"></option>
+                        @endforeach
+                    </datalist>
+
+                    @error('category_name')
                         <div class="mt-2 text-sm text-rose-400 font-semibold">{{ $message }}</div>
                     @enderror
-                    <p class="mt-2 text-sm text-slate-400">Choisissez la catégorie qui correspond le mieux à cet article.</p>
+                    <p class="mt-2 text-sm text-slate-400">Tapez une nouvelle catégorie ou sélectionnez une catégorie existante.</p>
 
                     <div id="category-articles-container" class="mt-4 hidden rounded-3xl border border-slate-700 bg-slate-950/90 p-4">
                         <div class="flex items-center gap-2 text-slate-100 mb-3">
@@ -487,25 +482,25 @@
         })->toArray()
     ) !!};
 
-    // Initialiser la sélection de catégorie
-    const categorySelect = document.getElementById('category_id');
-    if (categorySelect) {
-        categorySelect.addEventListener('change', updateCategoryArticles);
+    // Initialiser la saisie de catégorie
+    const categoryInput = document.getElementById('category_name');
+    if (categoryInput) {
+        categoryInput.addEventListener('input', updateCategoryArticles);
         updateCategoryArticles();
     }
 
     function updateCategoryArticles() {
-        const selectedId = parseInt(categorySelect.value, 10);
+        const selectedName = categoryInput.value.trim();
         const container = document.getElementById('category-articles-container');
         const list = document.getElementById('category-articles-list');
 
-        if (!selectedId) {
+        if (!selectedName) {
             container.classList.add('hidden');
             list.innerHTML = '';
             return;
         }
 
-        const category = categoryArticlesData.find(item => item.id === selectedId);
+        const category = categoryArticlesData.find(item => item.nom.toLowerCase() === selectedName.toLowerCase());
         if (!category) {
             container.classList.add('hidden');
             list.innerHTML = '';
